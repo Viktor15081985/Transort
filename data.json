@@ -36,7 +36,9 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_0": "28.12.2025"
+      },
       "attachments": {},
       "displayId": 3
     },
@@ -45,7 +47,9 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_0": "27.12.2025"
+      },
       "attachments": {},
       "displayId": 4
     },
@@ -54,7 +58,9 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_0": "19.11.2025"
+      },
       "attachments": {},
       "displayId": 5
     },
@@ -63,7 +69,9 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_0": "03.11.2025"
+      },
       "attachments": {},
       "displayId": 6
     }
@@ -181,6 +189,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T17:39:50.457Z",
+  "lastSync": "2025-11-21T17:40:47.422Z",
   "mergeOperation": true
 }
