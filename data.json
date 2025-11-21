@@ -93,7 +93,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Оснопко",
+    "headerTitle": "Персонал",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -163,7 +163,7 @@
   "tabs": [
     {
       "id": "tab1",
-      "name": "Оснопко",
+      "name": "Основное окно",
       "data": [
         {
           "id": 1,
@@ -240,12 +240,42 @@
           "displayId": 6
         }
       ]
+    },
+    {
+      "id": "tab_1763752386171",
+      "name": "Таблица 2",
+      "data": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 1
+        }
+      ]
+    },
+    {
+      "id": "tab_1763752388313",
+      "name": "Таблица 3",
+      "data": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 1
+        }
+      ]
     }
   ],
-  "lastSync": "2025-11-21T19:12:50.352Z",
+  "lastSync": "2025-11-21T19:13:57.612Z",
   "mergeOperation": true,
   "mergedFrom": {
-    "remote": "2025-11-21T19:11:47.585Z",
-    "local": "2025-11-21T19:12:48.762Z"
+    "remote": "2025-11-21T19:12:50.352Z",
+    "local": "2025-11-21T19:13:56.798Z"
   }
 }
