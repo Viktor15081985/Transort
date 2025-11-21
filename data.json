@@ -25,7 +25,9 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_0": "30.11.2025"
+      },
       "attachments": {},
       "displayId": 2
     },
@@ -179,6 +181,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T17:26:55.235Z",
+  "lastSync": "2025-11-21T17:39:50.457Z",
   "mergeOperation": true
 }
