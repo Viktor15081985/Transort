@@ -93,7 +93,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Персонал",
+    "headerTitle": "Оснопко",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -163,17 +163,14 @@
   "tabs": [
     {
       "id": "tab1",
-      "name": "Основное окно",
+      "name": "Оснопко",
       "data": [
         {
           "id": 1,
           "name": "Новый проект",
           "date": "21.11.2025",
           "status": "Активен",
-          "customData": {
-            "col_1763711311027_0": "15.11.2025",
-            "col_1763711311027_1": ""
-          },
+          "customData": {},
           "attachments": {
             "col_1763711311027_1": [
               {
@@ -184,10 +181,71 @@
             ]
           },
           "displayId": 1
+        },
+        {
+          "id": 2,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1763711311027_0": "30.11.2025",
+            "col_1763711311027_1": "1451500"
+          },
+          "attachments": {},
+          "displayId": 2
+        },
+        {
+          "id": 3,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1763711311027_0": "28.12.2025",
+            "col_1763711311027_1": "551515"
+          },
+          "attachments": {},
+          "displayId": 3
+        },
+        {
+          "id": 4,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1763711311027_0": "27.12.2025"
+          },
+          "attachments": {},
+          "displayId": 4
+        },
+        {
+          "id": 5,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1763711311027_0": "19.11.2025"
+          },
+          "attachments": {},
+          "displayId": 5
+        },
+        {
+          "id": 6,
+          "name": "Новый проект",
+          "date": "21.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1763711311027_0": "03.11.2025"
+          },
+          "attachments": {},
+          "displayId": 6
         }
       ]
     }
   ],
-  "lastSync": "2025-11-21T19:11:47.585Z",
-  "mergeOperation": true
+  "lastSync": "2025-11-21T19:12:50.352Z",
+  "mergeOperation": true,
+  "mergedFrom": {
+    "remote": "2025-11-21T19:11:47.585Z",
+    "local": "2025-11-21T19:12:48.762Z"
+  }
 }
