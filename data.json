@@ -5,11 +5,7 @@
       "name": "Новый проект",
       "date": "21.11.2025",
       "status": "Активен",
-      "customData": {
-        "col_1763711311027_0": "15.11.2025",
-        "col_1763711311027_1": "эдесь есть картинка",
-        "col_1763730690931_0": "а здесь нет"
-      },
+      "customData": {},
       "attachments": {
         "col_1763711311027_1": [
           {
@@ -96,7 +92,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Основное окно",
+    "headerTitle": "ц",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -191,6 +187,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T18:50:29.282Z",
+  "lastSync": "2025-11-21T18:51:33.121Z",
   "mergeOperation": true
 }
