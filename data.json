@@ -93,7 +93,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "ц",
+    "headerTitle": "Техника",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -188,6 +188,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T19:06:26.080Z",
+  "lastSync": "2025-11-21T19:07:20.298Z",
   "mergeOperation": true
 }
