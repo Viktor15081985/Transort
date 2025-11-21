@@ -31,6 +31,11 @@
       "username": "user",
       "password": "user",
       "role": "user"
+    },
+    {
+      "username": "1",
+      "password": "1",
+      "role": "user"
     }
   ],
   "appSettings": {
@@ -128,5 +133,7 @@
         }
       ]
     }
-  ]
+  ],
+  "lastSync": "2025-11-21T17:16:52.507Z",
+  "mergeOperation": true
 }
