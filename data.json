@@ -19,6 +19,51 @@
         ]
       },
       "displayId": 1
+    },
+    {
+      "id": 2,
+      "name": "Новый проект",
+      "date": "21.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 2
+    },
+    {
+      "id": 3,
+      "name": "Новый проект",
+      "date": "21.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 3
+    },
+    {
+      "id": 4,
+      "name": "Новый проект",
+      "date": "21.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 4
+    },
+    {
+      "id": 5,
+      "name": "Новый проект",
+      "date": "21.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 5
+    },
+    {
+      "id": 6,
+      "name": "Новый проект",
+      "date": "21.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 6
     }
   ],
   "users": [
@@ -134,6 +179,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T17:16:52.507Z",
+  "lastSync": "2025-11-21T17:26:55.235Z",
   "mergeOperation": true
 }
