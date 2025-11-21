@@ -2295,424 +2295,566 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
-        // GitHub Storage System
-        class GitHubStorage {
-            constructor() {
-                this.owner = 'viktor15081985';
-                this.repo = 'Transort';
-                this.branch = 'main';
-                this.dataFile = 'transport-data.json';
-                this.token = null;
-            }
+    // GitHub Storage System
+    class GitHubStorage {
+        constructor() {
+            this.owner = 'viktor15081985';
+            this.repo = 'Transort';
+            this.branch = 'main';
+            this.dataFile = 'transport-data.json';
+            this.token = null;
+        }
 
-            async init() {
-                this.token = localStorage.getItem('github_token');
-                if (!this.token) {
-                    return null;
-                }
-                return this.loadData();
-            }
+        async init() {
+            this.token = localStorage.getItem('github_token');
+            return this.loadData();
+        }
 
-            async requestToken() {
-                return new Promise((resolve) => {
-                    const token = prompt(
-                        'ВВЕДИТЕ ВАШ GITHUB ТОКЕН:\n\n' +
-                        'Это нужно для синхронизации данных между устройствами.\n' +
-                        'Токен будет сохранен в вашем браузере.',
-                        ''
-                    );
-                    
-                    if (token && token.trim()) {
-                        this.token = token.trim();
-                        localStorage.setItem('github_token', this.token);
-                        this.showMessage('✅ Токен сохранен!', 'success');
-                        resolve();
-                    } else {
-                        this.showMessage('❌ Токен обязателен для работы', 'error');
-                        resolve();
-                    }
-                });
-            }
-
-            async makeGitHubRequest(url, options = {}) {
-                if (!this.token) throw new Error('No token');
-
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    ...options
-                });
-
-                if (response.status === 401) {
-                    localStorage.removeItem('github_token');
-                    this.token = null;
-                    throw new Error('Invalid token');
-                }
+        async requestToken() {
+            return new Promise((resolve) => {
+                const token = prompt(
+                    'ВВЕДИТЕ ВАШ GITHUB ТОКЕН:\n\n' +
+                    'Это нужно для синхронизации данных между устройствами.\n' +
+                    'Токен будет сохранен в вашем браузере.',
+                    ''
+                );
                 
-                if (!response.ok) throw new Error(`Error: ${response.status}`);
-                return response.json();
-            }
-
-            async getFileSHA() {
-                try {
-                    const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
-                    const fileInfo = await this.makeGitHubRequest(url);
-                    return fileInfo.sha;
-                } catch (error) {
-                    return null;
-                }
-            }
-
-            async loadData() {
-                if (this.token) {
-                    try {
-                        const data = await this.loadFromGitHub();
-                        this.saveToLocalStorage(data);
-                        this.showMessage('✅ Данные загружены из облака', 'success');
-                        return data;
-                    } catch (error) {
-                        console.warn('Cloud load failed:', error);
-                    }
-                }
-                return this.loadFromLocalStorage();
-            }
-
-            async loadFromGitHub() {
-                try {
-                    const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
-                    const fileInfo = await this.makeGitHubRequest(url);
-                    const content = atob(fileInfo.content);
-                    return JSON.parse(content);
-                } catch (error) {
-                    if (error.message.includes('404')) {
-                        return this.getDefaultData();
-                    }
-                    throw error;
-                }
-            }
-
-            async saveData(data) {
-                this.saveToLocalStorage(data);
-                
-                if (this.token) {
-                    try {
-                        await this.saveToGitHub(data);
-                        this.showMessage('✅ Данные сохранены в облако', 'success');
-                    } catch (error) {
-                        this.showMessage('⚠️ Данные сохранены локально', 'warning');
-                    }
+                if (token && token.trim()) {
+                    this.token = token.trim();
+                    localStorage.setItem('github_token', this.token);
+                    this.showMessage('✅ Токен сохранен!', 'success');
+                    resolve();
                 } else {
-                    this.showMessage('💾 Данные сохранены локально', 'info');
+                    this.showMessage('❌ Токен обязателен для работы', 'error');
+                    resolve();
                 }
-            }
+            });
+        }
 
-            async saveToGitHub(data) {
-                const sha = await this.getFileSHA();
-                const content = btoa(JSON.stringify(data, null, 2));
-                
-                const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
-                const method = sha ? 'PUT' : 'POST';
-                
-                const body = {
-                    message: `Update: ${new Date().toLocaleString('ru-RU')}`,
-                    content: content,
-                    branch: this.branch
-                };
-                
-                if (sha) body.sha = sha;
-                
-                await this.makeGitHubRequest(url, {
-                    method: method,
-                    body: JSON.stringify(body)
-                });
-            }
+        async makeGitHubRequest(url, options = {}) {
+            if (!this.token) throw new Error('No token');
 
-            saveToLocalStorage(data) {
-                localStorage.setItem('transport_data', JSON.stringify(data));
-                localStorage.setItem('last_save', new Date().toISOString());
-            }
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                ...options
+            });
 
-            loadFromLocalStorage() {
-                const stored = localStorage.getItem('transport_data');
-                if (stored) {
-                    this.showMessage('📱 Данные загружены локально', 'info');
-                    return JSON.parse(stored);
-                }
-                return this.getDefaultData();
-            }
-
-            getDefaultData() {
-                return {
-                    vehicles: [],
-                    drivers: [],
-                    routes: [],
-                    lastUpdate: new Date().toISOString()
-                };
-            }
-
-            showMessage(message, type = 'info') {
-                const statusElement = document.getElementById('sync-status');
-                const statusText = document.getElementById('sync-status-text');
-                
-                if (statusElement && statusText) {
-                    statusElement.className = `sync-status ${type}`;
-                    statusElement.textContent = message;
-                    statusText.textContent = message;
-                    
-                    setTimeout(() => {
-                        statusElement.style.display = 'none';
-                    }, 3000);
-                }
-                
-                console.log(message);
-            }
-
-            async forceSync() {
-                if (!this.token) {
-                    await this.requestToken();
-                }
-                
-                try {
-                    const cloudData = await this.loadFromGitHub();
-                    const localData = this.loadFromLocalStorage();
-                    
-                    const cloudTime = new Date(cloudData.lastUpdate);
-                    const localTime = new Date(localData.lastUpdate);
-                    
-                    if (cloudTime > localTime) {
-                        this.saveToLocalStorage(cloudData);
-                        this.showMessage('✅ Синхронизировано с облаком', 'success');
-                        return cloudData;
-                    } else if (localTime > cloudTime) {
-                        await this.saveToGitHub(localData);
-                        this.showMessage('✅ Локальные данные загружены в облако', 'success');
-                        return localData;
-                    } else {
-                        this.showMessage('✅ Данные актуальны', 'info');
-                        return localData;
-                    }
-                } catch (error) {
-                    this.showMessage('❌ Ошибка синхронизации', 'error');
-                }
-            }
-
-            setToken(token) {
-                this.token = token;
-                localStorage.setItem('github_token', token);
-                this.showMessage('✅ Токен сохранен', 'success');
-            }
-
-            removeToken() {
-                this.token = null;
+            if (response.status === 401) {
                 localStorage.removeItem('github_token');
-                this.showMessage('🗑️ Токен удален', 'info');
+                this.token = null;
+                throw new Error('Invalid token');
+            }
+            
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return response.json();
+        }
+
+        async getFileSHA() {
+            try {
+                const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
+                const fileInfo = await this.makeGitHubRequest(url);
+                return fileInfo.sha;
+            } catch (error) {
+                return null;
             }
         }
 
-        // Основное приложение
-        const githubStorage = new GitHubStorage();
-
-        // Данные пользователей
-        let users = JSON.parse(localStorage.getItem('users')) || [
-            { username: 'admin', password: 'admin', role: 'admin' },
-            { username: 'user', password: 'user', role: 'user' }
-        ];
-
-        // Данные таблицы
-        let tableData = JSON.parse(localStorage.getItem('tableData')) || [
-            { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
-            { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
-            { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
-        ];
-
-        // Настройки приложения
-        let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
-            headerTitle: 'Основное окно',
-            headerLogo: '',
-            fixedColumnsCount: 3,
-            currentTheme: 'theme-orange'
-        };
-
-        // Данные кнопок и столбцов
-        let customButtons = JSON.parse(localStorage.getItem('customButtons')) || [];
-        let customColumns = JSON.parse(localStorage.getItem('customColumns')) || [];
-
-        // Базовые столбцы
-        let basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || [
-            { id: 'id', name: '№ п/п', editable: false },
-            { id: 'name', name: 'Название', editable: true },
-            { id: 'date', name: 'Дата создания', editable: true },
-            { id: 'status', name: 'Статус', editable: true }
-        ];
-
-        // Настройки проверки дат
-        let dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || {};
-
-        // Текущий пользователь и состояние
-        let currentUser = null;
-        let currentEditingCell = null;
-        let isEditingHeader = false;
-        let currentPreviewFile = null;
-        let currentSort = { column: null, direction: 'asc' };
-        let currentFilters = {};
-        let currentDatePicker = null;
-        let currentDateInput = null;
-
-        // Новые переменные для вкладок и поиска
-        let tabs = JSON.parse(localStorage.getItem('tabs')) || [
-            { id: 'tab1', name: 'Основное окно', data: null }
-        ];
-        let currentTabId = 'tab1';
-        let selectedRows = new Set();
-        let searchTerm = '';
-
-        // Данные для импорта
-        let currentImportData = null;
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-
-        async function initializeApp() {
-            setupEventListeners();
-            // Загружаем данные из GitHub если есть токен
-            await githubStorage.init();
-            loadAppSettings();
-            renderTabs();
+        async loadData() {
+            if (this.token) {
+                try {
+                    const data = await this.loadFromGitHub();
+                    this.saveToLocalStorage(data);
+                    this.showMessage('✅ Данные загружены из облака', 'success');
+                    return data;
+                } catch (error) {
+                    console.warn('Cloud load failed:', error);
+                }
+            }
+            return this.loadFromLocalStorage();
         }
 
-        function setupEventListeners() {
-            // Логин
-            document.getElementById('login-form').addEventListener('submit', function(e) {
+        async loadFromGitHub() {
+            try {
+                const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
+                const fileInfo = await this.makeGitHubRequest(url);
+                const content = atob(fileInfo.content);
+                return JSON.parse(content);
+            } catch (error) {
+                if (error.message.includes('404')) {
+                    return this.getDefaultData();
+                }
+                throw error;
+            }
+        }
+
+        async saveData(data) {
+            this.saveToLocalStorage(data);
+            
+            if (this.token) {
+                try {
+                    await this.saveToGitHub(data);
+                    this.showMessage('✅ Данные сохранены в облако', 'success');
+                } catch (error) {
+                    this.showMessage('⚠️ Данные сохранены локально', 'warning');
+                }
+            } else {
+                this.showMessage('💾 Данные сохранены локально', 'info');
+            }
+        }
+
+        async saveToGitHub(data) {
+            const sha = await this.getFileSHA();
+            const content = btoa(JSON.stringify(data, null, 2));
+            
+            const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.dataFile}`;
+            const method = sha ? 'PUT' : 'POST';
+            
+            const body = {
+                message: `Update: ${new Date().toLocaleString('ru-RU')}`,
+                content: content,
+                branch: this.branch
+            };
+            
+            if (sha) body.sha = sha;
+            
+            await this.makeGitHubRequest(url, {
+                method: method,
+                body: JSON.stringify(body)
+            });
+        }
+
+        saveToLocalStorage(data) {
+            localStorage.setItem('transport_data', JSON.stringify(data));
+            localStorage.setItem('last_save', new Date().toISOString());
+        }
+
+        loadFromLocalStorage() {
+            const stored = localStorage.getItem('transport_data');
+            if (stored) {
+                this.showMessage('📱 Данные загружены локально', 'info');
+                return JSON.parse(stored);
+            }
+            return this.getDefaultData();
+        }
+
+        getDefaultData() {
+            return {
+                vehicles: [],
+                drivers: [],
+                routes: [],
+                lastUpdate: new Date().toISOString()
+            };
+        }
+
+        showMessage(message, type = 'info') {
+            const statusElement = document.getElementById('sync-status');
+            const statusText = document.getElementById('sync-status-text');
+            
+            if (statusElement && statusText) {
+                statusElement.className = `sync-status ${type}`;
+                statusElement.textContent = message;
+                statusText.textContent = message;
+                
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 3000);
+            }
+            
+            console.log(message);
+        }
+
+        async forceSync() {
+            if (!this.token) {
+                await this.requestToken();
+            }
+            
+            try {
+                const cloudData = await this.loadFromGitHub();
+                const localData = this.loadFromLocalStorage();
+                
+                const cloudTime = new Date(cloudData.lastUpdate);
+                const localTime = new Date(localData.lastUpdate);
+                
+                if (cloudTime > localTime) {
+                    this.saveToLocalStorage(cloudData);
+                    this.showMessage('✅ Синхронизировано с облаком', 'success');
+                    return cloudData;
+                } else if (localTime > cloudTime) {
+                    await this.saveToGitHub(localData);
+                    this.showMessage('✅ Локальные данные загружены в облако', 'success');
+                    return localData;
+                } else {
+                    this.showMessage('✅ Данные актуальны', 'info');
+                    return localData;
+                }
+            } catch (error) {
+                this.showMessage('❌ Ошибка синхронизации', 'error');
+            }
+        }
+
+        setToken(token) {
+            this.token = token;
+            localStorage.setItem('github_token', token);
+            this.showMessage('✅ Токен сохранен', 'success');
+        }
+
+        removeToken() {
+            this.token = null;
+            localStorage.removeItem('github_token');
+            this.showMessage('🗑️ Токен удален', 'info');
+        }
+    }
+
+    // Основное приложение
+    const githubStorage = new GitHubStorage();
+
+    // Данные пользователей
+    let users = JSON.parse(localStorage.getItem('users')) || [
+        { username: 'admin', password: 'admin', role: 'admin' },
+        { username: 'user', password: 'user', role: 'user' }
+    ];
+
+    // Данные таблицы
+    let tableData = JSON.parse(localStorage.getItem('tableData')) || [
+        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+    ];
+
+    // Настройки приложения
+    let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
+        headerTitle: 'Основное окно',
+        headerLogo: '',
+        fixedColumnsCount: 3,
+        currentTheme: 'theme-orange'
+    };
+
+    // Данные кнопок и столбцов
+    let customButtons = JSON.parse(localStorage.getItem('customButtons')) || [];
+    let customColumns = JSON.parse(localStorage.getItem('customColumns')) || [];
+
+    // Базовые столбцы
+    let basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || [
+        { id: 'id', name: '№ п/п', editable: false },
+        { id: 'name', name: 'Название', editable: true },
+        { id: 'date', name: 'Дата создания', editable: true },
+        { id: 'status', name: 'Статус', editable: true }
+    ];
+
+    // Настройки проверки дат
+    let dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || {};
+
+    // Текущий пользователь и состояние
+    let currentUser = null;
+    let currentEditingCell = null;
+    let isEditingHeader = false;
+    let currentPreviewFile = null;
+    let currentSort = { column: null, direction: 'asc' };
+    let currentFilters = {};
+    let currentDatePicker = null;
+    let currentDateInput = null;
+
+    // Новые переменные для вкладок и поиска
+    let tabs = JSON.parse(localStorage.getItem('tabs')) || [
+        { id: 'tab1', name: 'Основное окно', data: null }
+    ];
+    let currentTabId = 'tab1';
+    let selectedRows = new Set();
+    let searchTerm = '';
+
+    // Данные для импорта
+    let currentImportData = null;
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeApp();
+    });
+
+    function initializeApp() {
+        console.log('Инициализация приложения...');
+        setupEventListeners();
+        loadAppSettings();
+        renderTabs();
+        
+        // Инициализация GitHub Storage (не блокирующая)
+        setTimeout(() => {
+            githubStorage.init().catch(error => {
+                console.log('GitHub Storage инициализация пропущена:', error);
+            });
+        }, 1000);
+    }
+
+    function setupEventListeners() {
+        console.log('Настройка обработчиков событий...');
+        
+        // Логин
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                console.log('Форма входа отправлена');
                 e.preventDefault();
                 handleLogin();
             });
-            
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
-
-            // Основные кнопки
-            document.getElementById('show-all').addEventListener('click', showAllColumns);
-            document.getElementById('add-button').addEventListener('click', () => showModal('add-button-modal'));
-            document.getElementById('manage-users').addEventListener('click', () => showModal('users-modal'));
-            document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
-            document.getElementById('add-row-btn').addEventListener('click', addNewRow);
-
-            // Кнопки синхронизации
-            document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
-            document.getElementById('save-token-btn').addEventListener('click', saveGitHubToken);
-            document.getElementById('remove-token-btn').addEventListener('click', removeGitHubToken);
-            document.getElementById('force-save-btn').addEventListener('click', forceSaveToGitHub);
-            document.getElementById('force-load-btn').addEventListener('click', forceLoadFromGitHub);
-
-            // Новые кнопки управления
-            document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
-            document.getElementById('filter-selected-btn').addEventListener('click', filterSelectedRows);
-            document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
-            document.getElementById('import-excel-btn').addEventListener('click', () => showModal('import-excel-modal'));
-            document.getElementById('table-search').addEventListener('input', handleSearch);
-            document.getElementById('search-clear').addEventListener('click', clearSearch);
-            document.getElementById('select-all-checkbox').addEventListener('change', handleSelectAll);
-
-            // Кнопки прокрутки вкладок
-            document.querySelector('.tabs-scroll-btn.left').addEventListener('click', scrollTabsLeft);
-            document.querySelector('.tabs-scroll-btn.right').addEventListener('click', scrollTabsRight);
-
-            // Кнопки управления столбцами
-            document.getElementById('add-column-btn').addEventListener('click', addNewColumn);
-            document.getElementById('remove-column-btn').addEventListener('click', showRemoveColumnModal);
-            document.getElementById('fixed-columns-count').addEventListener('change', updateFixedColumnsCount);
-
-            // Удаление столбца
-            document.getElementById('confirm-remove-column').addEventListener('click', removeSelectedColumn);
-
-            // Импорт Excel
-            document.getElementById('excel-upload-area').addEventListener('click', function() {
-                document.getElementById('excel-file-input').click();
-            });
-            document.getElementById('excel-file-input').addEventListener('change', handleExcelFileSelect);
-            document.getElementById('confirm-import-btn').addEventListener('click', confirmImport);
-            document.getElementById('cancel-import-btn').addEventListener('click', () => {
-                document.getElementById('import-excel-modal').style.display = 'none';
-            });
-
-            // Модальные окна
-            document.querySelectorAll('.close').forEach(close => {
-                close.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
-                });
-            });
-
-            // Формы
-            document.getElementById('add-button-form').addEventListener('submit', handleAddButton);
-            document.getElementById('add-user-form').addEventListener('submit', handleAddUser);
-            document.getElementById('column-count').addEventListener('change', generateColumnInputs);
-            document.getElementById('save-cell-btn').addEventListener('click', saveCellChanges);
-
-            // Кнопки предпросмотра
-            document.getElementById('download-preview-btn').addEventListener('click', downloadPreviewFile);
-            document.getElementById('copy-preview-btn').addEventListener('click', copyPreviewFile);
-            document.getElementById('print-preview-btn').addEventListener('click', printPreviewFile);
-
-            // Работа с файлами
-            const fileUploadArea = document.getElementById('file-upload-area');
-            const fileInput = document.getElementById('file-input');
-            
-            fileUploadArea.addEventListener('click', function() {
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', function(e) {
-                handleFileUpload(e.target.files);
-            });
-
-            setupFileDropZone();
-
-            // Логотип
-            document.getElementById('header-logo').addEventListener('click', triggerLogoUpload);
-            document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
-
-            // Закрытие фильтров при клике вне их
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.filter-dropdown') && !e.target.closest('.filter-btn')) {
-                    closeAllFilterDropdowns();
-                }
-                if (!e.target.closest('.date-picker') && !e.target.classList.contains('date-cell')) {
-                    closeDatePicker();
-                }
-                if (!e.target.closest('.date-input-overlay') && currentDateInput) {
-                    closeDateInput();
-                }
-            });
-
-            // Исправление проблемы с прокруткой фильтра
-            document.addEventListener('mousedown', function(e) {
-                if (e.target.closest('.filter-options')) {
-                    e.stopPropagation();
-                }
-            });
+        } else {
+            console.error('Форма входа не найдена!');
         }
+        
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
-        // ФУНКЦИИ СИНХРОНИЗАЦИИ
-        async function saveGitHubToken() {
-            const token = document.getElementById('github-token').value.trim();
-            if (token) {
-                githubStorage.setToken(token);
-                document.getElementById('github-sync-modal').style.display = 'none';
-            } else {
-                alert('Введите токен');
+        // Основные кнопки
+        document.getElementById('show-all').addEventListener('click', showAllColumns);
+        document.getElementById('add-button').addEventListener('click', () => showModal('add-button-modal'));
+        document.getElementById('manage-users').addEventListener('click', () => showModal('users-modal'));
+        document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
+        document.getElementById('add-row-btn').addEventListener('click', addNewRow);
+
+        // Кнопки синхронизации
+        document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
+        document.getElementById('save-token-btn').addEventListener('click', saveGitHubToken);
+        document.getElementById('remove-token-btn').addEventListener('click', removeGitHubToken);
+        document.getElementById('force-save-btn').addEventListener('click', forceSaveToGitHub);
+        document.getElementById('force-load-btn').addEventListener('click', forceLoadFromGitHub);
+
+        // Новые кнопки управления
+        document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
+        document.getElementById('filter-selected-btn').addEventListener('click', filterSelectedRows);
+        document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+        document.getElementById('import-excel-btn').addEventListener('click', () => showModal('import-excel-modal'));
+        document.getElementById('table-search').addEventListener('input', handleSearch);
+        document.getElementById('search-clear').addEventListener('click', clearSearch);
+        document.getElementById('select-all-checkbox').addEventListener('change', handleSelectAll);
+
+        // Кнопки прокрутки вкладок
+        document.querySelector('.tabs-scroll-btn.left').addEventListener('click', scrollTabsLeft);
+        document.querySelector('.tabs-scroll-btn.right').addEventListener('click', scrollTabsRight);
+
+        // Кнопки управления столбцами
+        document.getElementById('add-column-btn').addEventListener('click', addNewColumn);
+        document.getElementById('remove-column-btn').addEventListener('click', showRemoveColumnModal);
+        document.getElementById('fixed-columns-count').addEventListener('change', updateFixedColumnsCount);
+
+        // Удаление столбца
+        document.getElementById('confirm-remove-column').addEventListener('click', removeSelectedColumn);
+
+        // Импорт Excel
+        document.getElementById('excel-upload-area').addEventListener('click', function() {
+            document.getElementById('excel-file-input').click();
+        });
+        document.getElementById('excel-file-input').addEventListener('change', handleExcelFileSelect);
+        document.getElementById('confirm-import-btn').addEventListener('click', confirmImport);
+        document.getElementById('cancel-import-btn').addEventListener('click', () => {
+            document.getElementById('import-excel-modal').style.display = 'none';
+        });
+
+        // Модальные окна
+        document.querySelectorAll('.close').forEach(close => {
+            close.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+
+        // Формы
+        document.getElementById('add-button-form').addEventListener('submit', handleAddButton);
+        document.getElementById('add-user-form').addEventListener('submit', handleAddUser);
+        document.getElementById('column-count').addEventListener('change', generateColumnInputs);
+        document.getElementById('save-cell-btn').addEventListener('click', saveCellChanges);
+
+        // Кнопки предпросмотра
+        document.getElementById('download-preview-btn').addEventListener('click', downloadPreviewFile);
+        document.getElementById('copy-preview-btn').addEventListener('click', copyPreviewFile);
+        document.getElementById('print-preview-btn').addEventListener('click', printPreviewFile);
+
+        // Работа с файлами
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const fileInput = document.getElementById('file-input');
+        
+        fileUploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            handleFileUpload(e.target.files);
+        });
+
+        setupFileDropZone();
+
+        // Логотип
+        document.getElementById('header-logo').addEventListener('click', triggerLogoUpload);
+        document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
+
+        // Закрытие фильтров при клике вне их
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.filter-dropdown') && !e.target.closest('.filter-btn')) {
+                closeAllFilterDropdowns();
             }
-        }
+            if (!e.target.closest('.date-picker') && !e.target.classList.contains('date-cell')) {
+                closeDatePicker();
+            }
+            if (!e.target.closest('.date-input-overlay') && currentDateInput) {
+                closeDateInput();
+            }
+        });
 
-        function removeGitHubToken() {
-            githubStorage.removeToken();
-            document.getElementById('github-token').value = '';
-        }
+        // Исправление проблемы с прокруткой фильтра
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.closest('.filter-options')) {
+                e.stopPropagation();
+            }
+        });
+        
+        console.log('Все обработчики событий настроены');
+    }
 
-        async function forceSaveToGitHub() {
+    // ФУНКЦИЯ ВХОДА В СИСТЕМУ
+    function handleLogin() {
+        console.log('Обработка входа...');
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        console.log('Введенные данные:', { username, password });
+        console.log('Доступные пользователи:', users);
+
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            console.log('Пользователь найден:', user);
+            currentUser = user;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'flex';
+            document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
+            document.getElementById('user-name-display').textContent = user.username;
+            
+            if (user.role === 'admin') {
+                document.body.classList.add('admin');
+                setupAdminFeatures();
+            }
+            
+            loadCustomButtons();
+            renderTable();
+            
+            setTimeout(() => {
+                checkAllDates();
+            }, 1000);
+            
+            console.log('Вход выполнен успешно');
+        } else {
+            console.log('Пользователь не найден');
+            alert('Неверное имя пользователя или пароль');
+        }
+    }
+
+    function handleLogout() {
+        currentUser = null;
+        document.getElementById('main-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        document.body.classList.remove('admin');
+        
+        // Очищаем поля ввода
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+
+    // ФУНКЦИИ СИНХРОНИЗАЦИИ
+    async function saveGitHubToken() {
+        const token = document.getElementById('github-token').value.trim();
+        if (token) {
+            githubStorage.setToken(token);
+            document.getElementById('github-sync-modal').style.display = 'none';
+        } else {
+            alert('Введите токен');
+        }
+    }
+
+    function removeGitHubToken() {
+        githubStorage.removeToken();
+        document.getElementById('github-token').value = '';
+    }
+
+    async function forceSaveToGitHub() {
+        const allData = {
+            tableData,
+            customButtons,
+            customColumns,
+            dateValidationColumns,
+            tabs,
+            appSettings,
+            users,
+            lastUpdate: new Date().toISOString()
+        };
+        
+        await githubStorage.saveData(allData);
+    }
+
+    async function forceLoadFromGitHub() {
+        const data = await githubStorage.forceSync();
+        if (data) {
+            // Обновляем все данные из облака
+            tableData = data.tableData || tableData;
+            customButtons = data.customButtons || customButtons;
+            customColumns = data.customColumns || customColumns;
+            dateValidationColumns = data.dateValidationColumns || dateValidationColumns;
+            tabs = data.tabs || tabs;
+            appSettings = data.appSettings || appSettings;
+            users = data.users || users;
+
+            // Сохраняем в localStorage
+            saveAllData();
+            
+            // Перерисовываем интерфейс
+            renderTabs();
+            renderTable();
+            loadCustomButtons();
+            loadAppSettings();
+        }
+    }
+
+    function saveAllData() {
+        localStorage.setItem('tableData', JSON.stringify(tableData));
+        localStorage.setItem('customButtons', JSON.stringify(customButtons));
+        localStorage.setItem('customColumns', JSON.stringify(customColumns));
+        localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function setupAdminFeatures() {
+        const headerTitle = document.getElementById('header-title');
+        headerTitle.classList.add('editable');
+        headerTitle.contentEditable = 'true';
+        headerTitle.addEventListener('blur', function() {
+            appSettings.headerTitle = this.textContent;
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+        });
+        
+        headerTitle.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+
+        document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+    }
+
+    function loadAppSettings() {
+        document.getElementById('header-title').textContent = appSettings.headerTitle;
+        if (appSettings.headerLogo) {
+            document.getElementById('header-logo').src = appSettings.headerLogo;
+            document.getElementById('header-logo').style.display = 'block';
+        }
+        document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+    }
+
+    // Автоматически сохраняем данные при изменении
+    function autoSave() {
+        saveAllData();
+        
+        // Если есть токен GitHub, сохраняем и в облако
+        if (githubStorage.token) {
             const allData = {
                 tableData,
                 customButtons,
@@ -2724,99 +2866,610 @@
                 lastUpdate: new Date().toISOString()
             };
             
-            await githubStorage.saveData(allData);
+            githubStorage.saveData(allData).catch(error => {
+                console.warn('Auto-save to GitHub failed:', error);
+            });
+        }
+    }
+
+    // Вызываем autoSave при различных событиях
+    function setupAutoSave() {
+        // Сохраняем при изменении данных таблицы
+        const originalDeleteRow = window.deleteRow;
+        window.deleteRow = function(rowId) {
+            if (originalDeleteRow) originalDeleteRow(rowId);
+            autoSave();
+        };
+
+        // Сохраняем при добавлении строки
+        const originalAddNewRow = window.addNewRow;
+        window.addNewRow = function() {
+            if (originalAddNewRow) originalAddNewRow();
+            autoSave();
+        };
+
+        // Сохраняем при редактировании ячейки
+        const originalSaveCellChanges = window.saveCellChanges;
+        window.saveCellChanges = function() {
+            if (originalSaveCellChanges) originalSaveCellChanges();
+            autoSave();
+        };
+    }
+
+    // Инициализируем автосохранение после загрузки
+    setTimeout(setupAutoSave, 1000);
+
+    // ОСТАЛЬНЫЕ ФУНКЦИИ ВАШЕГО ПРИЛОЖЕНИЯ (без изменений)
+    // ... все остальные функции из вашего оригинального кода ...
+    
+    // ФУНКЦИИ ПРОКРУТКИ ВКЛАДОК
+    function scrollTabsLeft() {
+        const container = document.getElementById('tabs-container');
+        container.scrollBy({
+            left: -200,
+            behavior: 'smooth'
+        });
+    }
+
+    function scrollTabsRight() {
+        const container = document.getElementById('tabs-container');
+        container.scrollBy({
+            left: 200,
+            behavior: 'smooth'
+        });
+    }
+
+    function updateFixedColumnsCount() {
+        const count = parseInt(document.getElementById('fixed-columns-count').value);
+        if (count >= 1 && count <= 10) {
+            appSettings.fixedColumnsCount = count;
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+        }
+    }
+
+    // ФУНКЦИИ УПРАВЛЕНИЯ СТОЛБЦАМИ
+    function addNewColumn() {
+        const columnName = prompt('Введите название нового столбца:');
+        if (!columnName) return;
+
+        const columnId = 'col_' + Date.now();
+        customColumns.push({
+            id: columnId,
+            name: columnName
+        });
+
+        // Добавляем столбец во все строки
+        tableData.forEach(row => {
+            if (!row.customData) row.customData = {};
+            row.customData[columnId] = '';
+        });
+
+        localStorage.setItem('customColumns', JSON.stringify(customColumns));
+        localStorage.setItem('tableData', JSON.stringify(tableData));
+        
+        renderTable();
+    }
+
+    function showRemoveColumnModal() {
+        const select = document.getElementById('column-to-remove');
+        select.innerHTML = '';
+
+        // Добавляем только кастомные столбцы (базовые нельзя удалять)
+        customColumns.forEach(column => {
+            const option = document.createElement('option');
+            option.value = column.id;
+            option.textContent = column.name;
+            select.appendChild(option);
+        });
+
+        if (customColumns.length === 0) {
+            const option = document.createElement('option');
+            option.textContent = 'Нет пользовательских столбцов для удаления';
+            option.disabled = true;
+            select.appendChild(option);
+            document.getElementById('confirm-remove-column').disabled = true;
+        } else {
+            document.getElementById('confirm-remove-column').disabled = false;
         }
 
-        async function forceLoadFromGitHub() {
-            const data = await githubStorage.forceSync();
-            if (data) {
-                // Обновляем все данные из облака
-                tableData = data.tableData || tableData;
-                customButtons = data.customButtons || customButtons;
-                customColumns = data.customColumns || customColumns;
-                dateValidationColumns = data.dateValidationColumns || dateValidationColumns;
-                tabs = data.tabs || tabs;
-                appSettings = data.appSettings || appSettings;
-                users = data.users || users;
+        document.getElementById('remove-column-modal').style.display = 'flex';
+    }
 
-                // Сохраняем в localStorage
-                saveAllData();
+    function removeSelectedColumn() {
+        const select = document.getElementById('column-to-remove');
+        const columnId = select.value;
+
+        if (!columnId) return;
+
+        const column = customColumns.find(col => col.id === columnId);
+        if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
+
+        // Удаляем столбец из всех строк
+        tableData.forEach(row => {
+            if (row.customData && row.customData[columnId]) {
+                delete row.customData[columnId];
+            }
+        });
+
+        // Удаляем столбец из customColumns
+        customColumns = customColumns.filter(col => col.id !== columnId);
+        localStorage.setItem('customColumns', JSON.stringify(customColumns));
+        localStorage.setItem('tableData', JSON.stringify(tableData));
+
+        renderTable();
+        document.getElementById('remove-column-modal').style.display = 'none';
+        
+        alert(`Столбец "${column.name}" успешно удален!`);
+    }
+
+    // ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
+    function handleExcelFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (typeof XLSX === 'undefined') {
+            alert('Библиотека для чтения Excel файлов загружается. Попробуйте еще раз через несколько секунд.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
                 
-                // Перерисовываем интерфейс
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
-                loadAppSettings();
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                
+                showImportPreview(jsonData);
+            } catch (error) {
+                alert('Ошибка при чтении файла: ' + error.message);
+            }
+        };
+        reader.onerror = function() {
+            alert('Ошибка при чтении файла');
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function showImportPreview(data) {
+        const previewContainer = document.getElementById('import-preview');
+        const previewTable = document.getElementById('import-preview-table');
+        const confirmBtn = document.getElementById('confirm-import-btn');
+        
+        previewTable.innerHTML = '';
+        
+        if (data.length === 0) {
+            previewContainer.style.display = 'none';
+            confirmBtn.style.display = 'none';
+            return;
+        }
+        
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const headers = data[0];
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header || 'Столбец';
+            th.style.textAlign = 'center';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        previewTable.appendChild(thead);
+        
+        const tbody = document.createElement('tbody');
+        const rowsToShow = Math.min(5, data.length - 1);
+        
+        for (let i = 1; i <= rowsToShow; i++) {
+            const row = document.createElement('tr');
+            if (data[i]) {
+                data[i].forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
             }
         }
+        
+        previewTable.appendChild(tbody);
+        previewContainer.style.display = 'block';
+        confirmBtn.style.display = 'block';
+        
+        currentImportData = data;
+    }
 
-        function saveAllData() {
-            localStorage.setItem('tableData', JSON.stringify(tableData));
-            localStorage.setItem('customButtons', JSON.stringify(customButtons));
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
-            localStorage.setItem('tabs', JSON.stringify(tabs));
-            localStorage.setItem('appSettings', JSON.stringify(appSettings));
-            localStorage.setItem('users', JSON.stringify(users));
+    function confirmImport() {
+        if (!currentImportData || currentImportData.length < 2) {
+            alert('Нет данных для импорта');
+            return;
         }
-
-        // ОСТАЛЬНЫЕ ФУНКЦИИ ВАШЕГО ПРИЛОЖЕНИЯ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ
-        // (все функции из вашего оригинального кода)
-
-        // ... остальной код вашего приложения ...
-
-        // В КОНЦЕ СКРИПТА ДОБАВЬТЕ:
-        // Автоматически сохраняем данные при изменении
-        function autoSave() {
-            saveAllData();
-            
-            // Если есть токен GitHub, сохраняем и в облако
-            if (githubStorage.token) {
-                const allData = {
-                    tableData,
-                    customButtons,
-                    customColumns,
-                    dateValidationColumns,
-                    tabs,
-                    appSettings,
-                    users,
-                    lastUpdate: new Date().toISOString()
+        
+        const importMode = document.getElementById('import-mode').value;
+        const headers = currentImportData[0];
+        const rows = currentImportData.slice(1);
+        
+        if (importMode === 'replace') {
+            tableData = [];
+        }
+        
+        let nextId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
+        
+        rows.forEach(row => {
+            if (row && row.length > 0) {
+                const newRow = {
+                    id: nextId++,
+                    name: row[0] || 'Новый проект',
+                    date: row[1] || formatDate(new Date()),
+                    status: row[2] || 'Активен',
+                    customData: {},
+                    attachments: {}
                 };
                 
-                githubStorage.saveData(allData).catch(error => {
-                    console.warn('Auto-save to GitHub failed:', error);
+                for (let i = 3; i < headers.length; i++) {
+                    if (headers[i]) {
+                        const columnName = headers[i];
+                        const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
+                        
+                        if (!customColumns.find(col => col.name === columnName)) {
+                            customColumns.push({
+                                id: columnId,
+                                name: columnName
+                            });
+                        }
+                        
+                        newRow.customData[columnId] = row[i] || '';
+                    }
+                }
+                
+                tableData.push(newRow);
+            }
+        });
+        
+        const currentTab = tabs.find(tab => tab.id === currentTabId);
+        if (currentTab) {
+            currentTab.data = JSON.parse(JSON.stringify(tableData));
+            localStorage.setItem('tabs', JSON.stringify(tabs));
+        }
+        
+        if (currentTabId === 'tab1') {
+            localStorage.setItem('tableData', JSON.stringify(tableData));
+        }
+        
+        localStorage.setItem('customColumns', JSON.stringify(customColumns));
+        
+        renderTable();
+        document.getElementById('import-excel-modal').style.display = 'none';
+        alert(`Успешно импортировано ${rows.length} строк`);
+        
+        currentImportData = null;
+        document.getElementById('excel-file-input').value = '';
+        document.getElementById('import-preview').style.display = 'none';
+        document.getElementById('confirm-import-btn').style.display = 'none';
+    }
+
+    // НОВЫЕ ФУНКЦИИ ДЛЯ ВКЛАДОК
+    function renderTabs() {
+        const container = document.getElementById('tabs-container');
+        container.innerHTML = '';
+        
+        tabs.forEach(tab => {
+            const tabElement = document.createElement('div');
+            tabElement.className = `tab ${tab.id === currentTabId ? 'active' : ''}`;
+            tabElement.dataset.tabId = tab.id;
+            
+            const tabName = document.createElement('span');
+            tabName.textContent = tab.name;
+            tabName.className = 'tab-name';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'tab-close';
+            closeBtn.innerHTML = '×';
+            closeBtn.title = 'Закрыть вкладку';
+            
+            // Скрываем крестик закрытия вкладки для пользователей
+            if (currentUser && currentUser.role !== 'admin') {
+                closeBtn.style.display = 'none';
+            } else if (tabs.length > 1) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
                 });
+            } else {
+                closeBtn.style.display = 'none';
+            }
+            
+            tabElement.appendChild(tabName);
+            tabElement.appendChild(closeBtn);
+            
+            tabElement.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('tab-close')) {
+                    switchTab(tab.id);
+                }
+            });
+
+            if (currentUser && currentUser.role === 'admin') {
+                tabName.classList.add('editable');
+                tabName.contentEditable = 'true';
+                
+                tabName.addEventListener('blur', function() {
+                    const newName = this.textContent.trim();
+                    if (newName && newName !== tab.name) {
+                        tab.name = newName;
+                        localStorage.setItem('tabs', JSON.stringify(tabs));
+                        
+                        if (tab.id === currentTabId) {
+                            document.getElementById('header-title').textContent = newName;
+                            appSettings.headerTitle = newName;
+                            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+                        }
+                    } else {
+                        this.textContent = tab.name;
+                    }
+                });
+                
+                tabName.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            }
+            
+            container.appendChild(tabElement);
+        });
+        
+        if (currentTabId && currentTabId !== 'tab1') {
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab && currentTab.data) {
+                tableData = currentTab.data;
+                renderTable();
             }
         }
 
-        // Вызываем autoSave при различных событиях
-        function setupAutoSave() {
-            // Сохраняем при изменении данных таблицы
-            const originalDeleteRow = window.deleteRow;
-            window.deleteRow = function(rowId) {
-                originalDeleteRow(rowId);
-                autoSave();
-            };
+        const currentTab = tabs.find(tab => tab.id === currentTabId);
+        if (currentTab) {
+            document.getElementById('header-title').textContent = currentTab.name;
+        }
+    }
 
-            // Сохраняем при добавлении строки
-            const originalAddNewRow = window.addNewRow;
-            window.addNewRow = function() {
-                originalAddNewRow();
-                autoSave();
-            };
-
-            // Сохраняем при редактировании ячейки
-            const originalSaveCellChanges = window.saveCellChanges;
-            window.saveCellChanges = function() {
-                originalSaveCellChanges();
-                autoSave();
-            };
-
-            // Добавьте аналогичные перехватчики для других функций, изменяющих данные
+    function createNewTab() {
+        if (currentUser.role !== 'admin') {
+            alert('Только администраторы могут создавать новые вкладки');
+            return;
         }
 
-        // Инициализируем автосохранение после загрузки
-        setTimeout(setupAutoSave, 1000);
-    </script>
+        const tabId = 'tab_' + Date.now();
+        const tabName = `Таблица ${tabs.length + 1}`;
+        
+        const currentTab = tabs.find(tab => tab.id === currentTabId);
+        if (currentTab) {
+            currentTab.data = JSON.parse(JSON.stringify(tableData));
+        }
+        
+        const newTab = {
+            id: tabId,
+            name: tabName,
+            data: [
+                { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
+            ]
+        };
+        
+        tabs.push(newTab);
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+        
+        currentTabId = tabId;
+        tableData = JSON.parse(JSON.stringify(newTab.data));
+        
+        renderTabs();
+        renderTable();
+        resetFiltersAndSearch();
+    }
+
+    function switchTab(tabId) {
+        const currentTab = tabs.find(tab => tab.id === currentTabId);
+        if (currentTab) {
+            currentTab.data = JSON.parse(JSON.stringify(tableData));
+        }
+        
+        currentTabId = tabId;
+        const newTab = tabs.find(tab => tab.id === tabId);
+        
+        if (newTab && newTab.data) {
+            tableData = JSON.parse(JSON.stringify(newTab.data));
+        } else {
+            if (tabId === 'tab1') {
+                tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                    { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                    { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                    { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                ];
+            }
+        }
+        
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+        renderTabs();
+        renderTable();
+        resetFiltersAndSearch();
+    }
+
+    function closeTab(tabId) {
+        if (currentUser.role !== 'admin') {
+            alert('Только администраторы могут удалять вкладки');
+            return;
+        }
+
+        if (tabs.length <= 1) return;
+        
+        const tabIndex = tabs.findIndex(tab => tab.id === tabId);
+        if (tabIndex === -1) return;
+        
+        tabs.splice(tabIndex, 1);
+        
+        if (tabId === currentTabId) {
+            currentTabId = tabs[0].id;
+            const firstTab = tabs[0];
+            
+            if (firstTab.data) {
+                tableData = JSON.parse(JSON.stringify(firstTab.data));
+            } else if (firstTab.id === 'tab1') {
+                tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                    { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                    { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                    { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                ];
+            }
+        }
+        
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+        renderTabs();
+        renderTable();
+    }
+
+    function resetFiltersAndSearch() {
+        currentFilters = {};
+        searchTerm = '';
+        selectedRows.clear();
+        document.getElementById('table-search').value = '';
+        document.getElementById('select-all-checkbox').checked = false;
+        closeAllFilterDropdowns();
+    }
+
+    // ФУНКЦИИ ДЛЯ ЧЕКБОКСОВ И ФИЛЬТРАЦИИ
+    function handleSelectAll(e) {
+        const isChecked = e.target.checked;
+        
+        if (isChecked) {
+            currentFilters = {};
+            searchTerm = '';
+            selectedRows.clear();
+            document.getElementById('table-search').value = '';
+            closeAllFilterDropdowns();
+            renderTable();
+        }
+    }
+
+    function handleRowCheckboxChange(rowId, isChecked) {
+        if (isChecked) {
+            selectedRows.add(rowId);
+        } else {
+            selectedRows.delete(rowId);
+        }
+    }
+
+    function filterSelectedRows() {
+        if (selectedRows.size === 0) {
+            alert('Выберите строки для фильтрации!');
+            return;
+        }
+        
+        currentFilters.selectedRows = Array.from(selectedRows);
+        renderTable();
+    }
+
+    // ФУНКЦИЯ ПОИСКА
+    function handleSearch(e) {
+        searchTerm = e.target.value.toLowerCase().trim();
+        renderTable();
+    }
+
+    function clearSearch() {
+        document.getElementById('table-search').value = '';
+        searchTerm = '';
+        renderTable();
+    }
+
+    function applySearch(data) {
+        if (!searchTerm) return data;
+        
+        return data.filter(row => {
+            const searchableFields = [
+                row.id.toString(),
+                row.name || '',
+                row.date || '',
+                row.status || ''
+            ];
+            
+            if (row.customData) {
+                Object.values(row.customData).forEach(value => {
+                    searchableFields.push(value.toString());
+                });
+            }
+            
+            return searchableFields.some(field => 
+                field.toLowerCase().includes(searchTerm)
+            );
+        });
+    }
+
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
+    function exportToExcel() {
+        const exportData = [];
+        const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
+        
+        customColumns.forEach(col => {
+            headers.push(col.name);
+        });
+        
+        exportData.push(headers);
+        
+        tableData.forEach(row => {
+            const rowData = [
+                row.displayId || row.id,
+                row.name || '',
+                row.date || '',
+                row.status || ''
+            ];
+            
+        customColumns.forEach(col => {
+                const value = row.customData && row.customData[col.id] ? row.customData[col.id] : '';
+                rowData.push(value);
+            });
+            
+            exportData.push(rowData);
+        });
+        
+        let csvContent = '\uFEFF';
+        exportData.forEach(row => {
+            const escapedRow = row.map(field => {
+                if (field === null || field === undefined) return '';
+                const stringField = String(field);
+                if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+                    return '"' + stringField.replace(/"/g, '""') + '"';
+                }
+                return stringField;
+            });
+            csvContent += escapedRow.join(';') + '\n';
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        const currentTab = tabs.find(tab => tab.id === currentTabId);
+        const fileName = currentTab ? currentTab.name : 'таблица';
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${fileName}_${formatDate(new Date())}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        alert(`Данные из "${fileName}" успешно экспортированы в CSV файл!`);
+    }
+
+    // Добавьте здесь все остальные функции из вашего оригинального кода...
+    // (showAllColumns, addNewRow, showModal, generateColumnInputs, handleAddButton, loadCustomButtons, createCustomButton и т.д.)
+
+    // ВАЖНО: Убедитесь, что все функции из вашего оригинального кода присутствуют
+    // Если какие-то функции отсутствуют, скопируйте их из вашего предыдущего working кода
+
+</script>
 </body>
 </html>
+
