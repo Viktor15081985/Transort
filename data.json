@@ -93,7 +93,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Техника",
+    "headerTitle": "Персонал",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -188,6 +188,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T19:07:20.298Z",
+  "lastSync": "2025-11-21T19:08:22.954Z",
   "mergeOperation": true
 }
