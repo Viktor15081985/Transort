@@ -93,7 +93,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "3",
+    "headerTitle": "а 3",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -258,7 +258,7 @@
     },
     {
       "id": "tab_1763752388313",
-      "name": "3",
+      "name": "а 3",
       "data": [
         {
           "id": 1,
@@ -272,10 +272,10 @@
       ]
     }
   ],
-  "lastSync": "2025-11-21T19:19:23.984Z",
+  "lastSync": "2025-11-21T19:20:56.857Z",
   "mergeOperation": true,
   "mergedFrom": {
-    "remote": "2025-11-21T19:17:20.664Z",
-    "local": "2025-11-21T19:19:22.303Z"
+    "remote": "2025-11-21T19:19:23.984Z",
+    "local": "2025-11-21T19:20:54.419Z"
   }
 }
