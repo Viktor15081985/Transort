@@ -2331,21 +2331,43 @@
         // Данные для импорта
         let currentImportData = null;
 
-        // НОВАЯ ФУНКЦИЯ saveToGitHub с автоматическим слиянием
+        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ УЛУЧШЕННОЙ СИНХРОНИЗАЦИИ
+        let isSyncing = false;
+
+        // ФУНКЦИЯ ЗАДЕРЖКИ
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // БЕЗОПАСНАЯ СИНХРОНИЗАЦИЯ
+        async function safeSaveToGitHub() {
+            if (isSyncing) {
+                console.log('⚠️ Синхронизация уже выполняется, пропускаем...');
+                return;
+            }
+            
+            isSyncing = true;
+            try {
+                await saveToGitHub();
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        // УЛУЧШЕННАЯ ФУНКЦИЯ СИНХРОНИЗАЦИИ
         async function saveToGitHub() {
             const statusElement = document.getElementById('sync-status');
             statusElement.textContent = 'Синхронизация...';
             statusElement.className = 'sync-status syncing';
 
             try {
-                // Проверка конфигурации
                 if (!GITHUB_CONFIG.token) {
                     throw new Error('GitHub токен не настроен');
                 }
 
                 console.log('🔄 Начинаем процесс синхронизации...');
 
-                // 1. ПОДГОТОВКА ДАННЫХ
+                // Подготовка данных
                 const dataToSave = {
                     tableData,
                     users,
@@ -2356,18 +2378,12 @@
                     dateValidationColumns,
                     tabs,
                     lastSync: new Date().toISOString(),
-                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9) // Идентификатор устройства
+                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9)
                 };
-
-                console.log('📊 Данные для сохранения:', {
-                    строки: tableData.length,
-                    пользователи: users.length,
-                    вкладки: tabs.length
-                });
 
                 let content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
                 
-                // 2. ПОЛУЧЕНИЕ ТЕКУЩЕГО СОСТОЯНИЯ ФАЙЛА
+                // Получаем актуальную информацию о файле
                 let sha = null;
                 let remoteData = null;
                 
@@ -2389,10 +2405,6 @@
                         remoteData = JSON.parse(remoteContent);
                         
                         console.log('✅ Текущий SHA:', sha);
-                        console.log('📋 Данные с GitHub:', {
-                            строки: remoteData.tableData?.length || 0,
-                            последняяСинхронизация: remoteData.lastSync
-                        });
                     } else if (fileInfoResponse.status === 404) {
                         console.log('📝 Файл не существует, создаем новый');
                         sha = null;
@@ -2406,22 +2418,18 @@
                     // Продолжаем без информации о удаленном файле
                 }
 
-                // 3. АВТОМАТИЧЕСКОЕ СЛИЯНИЕ ДАННЫХ (если есть удаленные данные)
+                // Автоматическое слияние данных (если есть удаленные данные)
                 let finalData = dataToSave;
                 
                 if (remoteData && remoteData.tableData) {
                     console.log('🔄 Выполняем автоматическое слияние данных...');
                     finalData = mergeData(remoteData, dataToSave);
-                    console.log('✅ Слияние завершено:', {
-                        было_строк: remoteData.tableData.length,
-                        стало_строк: finalData.tableData.length
-                    });
                     
                     // Обновляем контент после слияния
                     content = btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2))));
                 }
 
-                // 4. СОХРАНЕНИЕ ДАННЫХ
+                // Сохраняем данные
                 console.log('💾 Отправляем данные с SHA:', sha);
                 const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
                     method: 'PUT',
@@ -2438,7 +2446,6 @@
                     })
                 });
 
-                // 5. ОБРАБОТКА ОТВЕТА
                 if (!saveResponse.ok) {
                     const error = await saveResponse.json();
                     
@@ -2446,121 +2453,178 @@
                     if (error.message && error.message.includes('does not match')) {
                         console.log('⚡ Обнаружен конфликт версий, выполняем разрешение...');
                         
-                        // Получаем самый актуальный SHA
-                        const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
-                            headers: {
-                                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
-                        });
-                        
-                        if (retryResponse.ok) {
-                            const latestFileInfo = await retryResponse.json();
-                            const newSha = latestFileInfo.sha;
-                            
-                            console.log('🔄 Получен новый SHA для повторной попытки:', newSha);
-                            
-                            // СЛИЯНИЕ С САМЫМИ АКТУАЛЬНЫМИ ДАННЫМИ
-                            const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
-                            const latestData = JSON.parse(latestContent);
-                            
-                            console.log('🔄 Повторное слияние с актуальными данными...');
-                            const mergedData = mergeData(latestData, dataToSave);
-                            const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
-                            
-                            // Повторяем запрос с новым SHA и объединенными данными
-                            const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/vnd.github.v3+json'
-                                },
-                                body: JSON.stringify({
-                                    message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()}`,
-                                    content: mergedContent,
-                                    branch: GITHUB_CONFIG.branch,
-                                    sha: newSha
-                                })
-                            });
-                            
-                            if (!retrySave.ok) {
-                                const retryError = await retrySave.json();
-                                throw new Error(`Ошибка при повторной попытке: ${retryError.message}`);
-                            }
-                            
-                            // УСПЕХ ПОВТОРНОЙ ПОПЫТКИ
-                            console.log('✅ Успешно сохранено после разрешения конфликта');
-                            statusElement.textContent = 'Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString();
-                            statusElement.className = 'sync-status success';
-                            
-                            // Обновляем локальные данные объединенной версией
-                            updateLocalData(mergedData);
-                            saveToLocalStorage();
-                            return;
-                        }
+                        // Получаем самый актуальный SHA и повторяем попытку
+                        await resolveConflictAndRetry(dataToSave);
+                        return;
                     }
                     
-                    // Другие ошибки
                     throw new Error(error.message || 'Ошибка сохранения в GitHub');
                 }
 
-                // УСПЕШНОЕ СОХРАНЕНИЕ
+                // Успешное сохранение
                 console.log('✅ Успешно сохранено в GitHub');
                 statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
                 statusElement.className = 'sync-status success';
-                saveToLocalStorage();
+
+                // Если были объединены данные, обновляем локально
+                if (finalData !== dataToSave) {
+                    updateLocalData(finalData);
+                    saveToLocalStorage();
+                }
                 
             } catch (error) {
                 console.error('❌ Ошибка синхронизации:', error);
                 statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
                 statusElement.className = 'sync-status error';
-                saveToLocalStorage();
             }
         }
 
-        // ФУНКЦИЯ АВТОМАТИЧЕСКОГО СЛИЯНИЯ ДАННЫХ
+        // ФУНКЦИЯ РАЗРЕШЕНИЯ КОНФЛИКТОВ
+        async function resolveConflictAndRetry(localData) {
+            const statusElement = document.getElementById('sync-status');
+            
+            try {
+                // Получаем самый актуальный SHA
+                const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!retryResponse.ok) {
+                    throw new Error('Не удалось получить актуальные данные для разрешения конфликта');
+                }
+                
+                const latestFileInfo = await retryResponse.json();
+                const newSha = latestFileInfo.sha;
+                
+                console.log('🔄 Получен новый SHA для повторной попытки:', newSha);
+                
+                // Слияние с самыми актуальными данными
+                const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
+                const latestData = JSON.parse(latestContent);
+                
+                console.log('🔄 Повторное слияние с актуальными данными...');
+                const mergedData = mergeData(latestData, localData);
+                const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
+                
+                // Небольшая задержка перед повторной попыткой
+                await delay(1000);
+                
+                // Повторяем запрос с новым SHA и объединенными данными
+                const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()}`,
+                        content: mergedContent,
+                        branch: GITHUB_CONFIG.branch,
+                        sha: newSha
+                    })
+                });
+                
+                if (!retrySave.ok) {
+                    const retryError = await retrySave.json();
+                    throw new Error(`Ошибка при повторной попытке: ${retryError.message}`);
+                }
+                
+                // Успех повторной попытки
+                console.log('✅ Успешно сохранено после разрешения конфликта');
+                statusElement.textContent = 'Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString();
+                statusElement.className = 'sync-status success';
+                
+                // Обновляем локальные данные объединенной версией
+                updateLocalData(mergedData);
+                saveToLocalStorage();
+                
+            } catch (retryError) {
+                console.error('❌ Ошибка при разрешении конфликта:', retryError);
+                statusElement.textContent = 'Ошибка разрешения конфликта: ' + retryError.message;
+                statusElement.className = 'sync-status error';
+                
+                // Предлагаем пользователю ручное решение
+                if (confirm('Обнаружен конфликт данных. Хотите загрузить версию с GitHub?')) {
+                    await loadFromGitHub();
+                }
+            }
+        }
+
+        // УЛУЧШЕННАЯ ФУНКЦИЯ СЛИЯНИЯ ДАННЫХ
         function mergeData(remoteData, localData) {
             console.log('🔄 Запуск слияния данных...');
             
             const merged = {
                 ...remoteData,
                 lastSync: new Date().toISOString(),
-                mergeOperation: true
+                mergeOperation: true,
+                mergedFrom: {
+                    remote: remoteData.lastSync,
+                    local: localData.lastSync
+                }
             };
 
-            // СЛИЯНИЕ ТАБЛИЧНЫХ ДАННЫХ
+            // Приоритет локальных данных для настроек
+            if (localData.appSettings) {
+                merged.appSettings = {
+                    ...remoteData.appSettings,
+                    ...localData.appSettings
+                };
+            }
+
+            // Умное слияние табличных данных
             if (localData.tableData && remoteData.tableData) {
                 console.log('📊 Слияние табличных данных...');
                 
-                const remoteRows = new Map(remoteData.tableData.map(row => [row.id, row]));
-                const localRows = new Map(localData.tableData.map(row => [row.id, row]));
+                const remoteMap = new Map(remoteData.tableData.map(row => [row.id, row]));
+                const localMap = new Map(localData.tableData.map(row => [row.id, row]));
                 
-                // Объединяем строки - локальные изменения имеют приоритет
-                const mergedTableData = [...remoteData.tableData];
+                // Объединяем строки
+                const mergedTableData = [];
+                const allIds = new Set([...remoteMap.keys(), ...localMap.keys()]);
                 
-                localData.tableData.forEach(localRow => {
-                    const existingIndex = mergedTableData.findIndex(row => row.id === localRow.id);
-                    if (existingIndex >= 0) {
-                        // Обновляем существующую строку, сохраняя attachments
-                        const existingAttachments = mergedTableData[existingIndex].attachments;
-                        mergedTableData[existingIndex] = {
+                allIds.forEach(id => {
+                    const remoteRow = remoteMap.get(id);
+                    const localRow = localMap.get(id);
+                    
+                    if (localRow && remoteRow) {
+                        // Обе строки существуют - объединяем с приоритетом локальных изменений
+                        const mergedRow = {
+                            ...remoteRow,
                             ...localRow,
-                            attachments: { ...existingAttachments, ...localRow.attachments }
+                            // Сохраняем вложения из обеих версий
+                            attachments: { 
+                                ...remoteRow.attachments, 
+                                ...localRow.attachments 
+                            },
+                            customData: {
+                                ...remoteRow.customData,
+                                ...localRow.customData
+                            }
                         };
-                        console.log(`✏️ Обновлена строка ID: ${localRow.id}`);
-                    } else {
-                        // Добавляем новую строку
+                        mergedTableData.push(mergedRow);
+                        console.log(`✏️ Объединена строка ID: ${id}`);
+                    } else if (localRow) {
+                        // Новая локальная строка
                         mergedTableData.push(localRow);
-                        console.log(`➕ Добавлена новая строка ID: ${localRow.id}`);
+                        console.log(`➕ Добавлена новая локальная строка ID: ${id}`);
+                    } else {
+                        // Существующая удаленная строка
+                        mergedTableData.push(remoteRow);
                     }
                 });
                 
+                // Сортируем по ID
+                mergedTableData.sort((a, b) => a.id - b.id);
                 merged.tableData = mergedTableData;
                 console.log(`✅ Табличные данные объединены: ${mergedTableData.length} строк`);
             }
 
-            // СЛИЯНИЕ ПОЛЬЗОВАТЕЛЕЙ (административные данные)
+            // Слияние пользователей (локальные имеют приоритет)
             if (localData.users && remoteData.users) {
                 console.log('👥 Слияние пользователей...');
                 const userMap = new Map(remoteData.users.map(user => [user.username, user]));
@@ -2573,22 +2637,12 @@
                 console.log(`✅ Пользователи объединены: ${merged.users.length} пользователей`);
             }
 
-            // СЛИЯНИЕ НАСТРОЕК (локальные настройки имеют приоритет)
-            if (localData.appSettings) {
-                console.log('⚙️ Слияние настроек приложения...');
-                merged.appSettings = {
-                    ...remoteData.appSettings,
-                    ...localData.appSettings
-                };
-            }
-
-            // СЛИЯНИЕ КОЛОНОК И КНОПОК
-            if (localData.customButtons) {
-                merged.customButtons = localData.customButtons;
-            }
-            if (localData.customColumns) {
-                merged.customColumns = localData.customColumns;
-            }
+            // Слияние остальных данных
+            ['customButtons', 'customColumns', 'basicColumns', 'dateValidationColumns', 'tabs'].forEach(key => {
+                if (localData[key]) {
+                    merged[key] = localData[key];
+                }
+            });
 
             console.log('🎉 Слияние завершено успешно');
             return merged;
@@ -2824,7 +2878,7 @@
 
             // GitHub синхронизация
             document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
-            document.getElementById('sync-now-btn').addEventListener('click', () => saveToGitHub());
+            document.getElementById('sync-now-btn').addEventListener('click', () => safeSaveToGitHub());
             document.getElementById('load-from-github-btn').addEventListener('click', () => loadFromGitHub());
 
             // Модальные окна
@@ -2943,7 +2997,7 @@
             headerTitle.addEventListener('blur', function() {
                 appSettings.headerTitle = this.textContent;
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
             });
             
             headerTitle.addEventListener('keydown', function(e) {
@@ -2987,7 +3041,7 @@
             }
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             
@@ -3061,7 +3115,7 @@
             
             customButtons.push(buttonData);
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
@@ -3079,7 +3133,7 @@
             });
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             createCustomButton(buttonData);
             renderTable();
@@ -3171,7 +3225,7 @@
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 loadCustomButtons();
             }
         }
@@ -3184,7 +3238,7 @@
             
             customButtons = customButtons.filter(b => b.id !== buttonId);
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             button.columns.forEach(colName => {
                 customColumns = customColumns.filter(col => col.name !== colName);
@@ -3200,7 +3254,7 @@
             });
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             loadCustomButtons();
             renderTable();
@@ -3357,7 +3411,7 @@
             }
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             closeDatePicker();
             renderTable();
@@ -3430,7 +3484,7 @@
                 }
                 
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 
                 renderTable();
                 checkAllDates();
@@ -3894,7 +3948,7 @@
                 }
                 
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 
                 currentEditingCell.textContent = newValue;
             } else {
@@ -3919,7 +3973,7 @@
                 }
                 
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
                 if (cellContent) {
@@ -3946,7 +4000,7 @@
                 }
                 
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 
                 if (currentEditingCell) {
                     loadAttachedFiles(currentEditingCell);
@@ -4008,7 +4062,7 @@
                     }
                     
                     saveToLocalStorage();
-                    saveToGitHub(); // Синхронизируем с GitHub
+                    safeSaveToGitHub(); // Синхронизируем с GitHub
                     
                     loadAttachedFiles(currentEditingCell);
                     renderTable();
@@ -4224,7 +4278,7 @@
             
             users.push({ username, password, role });
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
             document.getElementById('add-user-form').reset();
         }
@@ -4263,7 +4317,7 @@
             user.role = newRole;
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
         };
 
@@ -4271,7 +4325,7 @@
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
                 renderUsersList();
             }
         };
@@ -4300,7 +4354,7 @@
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
                     saveToLocalStorage();
-                    saveToGitHub(); // Синхронизируем с GitHub
+                    safeSaveToGitHub(); // Синхронизируем с GitHub
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -4330,7 +4384,7 @@
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
                 saveToLocalStorage();
-                saveToGitHub(); // Синхронизируем с GitHub
+                safeSaveToGitHub(); // Синхронизируем с GitHub
             }
         }
 
@@ -4352,7 +4406,7 @@
             });
 
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -4401,7 +4455,7 @@
             // Удаляем столбец из customColumns
             customColumns = customColumns.filter(col => col.id !== columnId);
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
 
             renderTable();
             document.getElementById('remove-column-modal').style.display = 'none';
@@ -4542,7 +4596,7 @@
             }
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             document.getElementById('import-excel-modal').style.display = 'none';
@@ -4603,13 +4657,13 @@
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
                             saveToLocalStorage();
-                            saveToGitHub(); // Синхронизируем с GitHub
+                            safeSaveToGitHub(); // Синхронизируем с GitHub
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
                                 saveToLocalStorage();
-                                saveToGitHub(); // Синхронизируем с GitHub
+                                safeSaveToGitHub(); // Синхронизируем с GitHub
                             }
                         } else {
                             this.textContent = tab.name;
@@ -4665,7 +4719,7 @@
             
             tabs.push(newTab);
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             currentTabId = tabId;
             tableData = JSON.parse(JSON.stringify(newTab.data));
@@ -4731,7 +4785,7 @@
             }
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             renderTabs();
             renderTable();
         }
@@ -5185,7 +5239,7 @@
             }
             
             saveToLocalStorage();
-            saveToGitHub(); // Синхронизируем с GitHub
+            safeSaveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -5221,4 +5275,3 @@
     </script>
 </body>
 </html>
-
