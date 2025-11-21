@@ -1643,6 +1643,31 @@
             margin-left: 8px;
         }
 
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            z-index: 1000;
+        }
+
+        .sync-status.syncing {
+            color: var(--accent-color);
+        }
+
+        .sync-status.error {
+            color: #e74c3c;
+        }
+
+        .sync-status.success {
+            color: #2ecc71;
+        }
+
         @media (max-width: 1200px) {
             .top-controls-panel {
                 height: auto;
@@ -1948,6 +1973,9 @@
                         <button id="manage-users" class="manage-users-btn" title="Управление пользователями системы">
                             <span class="icon">👥</span> Управление пользователями
                         </button>
+                        <button id="github-sync-btn" class="manage-users-btn" title="Настройки синхронизации с GitHub">
+                            <span class="icon">🔗</span> GitHub Синхронизация
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1974,7 +2002,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Данные будут загружаться динамически -->
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="1" title="Выделить строку"></td>
+                                <td>1</td>
+                                <td class="editable" title="Клик для редактирования">Проект А</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">01.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">Активен</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="2" title="Выделить строку"></td>
+                                <td>2</td>
+                                <td class="editable" title="Клик для редактирования">Проект Б</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">05.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">Завершен</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="3" title="Выделить строку"></td>
+                                <td>3</td>
+                                <td class="editable" title="Клик для редактирования">Проект В</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">10.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">В процессе</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -1991,6 +2048,9 @@
         <div class="fixed-columns-setting admin-only">
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
+
+        <!-- Статус синхронизации -->
+        <div class="sync-status" id="sync-status">Готов к синхронизации</div>
     </div>
 
     <!-- Модальное окно для добавления кнопки -->
@@ -2168,10 +2228,46 @@
         </div>
     </div>
 
+    <!-- Модальное окно настроек GitHub -->
+    <div id="github-sync-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Настройки синхронизации с GitHub</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="github-sync-form">
+                <div class="form-group">
+                    <label for="github-token">GitHub Токен</label>
+                    <input type="password" id="github-token" required title="Токен доступа GitHub с правами repo">
+                </div>
+                <div class="form-group">
+                    <label for="github-repo">Репозиторий</label>
+                    <input type="text" id="github-repo" value="viktor15081985/Transort" required title="Репозиторий в формате username/repo">
+                </div>
+                <div class="form-group">
+                    <label for="github-branch">Ветка</label>
+                    <input type="text" id="github-branch" value="main" required title="Ветка репозитория">
+                </div>
+                <button type="submit">Сохранить настройки</button>
+            </form>
+            <div class="preview-actions">
+                <button id="sync-now-btn" class="btn-success">Синхронизировать сейчас</button>
+                <button id="load-from-github-btn" class="btn-secondary">Загрузить из GitHub</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Скрытый input для загрузки логотипа -->
     <input type="file" id="logo-upload" accept=".png" style="display: none;">
 
     <script>
+        // Конфигурация GitHub
+        const GITHUB_CONFIG = {
+            token: localStorage.getItem('githubToken') || '',
+            repo: localStorage.getItem('githubRepo') || 'viktor15081985/Transort',
+            branch: localStorage.getItem('githubBranch') || 'main'
+        };
+
         // Данные пользователей
         let users = JSON.parse(localStorage.getItem('users')) || [
             { username: 'admin', password: 'admin', role: 'admin' },
@@ -2229,132 +2325,182 @@
         // Данные для импорта
         let currentImportData = null;
 
-        // GitHub Storage класс
-        class GitHubStorage {
-            constructor(repo, token) {
-                this.repo = repo;
-                this.token = token;
-                this.baseUrl = `https://api.github.com/repos/${repo}/contents`;
-            }
+        // Функции для работы с GitHub API
+        async function saveToGitHub() {
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Синхронизация...';
+            statusElement.className = 'sync-status syncing';
 
-            async loadData() {
+            try {
+                if (!GITHUB_CONFIG.token) {
+                    throw new Error('GitHub токен не настроен');
+                }
+
+                const dataToSave = {
+                    tableData,
+                    users,
+                    appSettings,
+                    customButtons,
+                    customColumns,
+                    basicColumns,
+                    dateValidationColumns,
+                    tabs
+                };
+
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
+                
+                // Сначала получаем информацию о файле, чтобы получить SHA
+                let sha = null;
                 try {
-                    // Для публичного репозитория не нужен токен
-                    const url = `${this.baseUrl}/data.json`;
-                    console.log('Загрузка данных из:', url);
-                    
-                    const response = await fetch(url, {
+                    const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
                         headers: {
-                            'Accept': 'application/vnd.github.v3+json',
-                            ...(this.token && { 'Authorization': `token ${this.token}` })
+                            'Authorization': `token ${GITHUB_CONFIG.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
                         }
                     });
                     
-                    if (!response.ok) {
-                        throw new Error(`Ошибка загрузки: ${response.status}`);
+                    if (response.ok) {
+                        const fileInfo = await response.json();
+                        sha = fileInfo.sha;
                     }
-                    
-                    const data = await response.json();
-                    const content = JSON.parse(atob(data.content));
-                    return content;
-                } catch (error) {
-                    console.error('Ошибка загрузки данных:', error);
-                    // Возвращаем данные по умолчанию при ошибке
-                    return {
-                        tableData: tableData,
-                        customButtons: customButtons,
-                        customColumns: customColumns,
-                        basicColumns: basicColumns,
-                        dateValidationColumns: dateValidationColumns,
-                        appSettings: appSettings,
-                        users: users,
-                        tabs: tabs
-                    };
+                } catch (e) {
+                    // Файл не существует, создаем новый
                 }
-            }
 
-            async saveData(data) {
-                try {
-                    // Для GitHub Pages мы не можем сохранять данные без токена
-                    // Сохраняем только в localStorage
-                    localStorage.setItem('tableData', JSON.stringify(data.tableData || tableData));
-                    localStorage.setItem('customButtons', JSON.stringify(data.customButtons || customButtons));
-                    localStorage.setItem('customColumns', JSON.stringify(data.customColumns || customColumns));
-                    localStorage.setItem('basicColumns', JSON.stringify(data.basicColumns || basicColumns));
-                    localStorage.setItem('dateValidationColumns', JSON.stringify(data.dateValidationColumns || dateValidationColumns));
-                    localStorage.setItem('appSettings', JSON.stringify(data.appSettings || appSettings));
-                    localStorage.setItem('users', JSON.stringify(data.users || users));
-                    localStorage.setItem('tabs', JSON.stringify(data.tabs || tabs));
-                    
-                    return { success: true, message: 'Данные сохранены в localStorage' };
-                } catch (error) {
-                    console.error('Ошибка сохранения данных:', error);
-                    throw error;
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Обновление данных ${new Date().toLocaleString()}`,
+                        content: content,
+                        branch: GITHUB_CONFIG.branch,
+                        sha: sha
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Ошибка сохранения в GitHub');
                 }
+
+                statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
+                statusElement.className = 'sync-status success';
+                
+                // Сохраняем также в localStorage как резервную копию
+                saveToLocalStorage();
+                
+            } catch (error) {
+                console.error('Ошибка синхронизации с GitHub:', error);
+                statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
+                statusElement.className = 'sync-status error';
+                
+                // При ошибке сохраняем только в localStorage
+                saveToLocalStorage();
             }
         }
 
-        // Инициализация GitHub Storage (без токена для публичного репозитория)
-        const githubStorage = new GitHubStorage('Viktor15081985/Transort', '');
+        async function loadFromGitHub() {
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Загрузка из GitHub...';
+            statusElement.className = 'sync-status syncing';
 
-        // Загрузка данных при запуске
-        async function loadAllData() {
             try {
-                console.log('Начало загрузки данных...');
-                const data = await githubStorage.loadData();
-                console.log('Данные загружены:', data);
-                
-                if (data) {
-                    tableData = data.tableData || tableData;
-                    customButtons = data.customButtons || customButtons;
-                    customColumns = data.customColumns || customColumns;
-                    basicColumns = data.basicColumns || basicColumns;
-                    dateValidationColumns = data.dateValidationColumns || dateValidationColumns;
-                    appSettings = data.appSettings || appSettings;
-                    users = data.users || users;
-                    tabs = data.tabs || tabs;
-                    
-                    // Сохраняем в localStorage для резервной копии
-                    localStorage.setItem('tableData', JSON.stringify(tableData));
-                    localStorage.setItem('customButtons', JSON.stringify(customButtons));
-                    localStorage.setItem('customColumns', JSON.stringify(customColumns));
-                    localStorage.setItem('basicColumns', JSON.stringify(basicColumns));
-                    localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
-                    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                    localStorage.setItem('users', JSON.stringify(users));
-                    localStorage.setItem('tabs', JSON.stringify(tabs));
+                if (!GITHUB_CONFIG.token) {
+                    throw new Error('GitHub токен не настроен');
                 }
+
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Файл данных не найден в репозитории');
+                }
+
+                const fileInfo = await response.json();
+                const content = decodeURIComponent(escape(atob(fileInfo.content)));
+                const data = JSON.parse(content);
+
+                // Восстанавливаем данные из GitHub
+                tableData = data.tableData || tableData;
+                users = data.users || users;
+                appSettings = data.appSettings || appSettings;
+                customButtons = data.customButtons || customButtons;
+                customColumns = data.customColumns || customColumns;
+                basicColumns = data.basicColumns || basicColumns;
+                dateValidationColumns = data.dateValidationColumns || dateValidationColumns;
+                tabs = data.tabs || tabs;
+
+                // Сохраняем в localStorage
+                saveToLocalStorage();
+
+                statusElement.textContent = 'Загружено из GitHub: ' + new Date().toLocaleTimeString();
+                statusElement.className = 'sync-status success';
+
+                // Перерисовываем интерфейс
+                renderTabs();
+                renderTable();
+                loadCustomButtons();
+                loadAppSettings();
+
             } catch (error) {
-                console.error('Ошибка загрузки данных:', error);
-                // Используем данные из localStorage при ошибке
-                console.log('Используем данные из localStorage');
+                console.error('Ошибка загрузки из GitHub:', error);
+                statusElement.textContent = 'Ошибка загрузки: ' + error.message;
+                statusElement.className = 'sync-status error';
+                
+                // При ошибке загружаем из localStorage
+                loadFromLocalStorage();
             }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('tableData', JSON.stringify(tableData));
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            localStorage.setItem('customButtons', JSON.stringify(customButtons));
+            localStorage.setItem('customColumns', JSON.stringify(customColumns));
+            localStorage.setItem('basicColumns', JSON.stringify(basicColumns));
+            localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
+            localStorage.setItem('tabs', JSON.stringify(tabs));
+        }
+
+        function loadFromLocalStorage() {
+            tableData = JSON.parse(localStorage.getItem('tableData')) || tableData;
+            users = JSON.parse(localStorage.getItem('users')) || users;
+            appSettings = JSON.parse(localStorage.getItem('appSettings')) || appSettings;
+            customButtons = JSON.parse(localStorage.getItem('customButtons')) || customButtons;
+            customColumns = JSON.parse(localStorage.getItem('customColumns')) || customColumns;
+            basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || basicColumns;
+            dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || dateValidationColumns;
+            tabs = JSON.parse(localStorage.getItem('tabs')) || tabs;
         }
 
         // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('DOM загружен, инициализация приложения...');
-            await initializeApp();
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
         });
 
-        async function initializeApp() {
-            try {
-                console.log('Инициализация приложения...');
-                await loadAllData();
-                setupEventListeners();
-                loadAppSettings();
+        function initializeApp() {
+            setupEventListeners();
+            loadAppSettings();
+            
+            // Пытаемся загрузить данные из GitHub при старте
+            if (GITHUB_CONFIG.token) {
+                loadFromGitHub();
+            } else {
+                loadFromLocalStorage();
                 renderTabs();
-                loadCustomButtons();
-                renderTable();
-                console.log('Приложение инициализировано');
-            } catch (error) {
-                console.error('Ошибка инициализации приложения:', error);
             }
         }
 
         function setupEventListeners() {
-            console.log('Настройка обработчиков событий...');
-            
             // Логин
             document.getElementById('login-form').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -2369,6 +2515,7 @@
             document.getElementById('manage-users').addEventListener('click', () => showModal('users-modal'));
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
+            document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
 
             // Новые кнопки управления
             document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
@@ -2400,6 +2547,11 @@
             document.getElementById('cancel-import-btn').addEventListener('click', () => {
                 document.getElementById('import-excel-modal').style.display = 'none';
             });
+
+            // GitHub синхронизация
+            document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
+            document.getElementById('sync-now-btn').addEventListener('click', () => saveToGitHub());
+            document.getElementById('load-from-github-btn').addEventListener('click', () => loadFromGitHub());
 
             // Модальные окна
             document.querySelectorAll('.close').forEach(close => {
@@ -2456,9 +2608,26 @@
                     e.stopPropagation();
                 }
             });
-
-            console.log('Обработчики событий настроены');
         }
+
+        function handleGitHubSettingsSave(e) {
+            e.preventDefault();
+            
+            GITHUB_CONFIG.token = document.getElementById('github-token').value;
+            GITHUB_CONFIG.repo = document.getElementById('github-repo').value;
+            GITHUB_CONFIG.branch = document.getElementById('github-branch').value;
+            
+            // Сохраняем настройки в localStorage
+            localStorage.setItem('githubToken', GITHUB_CONFIG.token);
+            localStorage.setItem('githubRepo', GITHUB_CONFIG.repo);
+            localStorage.setItem('githubBranch', GITHUB_CONFIG.branch);
+            
+            document.getElementById('github-sync-modal').style.display = 'none';
+            alert('Настройки GitHub сохранены!');
+        }
+
+        // Остальные функции остаются без изменений (прокрутка вкладок, управление столбцами, импорт/экспорт Excel и т.д.)
+        // ... [все остальные функции из предыдущего кода]
 
         // ФУНКЦИИ ПРОКРУТКИ ВКЛАДОК
         function scrollTabsLeft() {
@@ -2481,8 +2650,8 @@
             const count = parseInt(document.getElementById('fixed-columns-count').value);
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
-                localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
             }
         }
 
@@ -2503,9 +2672,8 @@
                 row.customData[columnId] = '';
             });
 
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            localStorage.setItem('tableData', JSON.stringify(tableData));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -2553,9 +2721,8 @@
 
             // Удаляем столбец из customColumns
             customColumns = customColumns.filter(col => col.id !== columnId);
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            localStorage.setItem('tableData', JSON.stringify(tableData));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
 
             renderTable();
             document.getElementById('remove-column-modal').style.display = 'none';
@@ -2568,32 +2735,11 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Динамическая загрузка библиотеки XLSX
             if (typeof XLSX === 'undefined') {
-                loadXLSXLibrary().then(() => {
-                    processExcelFile(file);
-                });
-            } else {
-                processExcelFile(file);
+                alert('Библиотека для чтения Excel файлов загружается. Попробуйте еще раз через несколько секунд.');
+                return;
             }
-        }
 
-        function loadXLSXLibrary() {
-            return new Promise((resolve, reject) => {
-                if (typeof XLSX !== 'undefined') {
-                    resolve();
-                    return;
-                }
-
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-
-        function processExcelFile(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -2714,15 +2860,10 @@
             const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 currentTab.data = JSON.parse(JSON.stringify(tableData));
-                localStorage.setItem('tabs', JSON.stringify(tabs));
             }
             
-            if (currentTabId === 'tab1') {
-                localStorage.setItem('tableData', JSON.stringify(tableData));
-            }
-            
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             document.getElementById('import-excel-modal').style.display = 'none';
@@ -2782,14 +2923,14 @@
                         const newName = this.textContent.trim();
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
-                            localStorage.setItem('tabs', JSON.stringify(tabs));
-                            saveAllData();
+                            saveToLocalStorage();
+                            saveToGitHub(); // Синхронизируем с GitHub
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
-                                localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                                saveAllData();
+                                saveToLocalStorage();
+                                saveToGitHub(); // Синхронизируем с GitHub
                             }
                         } else {
                             this.textContent = tab.name;
@@ -2844,8 +2985,8 @@
             };
             
             tabs.push(newTab);
-            localStorage.setItem('tabs', JSON.stringify(tabs));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             currentTabId = tabId;
             tableData = JSON.parse(JSON.stringify(newTab.data));
@@ -2876,8 +3017,7 @@
                 }
             }
             
-            localStorage.setItem('tabs', JSON.stringify(tabs));
-            saveAllData();
+            saveToLocalStorage();
             renderTabs();
             renderTable();
             resetFiltersAndSearch();
@@ -2911,8 +3051,8 @@
                 }
             }
             
-            localStorage.setItem('tabs', JSON.stringify(tabs));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderTabs();
             renderTable();
         }
@@ -3154,8 +3294,7 @@
             const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 currentTab.data = JSON.parse(JSON.stringify(tableData));
-                localStorage.setItem('tabs', JSON.stringify(tabs));
-                saveAllData();
+                saveToLocalStorage();
             }
         }
 
@@ -3364,14 +3503,11 @@
             const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 currentTab.data = JSON.parse(JSON.stringify(tableData));
-                localStorage.setItem('tabs', JSON.stringify(tabs));
             }
             
-            if (currentTabId === 'tab1') {
-                localStorage.setItem('tableData', JSON.stringify(tableData));
-            }
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
-            saveAllData();
             renderTable();
         }
 
@@ -3439,8 +3575,8 @@
             headerTitle.contentEditable = 'true';
             headerTitle.addEventListener('blur', function() {
                 appSettings.headerTitle = this.textContent;
-                localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
             });
             
             headerTitle.addEventListener('keydown', function(e) {
@@ -3481,14 +3617,11 @@
             const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 currentTab.data = JSON.parse(JSON.stringify(tableData));
-                localStorage.setItem('tabs', JSON.stringify(tabs));
             }
             
-            if (currentTabId === 'tab1') {
-                localStorage.setItem('tableData', JSON.stringify(tableData));
-            }
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
-            saveAllData();
             renderTable();
             
             setTimeout(() => {
@@ -3506,6 +3639,10 @@
                 renderUsersList();
             } else if (modalId === 'add-button-modal') {
                 generateColumnInputs();
+            } else if (modalId === 'github-sync-modal') {
+                document.getElementById('github-token').value = GITHUB_CONFIG.token;
+                document.getElementById('github-repo').value = GITHUB_CONFIG.repo;
+                document.getElementById('github-branch').value = GITHUB_CONFIG.branch;
             }
         }
 
@@ -3556,7 +3693,8 @@
             };
             
             customButtons.push(buttonData);
-            localStorage.setItem('customButtons', JSON.stringify(customButtons));
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
@@ -3573,9 +3711,8 @@
                 }
             });
             
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             createCustomButton(buttonData);
             renderTable();
@@ -3666,8 +3803,8 @@
             const newName = prompt('Введите новое название кнопки:', button.name);
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
-                localStorage.setItem('customButtons', JSON.stringify(customButtons));
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 loadCustomButtons();
             }
         }
@@ -3679,7 +3816,8 @@
             if (!button) return;
             
             customButtons = customButtons.filter(b => b.id !== buttonId);
-            localStorage.setItem('customButtons', JSON.stringify(customButtons));
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             button.columns.forEach(colName => {
                 customColumns = customColumns.filter(col => col.name !== colName);
@@ -3694,9 +3832,8 @@
                 });
             });
             
-            localStorage.setItem('customColumns', JSON.stringify(customColumns));
-            localStorage.setItem('tableData', JSON.stringify(tableData));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             loadCustomButtons();
             renderTable();
@@ -3850,14 +3987,11 @@
             const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 currentTab.data = JSON.parse(JSON.stringify(tableData));
-                localStorage.setItem('tabs', JSON.stringify(tabs));
             }
             
-            if (currentTabId === 'tab1') {
-                localStorage.setItem('tableData', JSON.stringify(tableData));
-            }
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
-            saveAllData();
             closeDatePicker();
             renderTable();
             checkAllDates();
@@ -3926,14 +4060,11 @@
                 const currentTab = tabs.find(tab => tab.id === currentTabId);
                 if (currentTab) {
                     currentTab.data = JSON.parse(JSON.stringify(tableData));
-                    localStorage.setItem('tabs', JSON.stringify(tabs));
                 }
                 
-                if (currentTabId === 'tab1') {
-                    localStorage.setItem('tableData', JSON.stringify(tableData));
-                }
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
-                saveAllData();
                 renderTable();
                 checkAllDates();
             } else if (dateStr) {
@@ -4391,11 +4522,12 @@
                 
                 if (columnType === 'basic') {
                     basicColumns[columnIndex].name = newValue;
-                    localStorage.setItem('basicColumns', JSON.stringify(basicColumns));
                 } else if (columnType === 'custom') {
                     customColumns[columnIndex].name = newValue;
-                    localStorage.setItem('customColumns', JSON.stringify(customColumns));
                 }
+                
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 currentEditingCell.textContent = newValue;
             } else {
@@ -4417,14 +4549,10 @@
                 const currentTab = tabs.find(tab => tab.id === currentTabId);
                 if (currentTab) {
                     currentTab.data = JSON.parse(JSON.stringify(tableData));
-                    localStorage.setItem('tabs', JSON.stringify(tabs));
                 }
                 
-                if (currentTabId === 'tab1') {
-                    localStorage.setItem('tableData', JSON.stringify(tableData));
-                }
-                
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
                 if (cellContent) {
@@ -4435,7 +4563,6 @@
                 }
             }
             
-            saveAllData();
             renderTable();
             document.getElementById('edit-cell-modal').style.display = 'none';
         }
@@ -4449,14 +4576,10 @@
                 const currentTab = tabs.find(tab => tab.id === currentTabId);
                 if (currentTab) {
                     currentTab.data = JSON.parse(JSON.stringify(tableData));
-                    localStorage.setItem('tabs', JSON.stringify(tabs));
                 }
                 
-                if (currentTabId === 'tab1') {
-                    localStorage.setItem('tableData', JSON.stringify(tableData));
-                }
-                
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 if (currentEditingCell) {
                     loadAttachedFiles(currentEditingCell);
@@ -4515,14 +4638,10 @@
                     const currentTab = tabs.find(tab => tab.id === currentTabId);
                     if (currentTab) {
                         currentTab.data = JSON.parse(JSON.stringify(tableData));
-                        localStorage.setItem('tabs', JSON.stringify(tabs));
                     }
                     
-                    if (currentTabId === 'tab1') {
-                        localStorage.setItem('tableData', JSON.stringify(tableData));
-                    }
-                    
-                    saveAllData();
+                    saveToLocalStorage();
+                    saveToGitHub(); // Синхронизируем с GitHub
                     
                     loadAttachedFiles(currentEditingCell);
                     renderTable();
@@ -4737,8 +4856,8 @@
             }
             
             users.push({ username, password, role });
-            localStorage.setItem('users', JSON.stringify(users));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
             document.getElementById('add-user-form').reset();
         }
@@ -4776,16 +4895,16 @@
             if (newPassword) user.password = newPassword;
             user.role = newRole;
             
-            localStorage.setItem('users', JSON.stringify(users));
-            saveAllData();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
         };
 
         window.deleteUser = function(index) {
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
-                localStorage.setItem('users', JSON.stringify(users));
-                saveAllData();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 renderUsersList();
             }
         };
@@ -4813,32 +4932,12 @@
                     document.getElementById('header-logo').src = e.target.result;
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
-                    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                    saveAllData();
+                    saveToLocalStorage();
+                    saveToGitHub(); // Синхронизируем с GitHub
                 };
                 reader.readAsDataURL(file);
             } else {
                 alert('Пожалуйста, выберите PNG файл');
-            }
-        }
-
-        // ФУНКЦИЯ СОХРАНЕНИЯ ВСЕХ ДАННЫХ
-        async function saveAllData() {
-            try {
-                const data = {
-                    tableData: tableData,
-                    customButtons: customButtons,
-                    customColumns: customColumns,
-                    basicColumns: basicColumns,
-                    dateValidationColumns: dateValidationColumns,
-                    appSettings: appSettings,
-                    users: users,
-                    tabs: tabs
-                };
-                
-                await githubStorage.saveData(data);
-            } catch (error) {
-                console.error('Ошибка сохранения данных:', error);
             }
         }
     </script>
