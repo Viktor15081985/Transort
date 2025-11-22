@@ -97,6 +97,51 @@
       "customData": {},
       "attachments": {},
       "displayId": 7
+    },
+    {
+      "id": 8,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 8
+    },
+    {
+      "id": 9,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 9
+    },
+    {
+      "id": 10,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 10
+    },
+    {
+      "id": 11,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 11
+    },
+    {
+      "id": 12,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 12
     }
   ],
   "users": [
@@ -311,12 +356,12 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T10:11:37.529Z",
+  "lastSync": "2025-11-22T11:29:34.013Z",
   "mergeOperation": true,
   "mergedFrom": {
     "remote": "2025-11-22T05:41:56.606Z",
     "local": "2025-11-22T05:43:35.792Z"
   },
   "lastModifiedBy": "admin",
-  "lastModifiedAt": "2025-11-22T10:11:37.529Z"
+  "lastModifiedAt": "2025-11-22T11:29:34.013Z"
 }
