@@ -84,7 +84,8 @@
       "date": "21.11.2025",
       "status": "Активен",
       "customData": {
-        "col_1763711311027_0": "03.11.2025"
+        "col_1763711311027_0": "03.11.2025",
+        "col_1763711311027_1": "ши"
       },
       "attachments": {},
       "displayId": 6
@@ -591,7 +592,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T14:16:42.566Z",
+  "lastSync": "2025-11-22T14:35:49.833Z",
   "syncSource": "device_g03rmfaoh",
   "lastEditor": "admin",
   "mergeOperation": true
