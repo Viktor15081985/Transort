@@ -3539,6 +3539,7 @@
             }
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ КНОПКИ
         function handleAddButton(e) {
             e.preventDefault();
             const buttonName = document.getElementById('button-name').value;
@@ -3549,6 +3550,11 @@
                 .map(input => input.value.trim())
                 .filter(name => name !== '');
             
+            if (columns.length === 0) {
+                alert('Пожалуйста, введите названия столбцов');
+                return;
+            }
+            
             const buttonId = 'btn_' + Date.now();
             const buttonData = {
                 id: buttonId,
@@ -3557,9 +3563,8 @@
             };
             
             customButtons.push(buttonData);
-            saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при добавлении кнопки
             
+            // Добавляем кастомные столбцы
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
                 if (!customColumns.find(col => col.name === colName)) {
@@ -3569,6 +3574,7 @@
                     });
                 }
                 
+                // Сохраняем настройки проверки дат
                 const dateCheckbox = dateCheckboxes[index];
                 if (dateCheckbox && dateCheckbox.checked) {
                     dateValidationColumns[columnId] = true;
@@ -3582,9 +3588,11 @@
             renderTable();
             document.getElementById('add-button-modal').style.display = 'none';
             document.getElementById('add-button-form').reset();
+            
+            alert('Кнопка успешно добавлена!');
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ - КНОПКИ РЯДОМ
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ
         function createCustomButton(buttonData) {
             const buttonWrapper = document.createElement('div');
             buttonWrapper.className = 'custom-button-wrapper';
@@ -3636,9 +3644,11 @@
                 if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
                     const columns = JSON.parse(this.dataset.columns);
                     
+                    // Скрываем все ячейки
                     const allCells = document.querySelectorAll('#data-table th, #data-table td');
                     allCells.forEach(cell => cell.style.display = 'none');
                     
+                    // Показываем фиксированные столбцы
                     for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
                         const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
                         const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
@@ -3647,6 +3657,7 @@
                         dataCells.forEach(cell => cell.style.display = '');
                     }
                     
+                    // Показываем выбранные столбцы
                     columns.forEach(colName => {
                         const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
                         const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
@@ -3670,11 +3681,12 @@
                 saveToLocalStorage();
                 autoSyncChanges(); // Автоматическая синхронизация при редактировании
                 loadCustomButtons();
+                alert('Название кнопки изменено!');
             }
         }
 
         function deleteButton(buttonId) {
-            if (!confirm('Удалить эту кнопку и связанные с ней столбцы?')) return;
+            if (!confirm('Удалить эту кнопку?')) return;
             
             const button = customButtons.find(b => b.id === buttonId);
             if (!button) return;
@@ -3683,24 +3695,8 @@
             saveToLocalStorage();
             autoSyncChanges(); // Автоматическая синхронизация при удалении
             
-            button.columns.forEach(colName => {
-                customColumns = customColumns.filter(col => col.name !== colName);
-                
-                tableData.forEach(row => {
-                    if (row.customData && row.customData[colName]) {
-                        delete row.customData[colName];
-                    }
-                    if (row.attachments && row.attachments[colName]) {
-                        delete row.attachments[colName];
-                    }
-                });
-            });
-            
-            saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация
-            
             loadCustomButtons();
-            renderTable();
+            alert('Кнопка удалена!');
         }
 
         function loadCustomButtons() {
@@ -4357,6 +4353,7 @@
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ УПРАВЛЕНИЯ ФАЙЛАМИ
         function openFileManagementModal(rowId, columnId) {
             currentEditingCell = null;
             isEditingHeader = false;
@@ -4779,6 +4776,7 @@
             autoSyncChanges(); // Автоматическая синхронизация при добавлении пользователя
             renderUsersList();
             document.getElementById('add-user-form').reset();
+            alert('Пользователь успешно добавлен!');
         }
 
         function renderUsersList() {
@@ -4817,6 +4815,7 @@
             saveToLocalStorage();
             autoSyncChanges(); // Автоматическая синхронизация при редактировании пользователя
             renderUsersList();
+            alert('Данные пользователя обновлены!');
         };
 
         window.deleteUser = function(index) {
@@ -4825,6 +4824,7 @@
                 saveToLocalStorage();
                 autoSyncChanges(); // Автоматическая синхронизация при удалении пользователя
                 renderUsersList();
+                alert('Пользователь удален!');
             }
         };
 
@@ -4853,6 +4853,7 @@
                     appSettings.headerLogo = e.target.result;
                     saveToLocalStorage();
                     autoSyncChanges(); // Автоматическая синхронизация при загрузке логотипа
+                    alert('Логотип успешно загружен!');
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -4907,6 +4908,7 @@
             autoSyncChanges(); // Автоматическая синхронизация при добавлении столбца
             
             renderTable();
+            alert(`Столбец "${columnName}" успешно добавлен!`);
             
             // Предлагаем переместить столбец
             if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
@@ -5302,6 +5304,7 @@
             renderTabs();
             renderTable();
             resetFiltersAndSearch();
+            alert('Новая вкладка создана!');
         }
 
         function switchTab(tabId) {
@@ -5363,6 +5366,7 @@
             autoSyncChanges(); // Автоматическая синхронизация при удалении вкладки
             renderTabs();
             renderTable();
+            alert('Вкладка удалена!');
         }
 
         function resetFiltersAndSearch() {
@@ -5606,15 +5610,15 @@
             }
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ ЗАГОЛОВКА ЯЧЕЙКИ
         function createHeaderCell(column, index, type) {
             const th = document.createElement('th');
             th.dataset.columnId = column.id;
             th.dataset.columnType = type;
             th.dataset.columnIndex = index;
             
-            if (type === 'custom') {
-                th.dataset.columnName = column.name;
-            }
+            // ДОБАВЛЕНО: устанавливаем data-column-name для всех столбцов
+            th.dataset.columnName = column.name;
             
             const thContent = document.createElement('div');
             thContent.className = 'th-content';
@@ -5681,6 +5685,7 @@
             return th;
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ ЯЧЕЙКИ ДАННЫХ
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
             
@@ -5708,9 +5713,8 @@
             td.dataset.columnId = column.id;
             td.dataset.rowId = rowData.id;
             
-            if (type === 'custom') {
-                td.dataset.columnName = column.name;
-            }
+            // ДОБАВЛЕНО: устанавливаем data-column-name для всех ячеек
+            td.dataset.columnName = column.name;
             
             let value = '';
             if (type === 'basic') {
@@ -5761,6 +5765,14 @@
             } else if (currentUser && currentUser.role === 'admin' && !td.classList.contains('editable-cell')) {
                 // Для нередактируемых ячеек оставляем модальное окно
                 td.addEventListener('click', () => openEditCellModal(td));
+                
+                // ДОБАВЛЕНО: обработчик двойного клика для управления файлами
+                td.addEventListener('dblclick', (e) => {
+                    if (!e.target.closest('.file-icons')) {
+                        e.stopPropagation();
+                        openFileManagementModal(rowData.id, column.id);
+                    }
+                });
             }
             
             const cellContent = document.createElement('div');
@@ -5864,6 +5876,7 @@
             autoSyncChanges(); // Автоматическая синхронизация при удалении строки
             
             renderTable();
+            alert('Строка удалена!');
         }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ПРИМЕНЕНИЯ ФИЛЬТРОВ
