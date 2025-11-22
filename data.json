@@ -376,6 +376,10 @@
     {
       "id": "col_1763825387847",
       "name": "777"
+    },
+    {
+      "id": "col_1763829778920",
+      "name": "перемещение"
     }
   ],
   "basicColumns": [
@@ -706,6 +710,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T16:46:57.053Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-22T16:50:57.629Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
