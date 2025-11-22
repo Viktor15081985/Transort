@@ -186,6 +186,70 @@
             background: var(--accent-hover);
         }
 
+        /* НОВАЯ СТРОКА СОСТОЯНИЯ В ХЕДЕРЕ */
+        .status-bar-header {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+
+        .status-bar-header.syncing {
+            background: rgba(230, 126, 34, 0.3);
+            color: var(--accent-color);
+        }
+
+        .status-bar-header.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .status-bar-header.error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .status-info-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .status-sync-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sync-icon {
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .sync-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
         .top-controls-panel {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
@@ -1651,101 +1715,7 @@
             margin-left: 8px;
         }
 
-        /* НОВАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ */
-        .status-bar {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(37, 37, 37, 0.85);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: move;
-            backdrop-filter: blur(5px);
-            max-width: 300px;
-            transition: all 0.3s ease;
-        }
-
-        .status-bar:hover {
-            background: rgba(37, 37, 37, 0.95);
-        }
-
-        .status-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 14px;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 3px;
-            transition: all 0.2s ease;
-        }
-
-        .status-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .status-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .status-sync {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-users {
-            display: flex;
-            gap: 8px;
-        }
-
-        .user-count {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .user-count.admin::before {
-            content: "👑";
-            font-size: 10px;
-        }
-
-        .user-count.user::before {
-            content: "👤";
-            font-size: 10px;
-        }
-
-        .sync-status {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .sync-status.syncing {
-            color: var(--accent-color);
-        }
-
-        .sync-status.error {
-            color: #e74c3c;
-        }
-
-        .sync-status.success {
-            color: #2ecc71;
-        }
+        /* УДАЛЕНА СТАРАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ */
 
         /* КНОПКА ОБНОВЛЕНИЯ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ */
         .refresh-data-btn {
@@ -1793,6 +1763,12 @@
             
             .search-container {
                 min-width: 200px;
+            }
+
+            .status-bar-header {
+                min-width: 180px;
+                max-width: 220px;
+                font-size: 0.75rem;
             }
         }
 
@@ -1859,25 +1835,12 @@
                 justify-content: center;
                 width: 100%;
             }
-            
-            /* АДАПТИВНЫЕ ВКЛАДКИ */
-            .tabs-container {
-                max-width: 100%;
-                padding: 0 5px;
-            }
-            
-            .tab {
-                min-width: 120px;
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-            
-            /* СТРОКА СОСТОЯНИЯ НА МОБИЛЬНЫХ */
-            .status-bar {
-                bottom: 5px;
-                right: 5px;
-                left: 5px;
+
+            .status-bar-header {
+                order: -1;
+                width: 100%;
                 max-width: none;
+                margin-bottom: 5px;
             }
         }
 
@@ -1918,18 +1881,6 @@
             .notification-panel {
                 width: 95%;
                 right: 2.5%;
-            }
-            
-            /* УПРОЩЕННАЯ СТРОКА СОСТОЯНИЯ НА МАЛЕНЬКИХ ЭКРАНАХ */
-            .status-bar {
-                flex-direction: column;
-                gap: 5px;
-                padding: 6px 8px;
-            }
-            
-            .status-users {
-                justify-content: space-between;
-                width: 100%;
             }
         }
 
@@ -1980,6 +1931,12 @@
                 min-width: 100px;
                 font-size: 0.8rem;
             }
+
+            .status-bar-header {
+                min-width: 150px;
+                font-size: 0.7rem;
+                padding: 0.4rem 0.8rem;
+            }
             
             th, td {
                 padding: 0.3rem;
@@ -1999,16 +1956,6 @@
             .fixed-columns-setting {
                 bottom: 50px;
                 right: 10px;
-            }
-            
-            /* ЕЩЕ БОЛЕЕ КОМПАКТНАЯ СТРОКА СОСТОЯНИЯ */
-            .status-bar {
-                font-size: 11px;
-                padding: 5px;
-            }
-            
-            .status-info {
-                gap: 1px;
             }
         }
 
@@ -2031,16 +1978,10 @@
                 width: 100%;
                 justify-content: flex-end;
             }
-            
-            /* МИНИМАЛИСТИЧНАЯ СТРОКА СОСТОЯНИЯ */
-            .status-bar {
-                flex-direction: row;
-                justify-content: space-between;
-                width: calc(100% - 10px);
-            }
-            
-            .status-users {
-                gap: 5px;
+
+            .status-bar-header {
+                min-width: 120px;
+                font-size: 0.65rem;
             }
         }
 
@@ -2077,6 +2018,15 @@
             </div>
             <div class="user-info">
                 <span class="user-name" id="user-name-display"></span>
+                <!-- НОВАЯ СТРОКА СОСТОЯНИЯ В ХЕДЕРЕ -->
+                <div class="status-bar-header" id="status-bar-header">
+                    <div class="status-info-header">
+                        <div class="status-sync-header">
+                            <span class="sync-icon">🔄</span>
+                            <span class="sync-text" id="sync-status-text">Готов к синхронизации</span>
+                        </div>
+                    </div>
+                </div>
                 <button class="user-role-btn" id="user-role">Пользователь</button>
                 <button id="logout-btn" class="user-role-btn">Выйти</button>
             </div>
@@ -2146,6 +2096,9 @@
                         </button>
                         <button id="github-sync-btn" class="manage-users-btn" title="Настройки синхронизации с GitHub">
                             <span class="icon">🔗</span> GitHub Синхронизация
+                        </button>
+                        <button id="force-sync-btn" class="manage-users-btn" title="Принудительная синхронизация с GitHub">
+                            <span class="icon">🔄</span> Принудительная синхронизация
                         </button>
                     </div>
                 </div>
@@ -2220,23 +2173,7 @@
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
 
-        <!-- НОВАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ -->
-        <div class="status-bar" id="status-bar">
-            <div class="status-info">
-                <div class="status-sync">
-                    <span id="sync-status-text">Готов к синхронизации</span>
-                </div>
-                <div class="status-users">
-                    <div class="user-count admin">
-                        <span id="admin-count">0</span>
-                    </div>
-                    <div class="user-count user">
-                        <span id="user-count">0</span>
-                    </div>
-                </div>
-            </div>
-            <button class="status-close" id="status-close" title="Скрыть строку состояния">×</button>
-        </div>
+        <!-- УДАЛЕНА СТАРАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ -->
     </div>
 
     <!-- Модальное окно для добавления кнопки -->
@@ -2538,13 +2475,10 @@
         let adminConflictData = null;
         let currentConflict = null;
 
-               // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ
+        // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
         function updateStatusBar() {
             const adminCount = Object.values(onlineUsers).filter(user => user.role === 'admin').length;
             const userCount = Object.values(onlineUsers).filter(user => user.role === 'user').length;
-            
-            document.getElementById('admin-count').textContent = adminCount;
-            document.getElementById('user-count').textContent = userCount;
             
             // Обновляем данные о текущем пользователе
             if (currentUser) {
@@ -2566,81 +2500,39 @@
             localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
         }
 
-        // ФУНКЦИЯ ДЛЯ РАБОТЫ С ПЛАВАЮЩЕЙ СТРОКОЙ СОСТОЯНИЯ
-        function setupStatusBar() {
-            const statusBar = document.getElementById('status-bar');
-            const statusClose = document.getElementById('status-close');
-            
-            // Закрытие строки состояния
-            statusClose.addEventListener('click', function() {
-                statusBar.style.display = 'none';
-                localStorage.setItem('statusBarHidden', 'true');
-            });
-            
-            // Восстановление состояния строки
-            if (localStorage.getItem('statusBarHidden') === 'true') {
-                statusBar.style.display = 'none';
-            }
-            
-            // Перетаскивание строки состояния
-            let isDragging = false;
-            let dragOffset = { x: 0, y: 0 };
-            
-            statusBar.addEventListener('mousedown', function(e) {
-                if (e.target === statusBar || e.target.classList.contains('status-info')) {
-                    isDragging = true;
-                    const rect = statusBar.getBoundingClientRect();
-                    dragOffset.x = e.clientX - rect.left;
-                    dragOffset.y = e.clientY - rect.top;
-                    statusBar.style.cursor = 'grabbing';
-                }
-            });
-            
-            document.addEventListener('mousemove', function(e) {
-                if (isDragging) {
-                    statusBar.style.left = (e.clientX - dragOffset.x) + 'px';
-                    statusBar.style.top = (e.clientY - dragOffset.y) + 'px';
-                    statusBar.style.right = 'auto';
-                    statusBar.style.bottom = 'auto';
-                }
-            });
-            
-            document.addEventListener('mouseup', function() {
-                isDragging = false;
-                statusBar.style.cursor = 'move';
-                
-                // Сохраняем позицию
-                const rect = statusBar.getBoundingClientRect();
-                localStorage.setItem('statusBarPosition', JSON.stringify({
-                    left: rect.left,
-                    top: rect.top
-                }));
-            });
-            
-            // Восстановление позиции
-            const savedPosition = localStorage.getItem('statusBarPosition');
-            if (savedPosition) {
-                const position = JSON.parse(savedPosition);
-                statusBar.style.left = position.left + 'px';
-                statusBar.style.top = position.top + 'px';
-                statusBar.style.right = 'auto';
-                statusBar.style.bottom = 'auto';
-            }
-        }
-
-        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ СТАТУСА СИНХРОНИЗАЦИИ
+        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ СТАТУСА СИНХРОНИЗАЦИИ В ХЕДЕРЕ
         function updateSyncStatus(message, type = '') {
             const statusElement = document.getElementById('sync-status-text');
+            const statusBar = document.getElementById('status-bar-header');
+            
             statusElement.textContent = message;
-            statusElement.className = 'sync-status ' + type;
+            
+            // Удаляем все классы статуса
+            statusBar.classList.remove('syncing', 'success', 'error');
+            
+            // Добавляем соответствующий класс
+            if (type) {
+                statusBar.classList.add(type);
+            }
+            
+            // Обновляем иконку в зависимости от статуса
+            const syncIcon = statusBar.querySelector('.sync-icon');
+            if (type === 'syncing') {
+                syncIcon.textContent = '🔄';
+            } else if (type === 'success') {
+                syncIcon.textContent = '✅';
+            } else if (type === 'error') {
+                syncIcon.textContent = '❌';
+            } else {
+                syncIcon.textContent = '🔗';
+            }
         }
 
-        // НОВАЯ ФУНКЦИЯ saveToGitHub с автоматическим слиянием и проверкой конфликтов
+        // УЛУЧШЕННАЯ ФУНКЦИЯ СИНХРОНИЗАЦИИ С АВТОМАТИЧЕСКИМ РАЗРЕШЕНИЕМ КОНФЛИКТОВ
         async function saveToGitHub() {
             updateSyncStatus('Синхронизация...', 'syncing');
 
             try {
-                // Проверка конфигурации
                 if (!GITHUB_CONFIG.token) {
                     throw new Error('GitHub токен не настроен');
                 }
@@ -2658,8 +2550,8 @@
                     dateValidationColumns,
                     tabs,
                     lastSync: new Date().toISOString(),
-                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9), // Идентификатор устройства
-                    lastEditor: currentUser.username // Добавляем информацию о редакторе
+                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9),
+                    lastEditor: currentUser.username
                 };
 
                 console.log('📊 Данные для сохранения:', {
@@ -2698,7 +2590,10 @@
                         });
 
                         // ПРОВЕРКА КОНФЛИКТОВ ДЛЯ АДМИНИСТРАТОРОВ
-                        if (currentUser.role === 'admin' && remoteData.lastEditor && remoteData.lastEditor !== currentUser.username) {
+                        if (currentUser.role === 'admin' && remoteData.lastEditor && 
+                            remoteData.lastEditor !== currentUser.username && 
+                            remoteData.lastSync > localStorage.getItem('lastSyncTime')) {
+                            
                             console.log('⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
                             
                             // Сохраняем данные конфликта для разрешения
@@ -2712,10 +2607,15 @@
                             showConflictResolution(remoteData, dataToSave);
                             return; // Прерываем сохранение до разрешения конфликта
                         }
+                        
+                        // Автоматическое слияние данных
+                        console.log('🔄 Выполняем автоматическое слияние данных...');
+                        const mergedData = mergeData(remoteData, dataToSave);
+                        content = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
+                        
                     } else if (fileInfoResponse.status === 404) {
                         console.log('📝 Файл не существует, создаем новый');
                         sha = null;
-                        remoteData = null;
                     } else {
                         const error = await fileInfoResponse.json();
                         throw new Error(`Ошибка получения информации о файле: ${error.message}`);
@@ -2725,23 +2625,8 @@
                     // Продолжаем без информации о удаленном файле
                 }
 
-                // 3. АВТОМАТИЧЕСКОЕ СЛИЯНИЕ ДАННЫХ (если есть удаленные данные)
-                let finalData = dataToSave;
-                
-                if (remoteData && remoteData.tableData) {
-                    console.log('🔄 Выполняем автоматическое слияние данных...');
-                    finalData = mergeData(remoteData, dataToSave);
-                    console.log('✅ Слияние завершено:', {
-                        было_строк: remoteData.tableData.length,
-                        стало_строк: finalData.tableData.length
-                    });
-                    
-                    // Обновляем контент после слияния
-                    content = btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2))));
-                }
-
-                // 4. СОХРАНЕНИЕ ДАННЫХ
-                console.log('💾 Отправляем данные с SHA:', sha);
+                // 3. СОХРАНЕНИЕ ДАННЫХ
+                console.log('💾 Отправляем данные на GitHub...');
                 const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
                     method: 'PUT',
                     headers: {
@@ -2753,41 +2638,40 @@
                         message: `Авто-синхронизация ${new Date().toLocaleString()} (${currentUser.username})`,
                         content: content,
                         branch: GITHUB_CONFIG.branch,
-                        sha: sha // Используем актуальный SHA
+                        sha: sha
                     })
                 });
 
-                // 5. ОБРАБОТКА ОТВЕТА
+                // 4. ОБРАБОТКА ОТВЕТА
                 if (!saveResponse.ok) {
                     const error = await saveResponse.json();
                     
                     // Если SHA не совпадает (конфликт версий)
                     if (error.message && error.message.includes('does not match')) {
-                        console.log('⚡ Обнаружен конфликт версий, выполняем разрешение...');
+                        console.log('⚡ Обнаружен конфликт SHA, обновляем данные...');
+                        await loadFromGitHub(); // Загружаем актуальные данные
                         
-                        // Получаем самый актуальный SHA
-                        const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                        // Повторяем сохранение с обновленными данными
+                        const retryData = {
+                            ...dataToSave,
+                            tableData: tableData, // Используем обновленные данные
+                            lastSync: new Date().toISOString()
+                        };
+                        
+                        const retryContent = btoa(unescape(encodeURIComponent(JSON.stringify(retryData, null, 2))));
+                        
+                        // Получаем актуальный SHA
+                        const retryInfoResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
                             headers: {
                                 'Authorization': `token ${GITHUB_CONFIG.token}`,
                                 'Accept': 'application/vnd.github.v3+json'
                             }
                         });
                         
-                        if (retryResponse.ok) {
-                            const latestFileInfo = await retryResponse.json();
-                            const newSha = latestFileInfo.sha;
+                        if (retryInfoResponse.ok) {
+                            const retryFileInfo = await retryInfoResponse.json();
+                            const newSha = retryFileInfo.sha;
                             
-                            console.log('🔄 Получен новый SHA для повторной попытки:', newSha);
-                            
-                            // СЛИЯНИЕ С САМЫМИ АКТУАЛЬНЫМИ ДАННЫМИ
-                            const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
-                            const latestData = JSON.parse(latestContent);
-                            
-                            console.log('🔄 Повторное слияние с актуальными данными...');
-                            const mergedData = mergeData(latestData, dataToSave);
-                            const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
-                            
-                            // Повторяем запрос с новым SHA и объединенными данными
                             const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
                                 method: 'PUT',
                                 headers: {
@@ -2797,7 +2681,7 @@
                                 },
                                 body: JSON.stringify({
                                     message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()} (${currentUser.username})`,
-                                    content: mergedContent,
+                                    content: retryContent,
                                     branch: GITHUB_CONFIG.branch,
                                     sha: newSha
                                 })
@@ -2808,24 +2692,20 @@
                                 throw new Error(`Ошибка при повторной попытке: ${retryError.message}`);
                             }
                             
-                            // УСПЕХ ПОВТОРНОЙ ПОПЫТКИ
-                            console.log('✅ Успешно сохранено после разрешения конфликта');
+                            console.log('✅ Успешно сохранено после разрешения конфликта SHA');
                             updateSyncStatus('Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString(), 'success');
-                            
-                            // Обновляем локальные данные объединенной версией
-                            updateLocalData(mergedData);
-                            saveToLocalStorage();
+                            localStorage.setItem('lastSyncTime', new Date().toISOString());
                             return;
                         }
                     }
                     
-                    // Другие ошибки
                     throw new Error(error.message || 'Ошибка сохранения в GitHub');
                 }
 
                 // УСПЕШНОЕ СОХРАНЕНИЕ
                 console.log('✅ Успешно сохранено в GitHub');
                 updateSyncStatus('Синхронизировано: ' + new Date().toLocaleTimeString(), 'success');
+                localStorage.setItem('lastSyncTime', new Date().toISOString());
                 saveToLocalStorage();
                 
             } catch (error) {
@@ -2909,6 +2789,7 @@
             if (saveResponse.ok) {
                 console.log('✅ Успешно сохранено после разрешения конфликта');
                 updateSyncStatus('Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString(), 'success');
+                localStorage.setItem('lastSyncTime', new Date().toISOString());
                 
                 if (resolution === 'merge') {
                     updateLocalData(finalData);
@@ -3049,17 +2930,15 @@
             loadCustomButtons();
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ loadFromGitHub
+        // УЛУЧШЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ИЗ GITHUB
         async function loadFromGitHub() {
             updateSyncStatus('Загрузка из GitHub...', 'syncing');
 
             try {
                 console.log('📥 Начинаем загрузку данных из GitHub...');
                 
-                if (!GITHUB_CONFIG.token) {
-                    // Если токена нет, пытаемся загрузить из публичного репозитория
-                    console.log('⚠️ Токен GitHub не настроен, пробуем загрузить из публичного репозитория...');
-                    updateSyncStatus('Попытка загрузки из публичного репозитория...', 'syncing');
+                if (!GITHUB_CONFIG.token && !GITHUB_CONFIG.repo) {
+                    throw new Error('Настройки GitHub не настроены');
                 }
 
                 const headers = {
@@ -3078,7 +2957,7 @@
                 if (!response.ok) {
                     if (response.status === 404) {
                         console.log('📝 Файл данных не найден, будет создан при первой синхронизации');
-                        updateSyncStatus('Файл данных не найден (создастся при синхронизации)', '');
+                        updateSyncStatus('Файл данных не найден', '');
                         return;
                     }
                     const error = await response.json();
@@ -3108,31 +2987,41 @@
                     throw new Error('Файл данных поврежден');
                 }
 
-                console.log('✅ Данные успешно загружены:', {
-                    строки: data.tableData?.length || 0,
-                    пользователи: data.users?.length || 0,
-                    вкладки: data.tabs?.length || 0
-                });
-
-                // ОБНОВЛЯЕМ ЛОКАЛЬНЫЕ ДАННЫЕ
+                console.log('✅ Данные успешно загружены');
+                
+                // Обновляем локальные данные
                 updateLocalData(data);
                 saveToLocalStorage();
+                localStorage.setItem('lastSyncTime', new Date().toISOString());
 
                 updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
-
-                console.log('🎉 Загрузка завершена успешно');
 
             } catch (error) {
                 console.error('❌ Ошибка загрузки:', error);
                 updateSyncStatus('Ошибка загрузки: ' + error.message, 'error');
                 
                 // При ошибке загружаем данные из localStorage
-                loadFromLocalStorage();
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
+                loadFromLocalStorageWithNotification();
+            }
+        }
+
+        // ФУНКЦИЯ ПРИНУДИТЕЛЬНОЙ СИНХРОНИЗАЦИИ
+        async function forceSync() {
+            if (!confirm('Принудительная синхронизация загрузит данные из GitHub и перезапишет локальные изменения. Продолжить?')) {
+                return;
+            }
+            
+            try {
+                updateSyncStatus('Принудительная синхронизация...', 'syncing');
                 
-                console.log('📁 Загружены резервные данные из localStorage');
+                // Сбрасываем временные метки для принудительной загрузки
+                localStorage.removeItem('lastSyncTime');
+                
+                await loadFromGitHub();
+                
+                alert('Принудительная синхронизация завершена успешно!');
+            } catch (error) {
+                alert('Ошибка принудительной синхронизации: ' + error.message);
             }
         }
 
@@ -3166,7 +3055,6 @@
         function initializeAppWithFallback() {
             setupEventListeners();
             loadAppSettings();
-            setupStatusBar();
             updateStatusBar();
             
             // Загружаем данные онлайн-пользователей
@@ -3229,8 +3117,9 @@
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
             document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
+            document.getElementById('force-sync-btn').addEventListener('click', forceSync);
             
-            // НОВАЯ КНОПКА ОБНОВЛЕНИЯ ДАННЫХ
+            // КНОПКА ОБНОВЛЕНИЯ ДАННЫХ
             document.getElementById('refresh-data-btn').addEventListener('click', function() {
                 if (currentUser && currentUser.role === 'user') {
                     loadFromGitHub();
@@ -3426,7 +3315,7 @@
             document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
-        // ОСТАВШИЕСЯ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЙ (но с заменой старой строки состояния на новую)
+        // ОСТАВШИЕСЯ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЙ 
         function showAllColumns() {
             const allCells = document.querySelectorAll('#data-table th, #data-table td');
             allCells.forEach(cell => cell.style.display = '');
@@ -4582,7 +4471,7 @@
             }
         }
 
-                function printPreviewFile() {
+        function printPreviewFile() {
             if (!currentPreviewFile) return;
             
             const printWindow = window.open('', '_blank');
