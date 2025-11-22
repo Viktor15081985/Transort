@@ -178,6 +178,24 @@
       "customData": {},
       "attachments": {},
       "displayId": 16
+    },
+    {
+      "id": 17,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 17
+    },
+    {
+      "id": 18,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 18
     }
   ],
   "users": [
@@ -447,7 +465,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T12:28:25.461Z",
+  "lastSync": "2025-11-22T12:29:31.743Z",
   "mergeOperation": true,
   "mergedFrom": {
     "remote": "2025-11-22T05:41:56.606Z",
