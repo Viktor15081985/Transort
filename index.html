@@ -127,46 +127,7 @@
             background: var(--bg-primary);
         }
 
-        /* НОВАЯ СТРОКА СОСТОЯНИЯ */
-        .status-bar {
-            background: var(--bg-secondary);
-            padding: 6px 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            height: 30px;
-            min-height: 30px;
-        }
-
-        .status-info {
-            display: flex;
-            gap: 15px;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--text-secondary);
-        }
-
-        .status-indicator.online {
-            background: #2ecc71;
-        }
-
-        .status-indicator.admin {
-            background: var(--accent-color);
-        }
-
+        /* УДАЛЕНА СТРОКА СОСТОЯНИЯ ИЗ ВЕРХНЕЙ ЧАСТИ */
         .header {
             background: var(--bg-secondary);
             padding: 0.8rem 1.5rem;
@@ -496,7 +457,7 @@
             background: var(--table-hover);
         }
 
-        /* НОВАЯ КНОПКА ОБНОВИТЬ */
+        /* НОВАЯ КНОПКА ОБНОВИТЬ - ТОЛЬКО ДЛЯ ПОЛЬЗОВАТЕЛЕЙ */
         .refresh-data-btn {
             background: var(--bg-dark-controls);
             color: var(--text-primary);
@@ -519,9 +480,25 @@
             background: var(--table-hover);
         }
 
+        .admin-only {
+            display: none;
+        }
+
+        .admin .admin-only {
+            display: block;
+        }
+
+        .user-only {
+            display: block;
+        }
+
+        .admin .user-only {
+            display: none;
+        }
+
         .container {
             display: flex;
-            height: calc(100vh - 165px); /* Увеличили высоту из-за новой строки состояния */
+            height: calc(100vh - 135px); /* Уменьшили высоту из-за удаления строки состояния */
         }
 
         .sidebar {
@@ -1363,22 +1340,6 @@
             color: var(--text-primary);
         }
 
-        .admin-only {
-            display: none;
-        }
-
-        .admin .admin-only {
-            display: block;
-        }
-
-        .user-only {
-            display: block;
-        }
-
-        .admin .user-only {
-            display: none;
-        }
-
         .user-list {
             margin-top: 1.2rem;
         }
@@ -1715,12 +1676,12 @@
             margin-left: 8px;
         }
 
-        /* ИЗМЕНЕНИЕ: Переносим статус синхронизации в правый нижний угол */
-        .sync-status {
+        /* НОВЫЙ СТИЛЬ ДЛЯ СТРОКИ СОСТОЯНИЯ В НИЖНЕМ ПРАВОМ УГЛУ */
+        .status-info-bottom {
             position: fixed;
             bottom: 10px;
-            right: 10px;
-            background: var(--bg-secondary);
+            left: 10px;
+            background: rgba(37, 37, 37, 0.7); /* Прозрачный фон */
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 6px 12px;
@@ -1728,18 +1689,39 @@
             color: var(--text-secondary);
             z-index: 1000;
             max-width: 300px;
+            backdrop-filter: blur(5px);
         }
 
-        .sync-status.syncing {
-            color: var(--accent-color);
+        .status-info-bottom .status-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
 
-        .sync-status.error {
-            color: #e74c3c;
+        .status-info-bottom .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .sync-status.success {
-            color: #2ecc71;
+        .status-info-bottom .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .status-info-bottom .status-indicator.online {
+            background: #2ecc71;
+        }
+
+        .status-info-bottom .status-indicator.admin {
+            background: var(--accent-color);
+        }
+
+        /* УДАЛЕН СТАРЫЙ СТИЛЬ СТАТУСА СИНХРОНИЗАЦИИ */
+        .sync-status {
+            display: none;
         }
 
         /* УЛУЧШЕННАЯ МОБИЛЬНАЯ ВЕРСИЯ */
@@ -1819,19 +1801,6 @@
             }
             
             /* Улучшения для мобильных устройств */
-            .status-bar {
-                flex-direction: column;
-                height: auto;
-                padding: 8px;
-                gap: 5px;
-            }
-            
-            .status-info {
-                justify-content: center;
-                width: 100%;
-                flex-wrap: wrap;
-            }
-            
             .table-container {
                 font-size: 0.8rem;
             }
@@ -1881,10 +1850,6 @@
             }
             
             /* Дополнительные улучшения для планшетов */
-            .status-bar {
-                font-size: 0.75rem;
-            }
-            
             .column-controls {
                 bottom: 15px;
                 right: 15px;
@@ -1969,18 +1934,9 @@
             }
             
             /* Оптимизация для маленьких экранов */
-            .status-bar {
-                padding: 5px;
-                font-size: 0.7rem;
-            }
-            
-            .status-info {
-                gap: 10px;
-            }
-            
-            .sync-status {
+            .status-info-bottom {
                 bottom: 5px;
-                right: 5px;
+                left: 5px;
                 font-size: 0.7rem;
                 padding: 4px 8px;
             }
@@ -2052,23 +2008,6 @@
 
     <!-- Основной экран -->
     <div id="main-screen">
-        <!-- НОВАЯ СТРОКА СОСТОЯНИЯ -->
-        <div class="status-bar">
-            <div class="status-info">
-                <div class="status-item">
-                    <span class="status-indicator online"></span>
-                    <span id="online-users-count">Пользователи: 0</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-indicator admin"></span>
-                    <span id="online-admins-count">Администраторы: 0</span>
-                </div>
-            </div>
-            <div id="last-update-info" class="status-item">
-                Последнее обновление: <span id="last-update-time">--:--:--</span>
-            </div>
-        </div>
-
         <div class="header">
             <div class="header-content">
                 <img id="header-logo" class="logo" src="" alt="Logo" style="display: none;">
@@ -2101,8 +2040,8 @@
                     <button class="search-clear" id="search-clear" title="Очистить поиск">×</button>
                 </div>
 
-                <!-- НОВАЯ КНОПКА ОБНОВИТЬ -->
-                <button class="refresh-data-btn" id="refresh-data-btn" title="Обновить данные с GitHub">
+                <!-- НОВАЯ КНОПКА ОБНОВИТЬ - ТОЛЬКО ДЛЯ ПОЛЬЗОВАТЕЛЕЙ -->
+                <button class="refresh-data-btn user-only" id="refresh-data-btn" title="Обновить данные с GitHub">
                     <span class="icon">↻</span> Обновить
                 </button>
 
@@ -2220,8 +2159,22 @@
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
 
-        <!-- ИЗМЕНЕНИЕ: Статус синхронизации перенесен в правый нижний угол -->
-        <div class="sync-status" id="sync-status">Готов к синхронизации</div>
+        <!-- НОВАЯ СТРОКА СОСТОЯНИЯ В НИЖНЕМ ПРАВОМ УГЛУ -->
+        <div class="status-info-bottom" id="status-info-bottom">
+            <div class="status-info">
+                <div class="status-item">
+                    <span class="status-indicator online"></span>
+                    <span id="online-users-count">Пользователи: 0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-indicator admin"></span>
+                    <span id="online-admins-count">Администраторы: 0</span>
+                </div>
+                <div class="status-item" id="last-update-info">
+                    Последнее обновление: <span id="last-update-time">--:--:--</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Модальное окно для добавления кнопки -->
@@ -2562,10 +2515,8 @@
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ saveToGitHub С УЧЕТОМ КОНФЛИКТОВ
         async function saveToGitHub() {
-            const statusElement = document.getElementById('sync-status');
-            statusElement.textContent = 'Синхронизация...';
-            statusElement.className = 'sync-status syncing';
-
+            const statusElement = document.getElementById('status-info-bottom');
+            
             try {
                 // Проверка конфигурации
                 if (!GITHUB_CONFIG.token) {
@@ -2738,8 +2689,6 @@
                             
                             // УСПЕХ ПОВТОРНОЙ ПОПЫТКИ
                             console.log('✅ Успешно сохранено после разрешения конфликта');
-                            statusElement.textContent = 'Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString();
-                            statusElement.className = 'sync-status success';
                             
                             // Обновляем локальные данные объединенной версией
                             updateLocalData(mergedData);
@@ -2755,15 +2704,11 @@
 
                 // УСПЕШНОЕ СОХРАНЕНИЕ
                 console.log('✅ Успешно сохранено в GitHub');
-                statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
-                statusElement.className = 'sync-status success';
                 saveToLocalStorage();
                 updateLastUpdateTime();
                 
             } catch (error) {
                 console.error('❌ Ошибка синхронизации:', error);
-                statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
-                statusElement.className = 'sync-status error';
                 saveToLocalStorage();
             }
         }
@@ -2935,8 +2880,6 @@
 
         // ФУНКЦИЯ СОХРАНЕНИЯ РАЗРЕШЕННЫХ ДАННЫХ
         async function saveResolvedData(data, sha) {
-            const statusElement = document.getElementById('sync-status');
-            
             try {
                 const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
                 
@@ -2961,30 +2904,21 @@
                 }
                 
                 console.log('✅ Конфликт разрешен, данные сохранены');
-                statusElement.textContent = 'Конфликт разрешен: ' + new Date().toLocaleTimeString();
-                statusElement.className = 'sync-status success';
                 updateLastUpdateTime();
                 
             } catch (error) {
                 console.error('❌ Ошибка при сохранении разрешенных данных:', error);
-                statusElement.textContent = 'Ошибка разрешения конфликта: ' + error.message;
-                statusElement.className = 'sync-status error';
             }
         }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ loadFromGitHub
         async function loadFromGitHub() {
-            const statusElement = document.getElementById('sync-status');
-            statusElement.textContent = 'Загрузка из GitHub...';
-            statusElement.className = 'sync-status syncing';
-
             try {
                 console.log('📥 Начинаем загрузку данных из GitHub...');
                 
                 if (!GITHUB_CONFIG.token) {
                     // Если токена нет, пытаемся загрузить из публичного репозитория
                     console.log('⚠️ Токен GitHub не настроен, пробуем загрузить из публичного репозитория...');
-                    statusElement.textContent = 'Попытка загрузки из публичного репозитория...';
                 }
 
                 const headers = {
@@ -3003,8 +2937,6 @@
                 if (!response.ok) {
                     if (response.status === 404) {
                         console.log('📝 Файл данных не найден, будет создан при первой синхронизации');
-                        statusElement.textContent = 'Файл данных не найден (создастся при синхронизации)';
-                        statusElement.className = 'sync-status';
                         return;
                     }
                     const error = await response.json();
@@ -3045,15 +2977,10 @@
                 saveToLocalStorage();
                 updateLastUpdateTime();
 
-                statusElement.textContent = 'Загружено из GitHub: ' + new Date().toLocaleTimeString();
-                statusElement.className = 'sync-status success';
-
                 console.log('🎉 Загрузка завершена успешно');
 
             } catch (error) {
                 console.error('❌ Ошибка загрузки:', error);
-                statusElement.textContent = 'Ошибка загрузки: ' + error.message;
-                statusElement.className = 'sync-status error';
                 
                 // При ошибке загружаем данные из localStorage
                 loadFromLocalStorage();
@@ -3120,10 +3047,6 @@
             renderTable();
             loadCustomButtons();
             
-            const statusElement = document.getElementById('sync-status');
-            statusElement.textContent = 'Используются локальные данные';
-            statusElement.className = 'sync-status';
-            
             console.log('📁 Загружены локальные данные из localStorage');
         }
 
@@ -3158,7 +3081,7 @@
             document.getElementById('search-clear').addEventListener('click', clearSearch);
             document.getElementById('select-all-checkbox').addEventListener('change', handleSelectAll);
 
-            // НОВАЯ КНОПКА ОБНОВИТЬ
+            // НОВАЯ КНОПКА ОБНОВИТЬ - ТОЛЬКО ДЛЯ ПОЛЬЗОВАТЕЛЕЙ
             document.getElementById('refresh-data-btn').addEventListener('click', () => {
                 loadFromGitHub();
                 updateOnlineUsers();
@@ -3306,7 +3229,7 @@
             }
         }
 
-               function setupAdminFeatures() {
+        function setupAdminFeatures() {
             const headerTitle = document.getElementById('header-title');
             headerTitle.classList.add('editable');
             headerTitle.contentEditable = 'true';
@@ -4492,4 +4415,1106 @@
             }
         }
 
-        
+        function printPreviewFile() {
+            if (!currentPreviewFile) return;
+            
+            const printWindow = window.open('', '_blank');
+            
+            if (currentPreviewFile.file.type.startsWith('image/')) {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    text-align: center;
+                                    font-family: Arial, sans-serif;
+                                }
+                                img { 
+                                    max-width: 100%; 
+                                    max-height: 90vh; 
+                                    border-radius: 5px;
+                                }
+                                .file-info {
+                                    margin-bottom: 20px;
+                                    padding: 10px;
+                                    background: #f5f5f5;
+                                    border-radius: 5px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="file-info">
+                                <h2>${currentPreviewFile.file.name}</h2>
+                                <p>${getFileTypeDescription(currentPreviewFile.file.type)}</p>
+                            </div>
+                            <img src="${currentPreviewFile.file.data}" alt="${currentPreviewFile.file.name}">
+                        </body>
+                    </html>
+                `);
+            } else if (currentPreviewFile.file.type.includes('pdf')) {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { margin: 0; padding: 0; }
+                                embed { width: 100%; height: 100vh; }
+                            </style>
+                        </head>
+                        <body>
+                            <embed src="${currentPreviewFile.file.data}" type="application/pdf">
+                        </body>
+                    </html>
+                `);
+            } else {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 40px; 
+                                    font-family: Arial, sans-serif;
+                                    text-align: center;
+                                }
+                                .file-info {
+                                    margin-bottom: 30px;
+                                    padding: 20px;
+                                    background: #f5f5f5;
+                                    border-radius: 10px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="file-info">
+                                <h1>${currentPreviewFile.file.name}</h1>
+                                <h3>${getFileTypeDescription(currentPreviewFile.file.type)}</h3>
+                                <p>Прямая печать недоступна для этого типа файла.</p>
+                                <p>Пожалуйста, сохраните файл и откройте его в соответствующей программе для печати.</p>
+                            </div>
+                        </body>
+                    </html>
+                `);
+            }
+            
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+
+        // ФУНКЦИИ УПРАВЛЕНИЯ ПОЛЬЗОВАТЕЛЯМИ
+        function handleAddUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('new-role').value;
+            
+            if (users.find(u => u.username === username)) {
+                alert('Пользователь уже существует');
+                return;
+            }
+            
+            users.push({ username, password, role });
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            renderUsersList();
+            document.getElementById('add-user-form').reset();
+        }
+
+        function renderUsersList() {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                if (user.username === currentUser.username) return;
+                
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${user.username}</strong>
+                        <span class="user-role">${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</span>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn-edit" onclick="editUser(${index})">✎</button>
+                        <button class="btn-danger" onclick="deleteUser(${index})">×</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.editUser = function(index) {
+            const user = users[index];
+            const newUsername = prompt('Новое имя пользователя:', user.username);
+            const newPassword = prompt('Новый пароль (оставьте пустым чтобы не менять):');
+            const newRole = confirm('Сделать администратором?') ? 'admin' : 'user';
+            
+            if (newUsername) user.username = newUsername;
+            if (newPassword) user.password = newPassword;
+            user.role = newRole;
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            renderUsersList();
+        };
+
+        window.deleteUser = function(index) {
+            if (confirm('Удалить этого пользователя?')) {
+                users.splice(index, 1);
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
+                renderUsersList();
+            }
+        };
+
+        function loadAppSettings() {
+            document.getElementById('header-title').textContent = appSettings.headerTitle;
+            if (appSettings.headerLogo) {
+                document.getElementById('header-logo').src = appSettings.headerLogo;
+                document.getElementById('header-logo').style.display = 'block';
+            }
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+        }
+
+        function triggerLogoUpload() {
+            if (currentUser && currentUser.role === 'admin') {
+                document.getElementById('logo-upload').click();
+            }
+        }
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'image/png') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('header-logo').src = e.target.result;
+                    document.getElementById('header-logo').style.display = 'block';
+                    appSettings.headerLogo = e.target.result;
+                    saveToLocalStorage();
+                    saveToGitHub(); // Синхронизируем с GitHub
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Пожалуйста, выберите PNG файл');
+            }
+        }
+
+        // ФУНКЦИИ ПРОКРУТКИ ВКЛАДОК
+        function scrollTabsLeft() {
+            const container = document.getElementById('tabs-container');
+            container.scrollBy({
+                left: -200,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollTabsRight() {
+            const container = document.getElementById('tabs-container');
+            container.scrollBy({
+                left: 200,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateFixedColumnsCount() {
+            const count = parseInt(document.getElementById('fixed-columns-count').value);
+            if (count >= 1 && count <= 10) {
+                appSettings.fixedColumnsCount = count;
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
+            }
+        }
+
+        // ФУНКЦИИ УПРАВЛЕНИЯ СТОЛБЦАМИ
+        function addNewColumn() {
+            const columnName = prompt('Введите название нового столбца:');
+            if (!columnName) return;
+
+            const columnId = 'col_' + Date.now();
+            customColumns.push({
+                id: columnId,
+                name: columnName
+            });
+
+            // Добавляем столбец во все строки
+            tableData.forEach(row => {
+                if (!row.customData) row.customData = {};
+                row.customData[columnId] = '';
+            });
+
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            
+            renderTable();
+        }
+
+        function showRemoveColumnModal() {
+            const select = document.getElementById('column-to-remove');
+            select.innerHTML = '';
+
+            // Добавляем только кастомные столбцы (базовые нельзя удалять)
+            customColumns.forEach(column => {
+                const option = document.createElement('option');
+                option.value = column.id;
+                option.textContent = column.name;
+                select.appendChild(option);
+            });
+
+            if (customColumns.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'Нет пользовательских столбцов для удаления';
+                option.disabled = true;
+                select.appendChild(option);
+                document.getElementById('confirm-remove-column').disabled = true;
+            } else {
+                document.getElementById('confirm-remove-column').disabled = false;
+            }
+
+            document.getElementById('remove-column-modal').style.display = 'flex';
+        }
+
+        function removeSelectedColumn() {
+            const select = document.getElementById('column-to-remove');
+            const columnId = select.value;
+
+            if (!columnId) return;
+
+            const column = customColumns.find(col => col.id === columnId);
+            if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
+
+            // Удаляем столбец из всех строк
+            tableData.forEach(row => {
+                if (row.customData && row.customData[columnId]) {
+                    delete row.customData[columnId];
+                }
+            });
+
+            // Удаляем столбец из customColumns
+            customColumns = customColumns.filter(col => col.id !== columnId);
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+
+            renderTable();
+            document.getElementById('remove-column-modal').style.display = 'none';
+            
+            alert(`Столбец "${column.name}" успешно удален!`);
+        }
+
+        // ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
+        function handleExcelFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                alert('Библиотека для чтения Excel файлов загружается. Попробуйте еще раз через несколько секунд.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    showImportPreview(jsonData);
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                }
+            };
+            reader.onerror = function() {
+                alert('Ошибка при чтении файла');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showImportPreview(data) {
+            const previewContainer = document.getElementById('import-preview');
+            const previewTable = document.getElementById('import-preview-table');
+            const confirmBtn = document.getElementById('confirm-import-btn');
+            
+            previewTable.innerHTML = '';
+            
+            if (data.length === 0) {
+                previewContainer.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                return;
+            }
+            
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            const headers = data[0];
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header || 'Столбец';
+                th.style.textAlign = 'center';
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            previewTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            const rowsToShow = Math.min(5, data.length - 1);
+            
+            for (let i = 1; i <= rowsToShow; i++) {
+                const row = document.createElement('tr');
+                if (data[i]) {
+                    data[i].forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell || '';
+                        td.style.textAlign = 'center';
+                        row.appendChild(td);
+                    });
+                    tbody.appendChild(row);
+                }
+            }
+            
+            previewTable.appendChild(tbody);
+            previewContainer.style.display = 'block';
+            confirmBtn.style.display = 'block';
+            
+            currentImportData = data;
+        }
+
+        function confirmImport() {
+            if (!currentImportData || currentImportData.length < 2) {
+                alert('Нет данных для импорта');
+                return;
+            }
+            
+            const importMode = document.getElementById('import-mode').value;
+            const headers = currentImportData[0];
+            const rows = currentImportData.slice(1);
+            
+            if (importMode === 'replace') {
+                tableData = [];
+            }
+            
+            let nextId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
+            
+            rows.forEach(row => {
+                if (row && row.length > 0) {
+                    const newRow = {
+                        id: nextId++,
+                        name: row[0] || 'Новый проект',
+                        date: row[1] || formatDate(new Date()),
+                        status: row[2] || 'Активен',
+                        customData: {},
+                        attachments: {}
+                    };
+                    
+                    for (let i = 3; i < headers.length; i++) {
+                        if (headers[i]) {
+                            const columnName = headers[i];
+                            const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
+                            
+                            if (!customColumns.find(col => col.name === columnName)) {
+                                customColumns.push({
+                                    id: columnId,
+                                    name: columnName
+                                });
+                            }
+                            
+                            newRow.customData[columnId] = row[i] || '';
+                        }
+                    }
+                    
+                    tableData.push(newRow);
+                }
+            });
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            
+            renderTable();
+            document.getElementById('import-excel-modal').style.display = 'none';
+            alert(`Успешно импортировано ${rows.length} строк`);
+            
+            currentImportData = null;
+            document.getElementById('excel-file-input').value = '';
+            document.getElementById('import-preview').style.display = 'none';
+            document.getElementById('confirm-import-btn').style.display = 'none';
+        }
+
+        // НОВЫЕ ФУНКЦИИ ДЛЯ ВКЛАДОК
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+            
+            tabs.forEach(tab => {
+                const tabElement = document.createElement('div');
+                tabElement.className = `tab ${tab.id === currentTabId ? 'active' : ''}`;
+                tabElement.dataset.tabId = tab.id;
+                
+                const tabName = document.createElement('span');
+                tabName.textContent = tab.name;
+                tabName.className = 'tab-name';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'tab-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.title = 'Закрыть вкладку';
+                
+                // Скрываем крестик закрытия вкладки для пользователей
+                if (currentUser && currentUser.role !== 'admin') {
+                    closeBtn.style.display = 'none';
+                } else if (tabs.length > 1) {
+                    closeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeTab(tab.id);
+                    });
+                } else {
+                    closeBtn.style.display = 'none';
+                }
+                
+                tabElement.appendChild(tabName);
+                tabElement.appendChild(closeBtn);
+                
+                tabElement.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        switchTab(tab.id);
+                    }
+                });
+
+                if (currentUser && currentUser.role === 'admin') {
+                    tabName.classList.add('editable');
+                    tabName.contentEditable = 'true';
+                    
+                    tabName.addEventListener('blur', function() {
+                        const newName = this.textContent.trim();
+                        if (newName && newName !== tab.name) {
+                            tab.name = newName;
+                            saveToLocalStorage();
+                            saveToGitHub(); // Синхронизируем с GitHub
+                            
+                            if (tab.id === currentTabId) {
+                                document.getElementById('header-title').textContent = newName;
+                                appSettings.headerTitle = newName;
+                                saveToLocalStorage();
+                                saveToGitHub(); // Синхронизируем с GitHub
+                            }
+                        } else {
+                            this.textContent = tab.name;
+                        }
+                    });
+                    
+                    tabName.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.blur();
+                        }
+                    });
+                }
+                
+                container.appendChild(tabElement);
+            });
+            
+            if (currentTabId && currentTabId !== 'tab1') {
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab && currentTab.data) {
+                    tableData = currentTab.data;
+                    renderTable();
+                }
+            }
+
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                document.getElementById('header-title').textContent = currentTab.name;
+            }
+        }
+
+        function createNewTab() {
+            if (currentUser.role !== 'admin') {
+                alert('Только администраторы могут создавать новые вкладки');
+                return;
+            }
+
+            const tabId = 'tab_' + Date.now();
+            const tabName = `Таблица ${tabs.length + 1}`;
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            const newTab = {
+                id: tabId,
+                name: tabName,
+                data: [
+                    { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
+                ]
+            };
+            
+            tabs.push(newTab);
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            
+            currentTabId = tabId;
+            tableData = JSON.parse(JSON.stringify(newTab.data));
+            
+            renderTabs();
+            renderTable();
+            resetFiltersAndSearch();
+        }
+
+        function switchTab(tabId) {
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            currentTabId = tabId;
+            const newTab = tabs.find(tab => tab.id === tabId);
+            
+            if (newTab && newTab.data) {
+                tableData = JSON.parse(JSON.stringify(newTab.data));
+            } else {
+                if (tabId === 'tab1') {
+                    tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                    ];
+                }
+            }
+            
+            saveToLocalStorage();
+            renderTabs();
+            renderTable();
+            resetFiltersAndSearch();
+        }
+
+        function closeTab(tabId) {
+            if (currentUser.role !== 'admin') {
+                alert('Только администраторы могут удалять вкладки');
+                return;
+            }
+
+            if (tabs.length <= 1) return;
+            
+            const tabIndex = tabs.findIndex(tab => tab.id === tabId);
+            if (tabIndex === -1) return;
+            
+            tabs.splice(tabIndex, 1);
+            
+            if (tabId === currentTabId) {
+                currentTabId = tabs[0].id;
+                const firstTab = tabs[0];
+                
+                if (firstTab.data) {
+                    tableData = JSON.parse(JSON.stringify(firstTab.data));
+                } else if (firstTab.id === 'tab1') {
+                    tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                    ];
+                }
+            }
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            renderTabs();
+            renderTable();
+        }
+
+        function resetFiltersAndSearch() {
+            currentFilters = {};
+            searchTerm = '';
+            selectedRows.clear();
+            document.getElementById('table-search').value = '';
+            document.getElementById('select-all-checkbox').checked = false;
+            closeAllFilterDropdowns();
+        }
+
+        // ФУНКЦИИ ДЛЯ ЧЕКБОКСОВ И ФИЛЬТРАЦИИ
+        function handleSelectAll(e) {
+            const isChecked = e.target.checked;
+            
+            if (isChecked) {
+                currentFilters = {};
+                searchTerm = '';
+                selectedRows.clear();
+                document.getElementById('table-search').value = '';
+                closeAllFilterDropdowns();
+                renderTable();
+            }
+        }
+
+        function handleRowCheckboxChange(rowId, isChecked) {
+            if (isChecked) {
+                selectedRows.add(rowId);
+            } else {
+                selectedRows.delete(rowId);
+            }
+        }
+
+        function filterSelectedRows() {
+            if (selectedRows.size === 0) {
+                alert('Выберите строки для фильтрации!');
+                return;
+            }
+            
+            currentFilters.selectedRows = Array.from(selectedRows);
+            renderTable();
+        }
+
+        // ФУНКЦИЯ ПОИСКА
+        function handleSearch(e) {
+            searchTerm = e.target.value.toLowerCase().trim();
+            renderTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('table-search').value = '';
+            searchTerm = '';
+            renderTable();
+        }
+
+        function applySearch(data) {
+            if (!searchTerm) return data;
+            
+            return data.filter(row => {
+                const searchableFields = [
+                    row.id.toString(),
+                    row.name || '',
+                    row.date || '',
+                    row.status || ''
+                ];
+                
+                if (row.customData) {
+                    Object.values(row.customData).forEach(value => {
+                        searchableFields.push(value.toString());
+                    });
+                }
+                
+                return searchableFields.some(field => 
+                    field.toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
+        function exportToExcel() {
+            const exportData = [];
+            const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
+            
+            customColumns.forEach(col => {
+                headers.push(col.name);
+            });
+            
+            exportData.push(headers);
+            
+            tableData.forEach(row => {
+                const rowData = [
+                    row.displayId || row.id,
+                    row.name || '',
+                    row.date || '',
+                    row.status || ''
+                ];
+                
+                customColumns.forEach(col => {
+                    const value = row.customData && row.customData[col.id] ? row.customData[col.id] : '';
+                    rowData.push(value);
+                });
+                
+                exportData.push(rowData);
+            });
+            
+            let csvContent = '\uFEFF';
+            exportData.forEach(row => {
+                const escapedRow = row.map(field => {
+                    if (field === null || field === undefined) return '';
+                    const stringField = String(field);
+                    if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+                        return '"' + stringField.replace(/"/g, '""') + '"';
+                    }
+                    return stringField;
+                });
+                csvContent += escapedRow.join(';') + '\n';
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            const fileName = currentTab ? currentTab.name : 'таблица';
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${fileName}_${formatDate(new Date())}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert(`Данные из "${fileName}" успешно экспортированы в CSV файл!`);
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ РЕНДЕРА ТАБЛИЦЫ
+        function renderTable() {
+            const thead = document.querySelector('#data-table thead tr');
+            const tbody = document.querySelector('#data-table tbody');
+            
+            thead.innerHTML = '';
+            
+            const selectAllTh = document.createElement('th');
+            selectAllTh.style.minWidth = '50px';
+            selectAllTh.style.maxWidth = '60px';
+            selectAllTh.style.width = '50px';
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.className = 'select-all-checkbox';
+            selectAllCheckbox.id = 'select-all-checkbox';
+            selectAllCheckbox.title = 'Показать все строки';
+            selectAllCheckbox.checked = Object.keys(currentFilters).length === 0 && searchTerm === '';
+            selectAllCheckbox.addEventListener('change', handleSelectAll);
+            selectAllTh.appendChild(selectAllCheckbox);
+            thead.appendChild(selectAllTh);
+            
+            basicColumns.forEach((column, index) => {
+                const th = createHeaderCell(column, index, 'basic');
+                thead.appendChild(th);
+            });
+            
+            customColumns.forEach((column, index) => {
+                const th = createHeaderCell(column, index, 'custom');
+                thead.appendChild(th);
+            });
+            
+            if (currentUser && currentUser.role === 'admin') {
+                const actionsTh = document.createElement('th');
+                actionsTh.className = 'admin-only actions-header';
+                actionsTh.innerHTML = `
+                    <div class="th-content">
+                        <div class="th-main">
+                            <div class="th-title">×</div>
+                            <div class="filter-controls">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                actionsTh.style.minWidth = '40px';
+                actionsTh.style.maxWidth = '50px';
+                actionsTh.style.width = '40px';
+                actionsTh.style.zIndex = '10';
+                thead.appendChild(actionsTh);
+            }
+            
+            tbody.innerHTML = '';
+            
+            let filteredData = applyFilters(tableData);
+            filteredData = applySearch(filteredData);
+            let sortedData = applySorting(filteredData);
+            
+            sortedData.forEach((rowData, index) => {
+                rowData.displayId = index + 1;
+            });
+            
+            sortedData.forEach(rowData => {
+                const row = document.createElement('tr');
+                
+                const checkboxTd = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'row-checkbox';
+                checkbox.dataset.rowId = rowData.id;
+                checkbox.checked = selectedRows.has(rowData.id);
+                checkbox.addEventListener('change', (e) => {
+                    handleRowCheckboxChange(rowData.id, e.target.checked);
+                });
+                checkboxTd.appendChild(checkbox);
+                row.appendChild(checkboxTd);
+                
+                basicColumns.forEach(column => {
+                    const td = createDataCell(rowData, column, 'basic');
+                    row.appendChild(td);
+                });
+                
+                customColumns.forEach(column => {
+                    const td = createDataCell(rowData, column, 'custom');
+                    row.appendChild(td);
+                });
+                
+                if (currentUser && currentUser.role === 'admin') {
+                    const actionsTd = document.createElement('td');
+                    actionsTd.className = 'admin-only';
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-row-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.title = 'Удалить строку';
+                    deleteBtn.onclick = () => deleteRow(rowData.id);
+                    actionsTd.appendChild(deleteBtn);
+                    row.appendChild(actionsTd);
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+                saveToLocalStorage();
+            }
+        }
+
+        function createHeaderCell(column, index, type) {
+            const th = document.createElement('th');
+            th.dataset.columnId = column.id;
+            th.dataset.columnType = type;
+            th.dataset.columnIndex = index;
+            
+            if (type === 'custom') {
+                th.dataset.columnName = column.name;
+            }
+            
+            const thContent = document.createElement('div');
+            thContent.className = 'th-content';
+            
+            const thMain = document.createElement('div');
+            thMain.className = 'th-main';
+            
+            const thTitle = document.createElement('div');
+            thTitle.className = 'th-title';
+            thTitle.textContent = column.name;
+            
+            if (currentSort.column === column.id) {
+                thTitle.classList.add(`sort-${currentSort.direction}`);
+                const sortIndicator = document.createElement('span');
+                sortIndicator.className = 'sort-indicator';
+                thTitle.appendChild(sortIndicator);
+            }
+            
+            const filterControls = document.createElement('div');
+            filterControls.className = 'filter-controls';
+            
+            const sortBtn = document.createElement('button');
+            sortBtn.className = 'sort-btn';
+            sortBtn.innerHTML = '↕';
+            sortBtn.title = 'Сортировка';
+            sortBtn.onclick = (e) => {
+                e.stopPropagation();
+                handleSort(column.id);
+            };
+            
+            const filterBtn = document.createElement('button');
+            filterBtn.className = 'filter-btn';
+            filterBtn.innerHTML = '⌕';
+            filterBtn.title = 'Фильтр';
+            
+            if (currentFilters[column.id]) {
+                filterBtn.classList.add('filtered');
+            }
+            
+            filterBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFilter(column.id, filterBtn, th);
+            };
+            
+            filterControls.appendChild(sortBtn);
+            filterControls.appendChild(filterBtn);
+            
+            thMain.appendChild(thTitle);
+            thMain.appendChild(filterControls);
+            thContent.appendChild(thMain);
+            th.appendChild(thContent);
+            
+            if (currentUser && currentUser.role === 'admin' && (type === 'custom' || column.editable)) {
+                th.classList.add('editable-header');
+                th.style.cursor = 'pointer';
+                th.addEventListener('click', (e) => {
+                    if (!e.target.closest('.filter-controls')) {
+                        e.stopPropagation();
+                        openEditHeaderModal(th);
+                    }
+                });
+            }
+            
+            return th;
+        }
+
+        function createDataCell(rowData, column, type) {
+            const td = document.createElement('td');
+            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
+                td.classList.add('editable');
+            }
+            
+            td.dataset.columnId = column.id;
+            td.dataset.rowId = rowData.id;
+            
+            if (type === 'custom') {
+                td.dataset.columnName = column.name;
+            }
+            
+            let value = '';
+            if (type === 'basic') {
+                switch(column.id) {
+                    case 'id': value = rowData.displayId || rowData.id; break;
+                    case 'name': value = rowData.name || ''; break;
+                    case 'date': value = rowData.date || ''; break;
+                    case 'status': value = rowData.status || ''; break;
+                }
+            } else {
+                value = rowData.customData && rowData.customData[column.id] 
+                    ? rowData.customData[column.id] 
+                    : '';
+            }
+            
+            const isDateColumn = dateValidationColumns[column.id];
+            if (isDateColumn) {
+                td.classList.add('date-cell');
+                
+                td.addEventListener('dblclick', (e) => {
+                    if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
+                        openDateInput(td, value);
+                    }
+                });
+                
+                td.addEventListener('click', (e) => {
+                    if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
+                        openDatePicker(td, value);
+                    }
+                });
+                
+                if (value && isValidDate(value)) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const cellDate = parseDate(value);
+                    const timeDiff = cellDate.getTime() - today.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (daysDiff < 0) {
+                        td.classList.add('date-cell-danger');
+                    } else if (daysDiff <= 30) {
+                        td.classList.add('date-cell-warning');
+                    } else {
+                        td.classList.add('date-cell-normal');
+                    }
+                }
+            } else if (currentUser && currentUser.role === 'admin') {
+                td.addEventListener('click', () => openEditCellModal(td));
+            }
+            
+            const cellContent = document.createElement('div');
+            cellContent.className = 'cell-content';
+            
+            const cellText = document.createElement('div');
+            cellText.className = 'cell-text';
+            cellText.textContent = value;
+            
+            const fileIcons = document.createElement('div');
+            fileIcons.className = 'file-icons';
+            
+            if (rowData.attachments && rowData.attachments[columnId]) {
+                addFileIconsToCell(fileIcons, rowData.attachments[columnId], rowData.id, columnId);
+            }
+            
+            cellContent.appendChild(cellText);
+            cellContent.appendChild(fileIcons);
+            td.appendChild(cellContent);
+            
+            return td;
+        }
+
+        function addFileIconsToCell(container, files, rowId, columnId) {
+            files.forEach((file, index) => {
+                const fileIcon = document.createElement('div');
+                fileIcon.className = 'file-icon-small';
+                
+                let icon = '📄';
+                if (file.type.startsWith('image/')) {
+                    icon = '🖼';
+                } else if (file.type.includes('pdf')) {
+                    icon = '📕';
+                } else if (file.type.includes('word') || file.type.includes('document')) {
+                    icon = '📝';
+                } else if (file.type.includes('excel') || file.type.includes('spreadsheet')) {
+                    icon = '📊';
+                } else if (file.type.includes('text')) {
+                    icon = '📃';
+                }
+                
+                fileIcon.innerHTML = icon;
+                fileIcon.title = file.name;
+                
+                fileIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openFilePreview(file, rowId, columnId, index);
+                });
+                
+                container.appendChild(fileIcon);
+            });
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ СТРОКИ
+        function deleteRow(rowId) {
+            if (!confirm('Вы уверены, что хотите удалить эту строку?')) {
+                return;
+            }
+            
+            tableData = tableData.filter(row => row.id !== rowId);
+            
+            tableData.forEach((row, index) => {
+                row.displayId = index + 1;
+            });
+            
+            selectedRows.delete(rowId);
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
+            
+            renderTable();
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ПРИМЕНЕНИЯ ФИЛЬТРОВ
+        function applyFilters(data) {
+            if (Object.keys(currentFilters).length === 0) return data;
+            
+            return data.filter(row => {
+                return Object.entries(currentFilters).every(([filterType, filterValue]) => {
+                    if (filterType === 'selectedRows') {
+                        return filterValue.includes(row.id);
+                    } else {
+                        let value;
+                        
+                        if (customColumns.find(col => col.id === filterType)) {
+                            value = row.customData && row.customData[filterType] ? row.customData[filterType] : '';
+                        } else {
+                            switch(filterType) {
+                                case 'id': value = row.id.toString(); break;
+                                case 'name': value = row.name || ''; break;
+                                case 'date': value = row.date || ''; break;
+                                case 'status': value = row.status || ''; break;
+                                default: value = '';
+                            }
+                        }
+                        
+                        return filterValue.includes(value);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
