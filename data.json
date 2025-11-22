@@ -183,6 +183,13 @@
         "Тест1",
         "Тест2"
       ]
+    },
+    {
+      "id": "btn_1763813899266",
+      "name": "11111",
+      "columns": [
+        "222"
+      ]
     }
   ],
   "customColumns": [
@@ -201,6 +208,10 @@
     {
       "id": "col_1763730690931_1",
       "name": "Тест2"
+    },
+    {
+      "id": "col_1763813899276_0",
+      "name": "222"
     }
   ],
   "basicColumns": [
@@ -356,12 +367,13 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T11:29:34.013Z",
+  "lastSync": "2025-11-22T12:18:20.654Z",
   "mergeOperation": true,
   "mergedFrom": {
     "remote": "2025-11-22T05:41:56.606Z",
     "local": "2025-11-22T05:43:35.792Z"
   },
   "lastModifiedBy": "admin",
-  "lastModifiedAt": "2025-11-22T11:29:34.013Z"
+  "lastModifiedAt": "2025-11-22T11:29:34.013Z",
+  "lastEditor": "admin"
 }
