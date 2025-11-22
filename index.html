@@ -5783,7 +5783,12 @@
             
             return td;
         }
-
+// Добавляем обработчик двойного клика для открытия модального окна с файлами
+td.addEventListener('dblclick', (e) => {
+    if (currentUser && currentUser.role === 'admin' && !e.target.closest('.file-icons')) {
+        openEditCellModal(td);
+    }
+});
         function saveTextCellValue(rowData, column, newValue) {
             if (column.type === 'basic') {
                 switch(column.id) {
@@ -5804,13 +5809,7 @@
             saveToLocalStorage();
             autoSyncChanges();
         }
-// Добавляем обработчик двойного клика для открытия модального окна с файлами
-td.addEventListener('dblclick', (e) => {
-    if (currentUser && currentUser.role === 'admin' && !e.target.closest('.file-icons')) {
-        openEditCellModal(td);
-    }
-});
-        
+
         function addFileIconsToCell(container, files, rowId, columnId) {
             files.forEach((file, index) => {
                 const fileIcon = document.createElement('div');
