@@ -3585,82 +3585,80 @@
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ - КНОПКИ РЯДОМ
-       function createCustomButton(buttonData) {
-    const buttonWrapper = document.createElement('div');
-    buttonWrapper.className = 'custom-button-wrapper';
-    
-    const button = document.createElement('button');
-    button.className = 'custom-button';
-    button.dataset.buttonId = buttonData.id;
-    button.dataset.columns = JSON.stringify(buttonData.columns);
-    button.title = `Показать столбцы: ${buttonData.columns.join(', ')}`;
-    
-    const buttonText = document.createElement('span');
-    buttonText.className = 'button-text';
-    buttonText.textContent = buttonData.name;
-    
-    button.appendChild(buttonText);
-    
-    if (currentUser && currentUser.role === 'admin') {
-        const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'button-actions';
-        
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn-edit-small';
-        editBtn.innerHTML = '✎';
-        editBtn.title = 'Редактировать кнопку';
-        editBtn.onclick = (e) => {
-            e.stopPropagation();
-            editButton(buttonData.id);
-        };
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn-danger-small';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.title = 'Удалить кнопку';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteButton(buttonData.id);
-        };
-        
-        actionsContainer.appendChild(editBtn);
-        actionsContainer.appendChild(deleteBtn);
-        
-        buttonWrapper.appendChild(button);
-        buttonWrapper.appendChild(actionsContainer);
-    } else {
-        buttonWrapper.appendChild(button);
-    }
-    
-    button.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
-            const columns = JSON.parse(this.dataset.columns);
+        function createCustomButton(buttonData) {
+            const buttonWrapper = document.createElement('div');
+            buttonWrapper.className = 'custom-button-wrapper';
             
-            const allCells = document.querySelectorAll('#data-table th, #data-table td');
-            allCells.forEach(cell => cell.style.display = 'none');
+            const button = document.createElement('button');
+            button.className = 'custom-button';
+            button.dataset.buttonId = buttonData.id;
+            button.dataset.columns = JSON.stringify(buttonData.columns);
+            button.title = `Показать столбцы: ${buttonData.columns.join(', ')}`;
             
-            // Показываем фиксированные столбцы
-            for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
-                const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
-                const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+            const buttonText = document.createElement('span');
+            buttonText.className = 'button-text';
+            buttonText.textContent = buttonData.name;
+            
+            button.appendChild(buttonText);
+            
+            if (currentUser && currentUser.role === 'admin') {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'button-actions';
                 
-                headerCells.forEach(cell => cell.style.display = '');
-                dataCells.forEach(cell => cell.style.display = '');
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-edit-small';
+                editBtn.innerHTML = '✎';
+                editBtn.title = 'Редактировать кнопку';
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    editButton(buttonData.id);
+                };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-danger-small';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.title = 'Удалить кнопку';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteButton(buttonData.id);
+                };
+                
+                actionsContainer.appendChild(editBtn);
+                actionsContainer.appendChild(deleteBtn);
+                
+                buttonWrapper.appendChild(button);
+                buttonWrapper.appendChild(actionsContainer);
+            } else {
+                buttonWrapper.appendChild(button);
             }
             
-            // Показываем столбцы из кнопки
-            columns.forEach(colName => {
-                const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
-                const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
-                
-                customHeaders.forEach(cell => cell.style.display = '');
-                customCells.forEach(cell => cell.style.display = '');
+            button.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
+                    const columns = JSON.parse(this.dataset.columns);
+                    
+                    const allCells = document.querySelectorAll('#data-table th, #data-table td');
+                    allCells.forEach(cell => cell.style.display = 'none');
+                    
+                    for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
+                        const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
+                        const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+                        
+                        headerCells.forEach(cell => cell.style.display = '');
+                        dataCells.forEach(cell => cell.style.display = '');
+                    }
+                    
+                    columns.forEach(colName => {
+                        const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
+                        const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
+                        
+                        customHeaders.forEach(cell => cell.style.display = '');
+                        customCells.forEach(cell => cell.style.display = '');
+                    });
+                }
             });
+            
+            document.getElementById('custom-buttons').appendChild(buttonWrapper);
         }
-    });
-    
-    document.getElementById('custom-buttons').appendChild(buttonWrapper);
-}
 
         function editButton(buttonId) {
             const button = customButtons.find(b => b.id === buttonId);
@@ -4527,124 +4525,56 @@
             });
         }
 
-      function createDataCell(rowData, column, type) {
-    const td = document.createElement('td');
-    
-    const isDateColumn = dateValidationColumns[column.id];
-    
-    // Для администраторов делаем ячейки редактируемыми (кроме дат)
-    if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
-        td.classList.add('editable-cell');
-        td.contentEditable = true;
-        
-        td.addEventListener('blur', function() {
-            const newValue = this.textContent;
-            saveTextCellValue(rowData, column, newValue);
-        });
-        
-        td.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.blur();
+        function handleFileUpload(files) {
+            if (!currentEditingCell && !isEditingHeader) {
+                alert('Сначала выберите ячейку для редактирования!');
+                return;
             }
-        });
-        
-        // Двойной клик открывает модальное окно для файлов
-        td.addEventListener('dblclick', (e) => {
-            if (currentUser && currentUser.role === 'admin' && !e.target.closest('.file-icons')) {
-                openEditCellModal(td);
-            }
-        });
-        
-    } else if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
-        td.classList.add('editable');
-        // Одиночный клик открывает модальное окно для нередактируемых ячеек
-        td.addEventListener('click', (e) => {
-            if (!e.target.closest('.file-icons')) {
-                openEditCellModal(td);
-            }
-        });
-    }
-    
-    td.dataset.columnId = column.id;
-    td.dataset.rowId = rowData.id;
-    
-    if (type === 'custom') {
-        td.dataset.columnName = column.name;
-    }
-    
-    let value = '';
-    if (type === 'basic') {
-        switch(column.id) {
-            case 'id': value = rowData.displayId || rowData.id; break;
-            case 'name': value = rowData.name || ''; break;
-            case 'date': value = rowData.date || ''; break;
-            case 'status': value = rowData.status || ''; break;
-        }
-    } else {
-        value = rowData.customData && rowData.customData[column.id] 
-            ? rowData.customData[column.id] 
-            : '';
-    }
-    
-    // Для ячеек с датами - специальные обработчики (без модального окна)
-    if (isDateColumn) {
-        td.classList.add('date-cell');
-        
-        td.addEventListener('dblclick', (e) => {
-            if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
-                openDateInput(td, value);
-            }
-        });
-        
-        td.addEventListener('click', (e) => {
-            if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
-                openDatePicker(td, value);
-            }
-        });
-        
-        // Убираем любые другие обработчики для дат
-        td.removeEventListener('dblclick', openEditCellModal);
-        td.removeEventListener('click', openEditCellModal);
-        
-        if (value && isValidDate(value)) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const cellDate = parseDate(value);
-            const timeDiff = cellDate.getTime() - today.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
             
-            if (daysDiff < 0) {
-                td.classList.add('date-cell-danger');
-            } else if (daysDiff <= 30) {
-                td.classList.add('date-cell-warning');
-            } else {
-                td.classList.remove('date-cell-warning', 'date-cell-danger');
+            const columnId = currentEditingCell ? currentEditingCell.dataset.columnId : null;
+            const rowId = currentEditingCell ? parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent) : null;
+            
+            if (!columnId || !rowId) {
+                alert('Не удалось определить ячейку для прикрепления файлов');
+                return;
             }
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const rowData = tableData.find(row => row.id === rowId);
+                    if (!rowData.attachments) rowData.attachments = {};
+                    if (!rowData.attachments[columnId]) rowData.attachments[columnId] = [];
+                    
+                    rowData.attachments[columnId].push({
+                        name: file.name,
+                        type: file.type,
+                        data: e.target.result
+                    });
+                    
+                    const currentTab = tabs.find(tab => tab.id === currentTabId);
+                    if (currentTab) {
+                        currentTab.data = JSON.parse(JSON.stringify(tableData));
+                    }
+                    
+                    saveToLocalStorage();
+                    autoSyncChanges(); // Автоматическая синхронизация при загрузке файла
+                    
+                    if (currentEditingCell) {
+                        loadAttachedFiles(currentEditingCell);
+                    }
+                    renderTable();
+                    
+                    alert(`Файл "${file.name}" успешно добавлен!`);
+                };
+                
+                reader.onerror = function(e) {
+                    alert(`Ошибка при чтении файла "${file.name}"`);
+                };
+                
+                reader.readAsDataURL(file);
+            });
         }
-    }
-    
-    const cellContent = document.createElement('div');
-    cellContent.className = 'cell-content';
-    
-    const cellText = document.createElement('div');
-    cellText.className = 'cell-text';
-    cellText.textContent = value;
-    
-    const fileIcons = document.createElement('div');
-    fileIcons.className = 'file-icons';
-    
-    // Показываем только существующие файлы (без иконки загрузки)
-    if (rowData.attachments && rowData.attachments[column.id]) {
-        addFileIconsToCell(fileIcons, rowData.attachments[column.id], rowData.id, column.id);
-    }
-    
-    cellContent.appendChild(cellText);
-    cellContent.appendChild(fileIcons);
-    td.appendChild(cellContent);
-    
-    return td;
-}
 
         function openFilePreview(file, rowId, columnId, fileIndex) {
             currentPreviewFile = { file, rowId, columnId, fileIndex };
@@ -5751,124 +5681,109 @@
             return th;
         }
 
-function createDataCell(rowData, column, type) {
-    const td = document.createElement('td');
-    
-    const isDateColumn = dateValidationColumns[column.id];
-    
-    // Для администраторов делаем ячейки редактируемыми (кроме дат)
-    if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
-        td.classList.add('editable-cell');
-        td.contentEditable = true;
-        
-        td.addEventListener('blur', function() {
-            const newValue = this.textContent;
-            saveTextCellValue(rowData, column, newValue);
-        });
-        
-        td.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.blur();
-            }
-        });
-        
-        // Двойной клик открывает модальное окно для файлов
-        td.addEventListener('dblclick', (e) => {
-            if (currentUser && currentUser.role === 'admin' && !e.target.closest('.file-icons')) {
-                openEditCellModal(td);
-            }
-        });
-        
-    } else if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
-        td.classList.add('editable');
-        // Одиночный клик открывает модальное окно для нередактируемых ячеек
-        td.addEventListener('click', (e) => {
-            if (!e.target.closest('.file-icons')) {
-                openEditCellModal(td);
-            }
-        });
-    }
-    
-    td.dataset.columnId = column.id;
-    td.dataset.rowId = rowData.id;
-    
-    if (type === 'custom') {
-        td.dataset.columnName = column.name;
-    }
-    
-    let value = '';
-    if (type === 'basic') {
-        switch(column.id) {
-            case 'id': value = rowData.displayId || rowData.id; break;
-            case 'name': value = rowData.name || ''; break;
-            case 'date': value = rowData.date || ''; break;
-            case 'status': value = rowData.status || ''; break;
-        }
-    } else {
-        value = rowData.customData && rowData.customData[column.id] 
-            ? rowData.customData[column.id] 
-            : '';
-    }
-    
-    // Для ячеек с датами - специальные обработчики (без модального окна)
-    if (isDateColumn) {
-        td.classList.add('date-cell');
-        
-        td.addEventListener('dblclick', (e) => {
-            if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
-                openDateInput(td, value);
-            }
-        });
-        
-        td.addEventListener('click', (e) => {
-            if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
-                openDatePicker(td, value);
-            }
-        });
-        
-        // Убираем любые другие обработчики для дат
-        td.removeEventListener('dblclick', openEditCellModal);
-        td.removeEventListener('click', openEditCellModal);
-        
-        if (value && isValidDate(value)) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const cellDate = parseDate(value);
-            const timeDiff = cellDate.getTime() - today.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        function createDataCell(rowData, column, type) {
+            const td = document.createElement('td');
             
-            if (daysDiff < 0) {
-                td.classList.add('date-cell-danger');
-            } else if (daysDiff <= 30) {
-                td.classList.add('date-cell-warning');
-            } else {
-                td.classList.remove('date-cell-warning', 'date-cell-danger');
+            // Для администраторов делаем ячейки редактируемыми (кроме дат)
+            const isDateColumn = dateValidationColumns[column.id];
+            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
+                td.classList.add('editable-cell');
+                td.contentEditable = true;
+                
+                td.addEventListener('blur', function() {
+                    const newValue = this.textContent;
+                    saveTextCellValue(rowData, column, newValue);
+                });
+                
+                td.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            } else if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
+                td.classList.add('editable');
             }
+            
+            td.dataset.columnId = column.id;
+            td.dataset.rowId = rowData.id;
+            
+            if (type === 'custom') {
+                td.dataset.columnName = column.name;
+            }
+            
+            let value = '';
+            if (type === 'basic') {
+                switch(column.id) {
+                    case 'id': value = rowData.displayId || rowData.id; break;
+                    case 'name': value = rowData.name || ''; break;
+                    case 'date': value = rowData.date || ''; break;
+                    case 'status': value = rowData.status || ''; break;
+                }
+            } else {
+                value = rowData.customData && rowData.customData[column.id] 
+                    ? rowData.customData[column.id] 
+                    : '';
+            }
+            
+            // Для ячеек с датами оставляем специальные обработчики
+            if (isDateColumn) {
+                td.classList.add('date-cell');
+                
+                td.addEventListener('dblclick', (e) => {
+                    if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
+                        openDateInput(td, value);
+                    }
+                });
+                
+                td.addEventListener('click', (e) => {
+                    if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
+                        openDatePicker(td, value);
+                    }
+                });
+                
+                if (value && isValidDate(value)) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const cellDate = parseDate(value);
+                    const timeDiff = cellDate.getTime() - today.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (daysDiff < 0) {
+                        td.classList.add('date-cell-danger');
+                    } else if (daysDiff <= 30) {
+                        td.classList.add('date-cell-warning');
+                    } else {
+                        // Убрали класс date-cell-normal - теперь обычные ячейки с датами не подсвечиваются
+                        td.classList.remove('date-cell-warning', 'date-cell-danger');
+                    }
+                }
+            } else if (currentUser && currentUser.role === 'admin' && !td.classList.contains('editable-cell')) {
+                // Для нередактируемых ячеек оставляем модальное окно
+                td.addEventListener('click', () => openEditCellModal(td));
+            }
+            
+            const cellContent = document.createElement('div');
+            cellContent.className = 'cell-content';
+            
+            const cellText = document.createElement('div');
+            cellText.className = 'cell-text';
+            cellText.textContent = value;
+            
+            const fileIcons = document.createElement('div');
+            fileIcons.className = 'file-icons';
+            
+            if (rowData.attachments && rowData.attachments[column.id]) {
+                addFileIconsToCell(fileIcons, rowData.attachments[column.id], rowData.id, column.id);
+            }
+            
+            cellContent.appendChild(cellText);
+            cellContent.appendChild(fileIcons);
+            td.appendChild(cellContent);
+            
+            return td;
         }
-    }
-    
-    const cellContent = document.createElement('div');
-    cellContent.className = 'cell-content';
-    
-    const cellText = document.createElement('div');
-    cellText.className = 'cell-text';
-    cellText.textContent = value;
-    
-    const fileIcons = document.createElement('div');
-    fileIcons.className = 'file-icons';
-    
-    // Показываем только существующие файлы (без иконки загрузки)
-    if (rowData.attachments && rowData.attachments[column.id]) {
-        addFileIconsToCell(fileIcons, rowData.attachments[column.id], rowData.id, column.id);
-    }
-    
-    cellContent.appendChild(cellText);
-    cellContent.appendChild(fileIcons);
-    td.appendChild(cellContent);
-    
-    return td;
-}
+
         function saveTextCellValue(rowData, column, newValue) {
             if (column.type === 'basic') {
                 switch(column.id) {
@@ -5982,5 +5897,3 @@ function createDataCell(rowData, column, type) {
     </script>
 </body>
 </html>
-
-
