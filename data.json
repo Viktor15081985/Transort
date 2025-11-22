@@ -218,7 +218,8 @@
       "status": "Активен",
       "customData": {
         "col_1763825387847": "",
-        "col_1763829778920": ""
+        "col_1763829778920": "",
+        "col_1763711311027_1": ""
       },
       "attachments": {},
       "displayId": 14
@@ -725,7 +726,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T18:21:07.421Z",
-  "lastEditor": "user",
+  "lastSync": "2025-11-22T18:41:54.161Z",
+  "lastEditor": "admin",
   "mergeOperation": true
 }
