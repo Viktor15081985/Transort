@@ -88,6 +88,15 @@
       },
       "attachments": {},
       "displayId": 6
+    },
+    {
+      "id": 7,
+      "name": "Новый проект",
+      "date": "22.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 7
     }
   ],
   "users": [
@@ -302,10 +311,12 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T05:43:51.303Z",
+  "lastSync": "2025-11-22T10:11:37.529Z",
   "mergeOperation": true,
   "mergedFrom": {
     "remote": "2025-11-22T05:41:56.606Z",
     "local": "2025-11-22T05:43:35.792Z"
-  }
+  },
+  "lastModifiedBy": "admin",
+  "lastModifiedAt": "2025-11-22T10:11:37.529Z"
 }
