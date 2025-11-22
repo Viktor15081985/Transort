@@ -94,9 +94,7 @@
       "name": "Новый проект",
       "date": "22.11.2025",
       "status": "Активен",
-      "customData": {
-        "col_1763711311027_1": "чсмитьбю"
-      },
+      "customData": {},
       "attachments": {},
       "displayId": 7
     },
@@ -114,7 +112,9 @@
       "name": "Новый проект",
       "date": "22.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_1": "лт одлжб"
+      },
       "attachments": {},
       "displayId": 9
     },
@@ -467,7 +467,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T13:36:34.094Z",
+  "lastSync": "2025-11-22T13:37:37.567Z",
   "mergeOperation": true,
   "mergedFrom": {
     "remote": "2025-11-22T05:41:56.606Z",
