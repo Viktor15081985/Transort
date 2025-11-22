@@ -94,7 +94,9 @@
       "name": "Новый проект",
       "date": "22.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763711311027_1": "олоод"
+      },
       "attachments": {},
       "displayId": 7
     },
@@ -579,7 +581,8 @@
       ]
     }
   ],
-  "lastSync": "2025-11-22T13:40:27.097Z",
+  "lastSync": "2025-11-22T13:54:32.564Z",
   "syncSource": "device_g03rmfaoh",
-  "lastEditor": "admin"
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
