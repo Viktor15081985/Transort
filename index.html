@@ -3237,34 +3237,36 @@
         }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
-        function initializeAppWithFallback() {
-            setupEventListeners();
-            loadAppSettings();
-            
-            // Загружаем данные онлайн пользователей
-            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-            updateOnlineStatusDisplay();
-            
-            // Всегда сначала пытаемся загрузить из GitHub, даже без токена
-            // (на случай, если репозиторий публичный)
-            try {
-                if (GITHUB_CONFIG.repo && GITHUB_CONFIG.branch) {
-                    console.log('🔄 Попытка загрузки данных из GitHub...');
-                    loadFromGitHub().then(() => {
-                        console.log('✅ Загрузка из GitHub завершена');
-                    }).catch(error => {
-                        console.log('❌ Ошибка загрузки из GitHub:', error);
-                        // При ошибке загружаем из localStorage
-                        loadFromLocalStorageWithNotification();
-                    });
-                } else {
-                    loadFromLocalStorageWithNotification();
-                }
-            } catch (error) {
-                console.error('❌ Критическая ошибка инициализации:', error);
-                loadFromLocalStorageWithNotification();
-            }
-        }
+function initializeAppWithFallback() {
+    setupEventListeners();
+    loadAppSettings();
+    
+    // Загружаем данные онлайн пользователей
+    onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
+    updateOnlineStatusDisplay();
+    
+    // ИСПРАВЛЕНИЕ: Правильная инициализация данных
+    try {
+        loadFromLocalStorage();
+        renderTabs();
+        renderTable();
+        loadCustomButtons();
+        
+        console.log('📁 Загружены локальные данные из localStorage');
+    } catch (error) {
+        console.error('❌ Ошибка инициализации:', error);
+        // Создаем базовые данные при ошибке
+        tableData = [
+            { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+            { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+            { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+        ];
+        saveToLocalStorage();
+        renderTabs();
+        renderTable();
+        loadCustomButtons();
+    }
+}
 
         // НОВАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
         function loadFromLocalStorageWithNotification() {
@@ -3280,10 +3282,11 @@
             console.log('📁 Загружены локальные данные из localStorage');
         }
 
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeAppWithFallback();
-        });
+          // Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Инициализация приложения...');
+    initializeAppWithFallback();
+});
 
         function setupEventListeners() {
             // Логин
@@ -3435,49 +3438,54 @@
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВХОДА
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-            // ИСПРАВЛЕНИЕ: Добавляем проверку на пустые поля
-            if (!username || !password) {
-                alert('Пожалуйста, введите имя пользователя и пароль');
-                return;
-            }
+    // ИСПРАВЛЕНИЕ: Добавляем проверку на пустые поля
+    if (!username || !password) {
+        alert('Пожалуйста, введите имя пользователя и пароль');
+        return;
+    }
 
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-screen').style.display = 'flex';
-                document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
-                document.getElementById('user-name-display').textContent = user.username;
-                
-                if (user.role === 'admin') {
-                    document.body.classList.add('admin');
-                    setupAdminFeatures();
-                }
-                
-                // Запускаем отслеживание онлайн статуса
-                startOnlineStatusTracking();
-                
-                // ПЕРЕЗАГРУЖАЕМ ДАННЫЕ ПОСЛЕ ВХОДА
-                if (GITHUB_CONFIG.token) {
-                    loadFromGitHub();
-                } else {
-                    loadFromLocalStorage();
-                    renderTabs();
-                    renderTable();
-                    loadCustomButtons();
-                }
-                
-                setTimeout(() => {
-                    checkAllDates();
-                }, 1000);
-            } else {
-                alert('Неверное имя пользователя или пароль');
-            }
+    // ИСПРАВЛЕНИЕ: Правильно ищем пользователя
+    const user = users.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+        currentUser = user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'flex';
+        document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
+        document.getElementById('user-name-display').textContent = user.username;
+        
+        if (user.role === 'admin') {
+            document.body.classList.add('admin');
+            setupAdminFeatures();
         }
+        
+        // Запускаем отслеживание онлайн статуса
+        startOnlineStatusTracking();
+        
+        // ИСПРАВЛЕНИЕ: Правильно загружаем данные после входа
+        setTimeout(() => {
+            if (GITHUB_CONFIG.token) {
+                loadFromGitHub();
+            } else {
+                loadFromLocalStorage();
+                renderTabs();
+                renderTable();
+                loadCustomButtons();
+            }
+            
+            setTimeout(() => {
+                checkAllDates();
+            }, 1000);
+        }, 100);
+        
+    } else {
+        alert('Неверное имя пользователя или пароль');
+    }
+}
 
         function setupAdminFeatures() {
             const headerTitle = document.getElementById('header-title');
@@ -5767,3 +5775,4 @@
     </script>
 </body>
 </html>
+
