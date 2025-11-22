@@ -203,8 +203,26 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            cursor: default;
+            cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .status-bar-header:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .status-bar-header.syncing {
@@ -757,9 +775,9 @@
         }
 
         th:last-child {
-            min-width: 40px;
-            max-width: 50px;
-            width: 40px;
+            min-width: 120px;
+            max-width: 200px;
+            width: auto;
         }
 
         th.actions-header {
@@ -1988,6 +2006,34 @@
         #show-all {
             margin-bottom: 10px !important;
         }
+
+        /* Стили для прямого редактирования ячеек */
+        .editable-cell {
+            cursor: text;
+            outline: none;
+        }
+
+        .editable-cell:focus {
+            background-color: var(--table-hover);
+            box-shadow: inset 0 0 0 2px var(--accent-color);
+        }
+
+        /* Стили для модального окна управления файлами */
+        .file-management-modal .form-group:nth-child(2) {
+            display: none;
+        }
+
+        .file-management-modal #save-cell-btn {
+            display: none;
+        }
+
+        .file-management-modal #close-file-modal {
+            display: block;
+        }
+
+        #close-file-modal {
+            display: none;
+        }
     </style>
 </head>
 <body class="theme-orange">
@@ -2019,7 +2065,7 @@
             <div class="user-info">
                 <span class="user-name" id="user-name-display"></span>
                 <!-- НОВАЯ СТРОКА СОСТОЯНИЯ В ХЕДЕРЕ -->
-                <div class="status-bar-header" id="status-bar-header">
+                <div class="status-bar-header" id="status-bar-header" data-tooltip="">
                     <div class="status-info-header">
                         <div class="status-sync-header">
                             <span class="sync-icon">🔄</span>
@@ -2167,6 +2213,8 @@
         <div class="column-controls">
             <button class="column-control-btn" id="add-column-btn" title="Добавить столбец">+</button>
             <button class="column-control-btn" id="remove-column-btn" title="Удалить столбец">-</button>
+            <button class="column-control-btn" id="move-column-left-btn" title="Переместить столбец влево">←</button>
+            <button class="column-control-btn" id="move-column-right-btn" title="Переместить столбец вправо">→</button>
         </div>
 
         <!-- Настройки фиксированных столбцов - только для администратора -->
@@ -2261,7 +2309,10 @@
                     <!-- Прикрепленные файлы будут здесь -->
                 </div>
             </div>
-            <button id="save-cell-btn" title="Сохранить изменения в ячейке">Сохранить</button>
+            <div class="preview-actions">
+                <button id="save-cell-btn" title="Сохранить изменения в ячейке">Сохранить</button>
+                <button id="close-file-modal" title="Закрыть окно">Закрыть</button>
+            </div>
         </div>
     </div>
 
@@ -2349,6 +2400,27 @@
                 </select>
             </div>
             <button id="confirm-remove-column">Удалить столбец</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно перемещения столбца -->
+    <div id="move-column-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Перемещение столбца</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="column-to-move">Выберите столбец для перемещения:</label>
+                <select id="column-to-move" style="width: 100%; padding: 0.5rem; border: 1px solid #4a4a4a; border-radius: 5px; background: #2f2f2f; color: #ecf0f1;">
+                    <!-- Столбцы будут добавлены динамически -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="column-position">Новая позиция (от 1 до <span id="max-position">0</span>):</label>
+                <input type="number" id="column-position" min="1" value="1" style="width: 100%; padding: 0.5rem; border: 1px solid #4a4a4a; border-radius: 5px; background: #2f2f2f; color: #ecf0f1;">
+            </div>
+            <button id="confirm-move-column">Переместить столбец</button>
         </div>
     </div>
 
@@ -2506,6 +2578,10 @@
                 }
             });
             localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
+            
+            // Обновляем подсказку
+            const statusBar = document.getElementById('status-bar-header');
+            statusBar.setAttribute('data-tooltip', `Администраторов: ${adminCount}, Пользователей: ${userCount}`);
         }
 
         // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ СТАТУСА СИНХРОНИЗАЦИИ В ХЕДЕРЕ
@@ -3097,11 +3173,11 @@
             // Загружаем данные из localStorage
             loadFromLocalStorage();
             
-            // Всегда сначала пытаемся загрузить из GitHub, даже без токена
-            // (на случай, если репозиторий публичный)
-            try {
+            // Для администратора НЕ загружаем автоматически из GitHub
+            if (currentUser && currentUser.role === 'user') {
+                // Для пользователей загружаем из GitHub
                 if (GITHUB_CONFIG.repo && GITHUB_CONFIG.branch) {
-                    console.log('🔄 Попытка загрузки данных из GitHub...');
+                    console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
                     loadFromGitHub().then(() => {
                         console.log('✅ Загрузка из GitHub завершена');
                         
@@ -3117,8 +3193,8 @@
                 } else {
                     loadFromLocalStorageWithNotification();
                 }
-            } catch (error) {
-                console.error('❌ Критическая ошибка инициализации:', error);
+            } else {
+                // Для администратора используем только локальные данные
                 loadFromLocalStorageWithNotification();
             }
         }
@@ -3198,10 +3274,15 @@
             // Кнопки управления столбцами
             document.getElementById('add-column-btn').addEventListener('click', addNewColumn);
             document.getElementById('remove-column-btn').addEventListener('click', showRemoveColumnModal);
+            document.getElementById('move-column-left-btn').addEventListener('click', () => moveColumn(-1));
+            document.getElementById('move-column-right-btn').addEventListener('click', () => moveColumn(1));
             document.getElementById('fixed-columns-count').addEventListener('change', updateFixedColumnsCount);
 
             // Удаление столбца
             document.getElementById('confirm-remove-column').addEventListener('click', removeSelectedColumn);
+
+            // Перемещение столбца
+            document.getElementById('confirm-move-column').addEventListener('click', moveSelectedColumn);
 
             // Импорт Excel
             document.getElementById('excel-upload-area').addEventListener('click', function() {
@@ -3239,6 +3320,9 @@
             document.getElementById('add-user-form').addEventListener('submit', handleAddUser);
             document.getElementById('column-count').addEventListener('change', generateColumnInputs);
             document.getElementById('save-cell-btn').addEventListener('click', saveCellChanges);
+            document.getElementById('close-file-modal').addEventListener('click', function() {
+                document.getElementById('edit-cell-modal').style.display = 'none';
+            });
 
             // Кнопки предпросмотра
             document.getElementById('download-preview-btn').addEventListener('click', downloadPreviewFile);
@@ -3328,14 +3412,7 @@
                 updateStatusBar();
                 
                 // ПЕРЕЗАГРУЖАЕМ ДАННЫЕ ПОСЛЕ ВХОДА
-                if (GITHUB_CONFIG.token) {
-                    loadFromGitHub();
-                } else {
-                    loadFromLocalStorage();
-                    renderTabs();
-                    renderTable();
-                    loadCustomButtons();
-                }
+                initializeAppWithFallback();
                 
                 setTimeout(() => {
                     checkAllDates();
@@ -3428,6 +3505,8 @@
                 document.getElementById('github-token').value = GITHUB_CONFIG.token;
                 document.getElementById('github-repo').value = GITHUB_CONFIG.repo;
                 document.getElementById('github-branch').value = GITHUB_CONFIG.branch;
+            } else if (modalId === 'move-column-modal') {
+                showMoveColumnModal();
             }
         }
 
@@ -4046,6 +4125,13 @@
             filterDropdown.style.top = thRect.bottom + 'px';
             filterDropdown.style.zIndex = '10000';
             
+            // Исправление проблемы с уходом фильтра за границы экрана
+            const viewportWidth = window.innerWidth;
+            const filterWidth = 320; // Примерная ширина фильтра
+            if (thRect.left + filterWidth > viewportWidth) {
+                filterDropdown.style.left = (viewportWidth - filterWidth - 10) + 'px';
+            }
+            
             const uniqueValues = getUniqueValuesForColumn(columnId);
             const totalCount = uniqueValues.length;
             const selectedCount = currentFilters[columnId] ? currentFilters[columnId].length : totalCount;
@@ -4242,6 +4328,8 @@
             document.getElementById('edit-cell-title').textContent = 'Редактирование названия столбца';
             
             document.querySelector('.form-group:nth-child(3)').style.display = 'none';
+            document.getElementById('save-cell-btn').style.display = 'block';
+            document.getElementById('close-file-modal').style.display = 'none';
             
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
@@ -4262,8 +4350,23 @@
             document.getElementById('edit-cell-title').textContent = 'Редактирование ячейки';
             
             document.querySelector('.form-group:nth-child(3)').style.display = 'block';
+            document.getElementById('save-cell-btn').style.display = 'block';
+            document.getElementById('close-file-modal').style.display = 'none';
             
             loadAttachedFiles(cell);
+            document.getElementById('edit-cell-modal').style.display = 'flex';
+        }
+
+        function openFileManagementModal(rowId, columnId) {
+            currentEditingCell = null;
+            isEditingHeader = false;
+            
+            document.getElementById('edit-cell-title').textContent = 'Управление файлами ячейки';
+            document.querySelector('.form-group:nth-child(2)').style.display = 'none';
+            document.getElementById('save-cell-btn').style.display = 'none';
+            document.getElementById('close-file-modal').style.display = 'block';
+            
+            loadAttachedFilesForCell(rowId, columnId);
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
 
@@ -4275,6 +4378,30 @@
             
             const columnId = cell.dataset.columnId;
             const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
+            
+            const rowData = tableData.find(row => row.id === rowId);
+            if (rowData && rowData.attachments && rowData.attachments[columnId]) {
+                rowData.attachments[columnId].forEach((file, index) => {
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'attached-file';
+                    
+                    let fileContent = file.name;
+                    if (file.type.startsWith('image/')) {
+                        fileContent = `<img src="${file.data}" style="max-width: 50px; max-height: 50px; margin-right: 10px;"> ${file.name}`;
+                    }
+                    
+                    fileElement.innerHTML = `
+                        <div>${fileContent}</div>
+                        <button class="file-action-btn" onclick="removeAttachment(${rowId}, '${columnId}', ${index})">×</button>
+                    `;
+                    container.appendChild(fileElement);
+                });
+            }
+        }
+
+        function loadAttachedFilesForCell(rowId, columnId) {
+            const container = document.getElementById('attached-files');
+            container.innerHTML = '';
             
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
@@ -4399,13 +4526,18 @@
         }
 
         function handleFileUpload(files) {
-            if (!currentEditingCell || isEditingHeader) {
+            if (!currentEditingCell && !isEditingHeader) {
                 alert('Сначала выберите ячейку для редактирования!');
                 return;
             }
             
-            const columnId = currentEditingCell.dataset.columnId;
-            const rowId = parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent);
+            const columnId = currentEditingCell ? currentEditingCell.dataset.columnId : null;
+            const rowId = currentEditingCell ? parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent) : null;
+            
+            if (!columnId || !rowId) {
+                alert('Не удалось определить ячейку для прикрепления файлов');
+                return;
+            }
             
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
@@ -4428,7 +4560,9 @@
                     saveToLocalStorage();
                     autoSyncChanges(); // Автоматическая синхронизация при загрузке файла
                     
-                    loadAttachedFiles(currentEditingCell);
+                    if (currentEditingCell) {
+                        loadAttachedFiles(currentEditingCell);
+                    }
                     renderTable();
                     
                     alert(`Файл "${file.name}" успешно добавлен!`);
@@ -4536,7 +4670,7 @@
             }
         }
 
-                function printPreviewFile() {
+        function printPreviewFile() {
             if (!currentPreviewFile) return;
             
             const printWindow = window.open('', '_blank');
@@ -4773,6 +4907,11 @@
             autoSyncChanges(); // Автоматическая синхронизация при добавлении столбца
             
             renderTable();
+            
+            // Предлагаем переместить столбец
+            if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
+                showMoveColumnModal();
+            }
         }
 
         function showRemoveColumnModal() {
@@ -4825,6 +4964,78 @@
             document.getElementById('remove-column-modal').style.display = 'none';
             
             alert(`Столбец "${column.name}" успешно удален!`);
+        }
+
+        function showMoveColumnModal() {
+            const select = document.getElementById('column-to-move');
+            const maxPositionSpan = document.getElementById('max-position');
+            
+            select.innerHTML = '';
+            
+            // Добавляем все столбцы (кроме первого - чекбокса и последнего - действий)
+            const allColumns = [...basicColumns, ...customColumns];
+            allColumns.forEach((column, index) => {
+                const option = document.createElement('option');
+                option.value = column.id;
+                option.textContent = column.name;
+                option.dataset.index = index + 1; // +1 потому что первый столбец - чекбокс
+                select.appendChild(option);
+            });
+
+            maxPositionSpan.textContent = allColumns.length + 1; // +1 потому что можно переместить после последнего
+            
+            document.getElementById('column-position').value = allColumns.length + 1;
+            document.getElementById('column-position').max = allColumns.length + 1;
+            
+            document.getElementById('move-column-modal').style.display = 'flex';
+        }
+
+        function moveSelectedColumn() {
+            const select = document.getElementById('column-to-move');
+            const positionInput = document.getElementById('column-position');
+            
+            const columnId = select.value;
+            const newPosition = parseInt(positionInput.value);
+            
+            if (!columnId || !newPosition) return;
+            
+            // Находим столбец для перемещения
+            const allColumns = [...basicColumns, ...customColumns];
+            const columnIndex = allColumns.findIndex(col => col.id === columnId);
+            
+            if (columnIndex === -1) return;
+            
+            const columnToMove = allColumns[columnIndex];
+            
+            // Удаляем столбец из текущей позиции
+            if (columnIndex < basicColumns.length) {
+                basicColumns.splice(columnIndex, 1);
+            } else {
+                customColumns.splice(columnIndex - basicColumns.length, 1);
+            }
+            
+            // Вставляем столбец в новую позицию
+            const targetPosition = newPosition - 2; // -2 потому что первый столбец - чекбокс
+            
+            if (targetPosition < basicColumns.length) {
+                basicColumns.splice(targetPosition, 0, columnToMove);
+            } else {
+                customColumns.splice(targetPosition - basicColumns.length, 0, columnToMove);
+            }
+            
+            saveToLocalStorage();
+            autoSyncChanges(); // Автоматическая синхронизация при перемещении столбца
+            
+            renderTable();
+            document.getElementById('move-column-modal').style.display = 'none';
+            
+            alert(`Столбец "${columnToMove.name}" успешно перемещен на позицию ${newPosition}!`);
+        }
+
+        function moveColumn(direction) {
+            // Эта функция для быстрого перемещения столбцов с помощью кнопок
+            alert('Используйте модальное окно для точного перемещения столбцов');
+            showMoveColumnModal();
         }
 
         // ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
@@ -5472,7 +5683,25 @@
 
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
-            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
+            
+            // Для администраторов делаем ячейки редактируемыми (кроме дат)
+            const isDateColumn = dateValidationColumns[column.id];
+            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
+                td.classList.add('editable-cell');
+                td.contentEditable = true;
+                
+                td.addEventListener('blur', function() {
+                    const newValue = this.textContent;
+                    saveTextCellValue(rowData, column, newValue);
+                });
+                
+                td.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            } else if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
                 td.classList.add('editable');
             }
             
@@ -5497,7 +5726,7 @@
                     : '';
             }
             
-            const isDateColumn = dateValidationColumns[column.id];
+            // Для ячеек с датами оставляем специальные обработчики
             if (isDateColumn) {
                 td.classList.add('date-cell');
                 
@@ -5529,7 +5758,8 @@
                         td.classList.remove('date-cell-warning', 'date-cell-danger');
                     }
                 }
-            } else if (currentUser && currentUser.role === 'admin') {
+            } else if (currentUser && currentUser.role === 'admin' && !td.classList.contains('editable-cell')) {
+                // Для нередактируемых ячеек оставляем модальное окно
                 td.addEventListener('click', () => openEditCellModal(td));
             }
             
@@ -5552,6 +5782,27 @@
             td.appendChild(cellContent);
             
             return td;
+        }
+
+        function saveTextCellValue(rowData, column, newValue) {
+            if (column.type === 'basic') {
+                switch(column.id) {
+                    case 'name': rowData.name = newValue; break;
+                    case 'status': rowData.status = newValue; break;
+                    // id и date не редактируем таким образом
+                }
+            } else {
+                if (!rowData.customData) rowData.customData = {};
+                rowData.customData[column.id] = newValue;
+            }
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            saveToLocalStorage();
+            autoSyncChanges();
         }
 
         function addFileIconsToCell(container, files, rowId, columnId) {
@@ -5577,7 +5828,13 @@
                 
                 fileIcon.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    openFilePreview(file, rowId, columnId, index);
+                    if (currentUser && currentUser.role === 'admin') {
+                        // Для администраторов открываем управление файлами
+                        openFileManagementModal(rowId, columnId);
+                    } else {
+                        // Для пользователей открываем просмотр
+                        openFilePreview(file, rowId, columnId, index);
+                    }
                 });
                 
                 container.appendChild(fileIcon);
