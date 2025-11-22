@@ -35,20 +35,21 @@
             transition: all 0.3s ease;
         }
 
-#login-screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, rgba(47, 47, 47, 0.8) 0%, rgba(37, 37, 37, 0.8) 100%), url('fon.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(47, 47, 47, 0.8) 0%, rgba(37, 37, 37, 0.8) 100%), url('fon.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
 
-@media (max-width: 1920px) {
-    #login-screen {
-        background-attachment: scroll;
-    }
-}
+        @media (max-width: 1920px) {
+            #login-screen {
+                background-attachment: scroll;
+            }
+        }
+
         .login-container {
             background: var(--bg-secondary);
             padding: 2.5rem;
@@ -801,6 +802,7 @@
             color: var(--text-primary);
         }
 
+        /* ИСПРАВЛЕНО: Убрана серая подсветка для обычных дат */
         .date-cell-warning {
             background-color: rgba(230, 126, 34, 0.2) !important;
             border: 1px solid var(--accent-color) !important;
@@ -810,12 +812,6 @@
         .date-cell-danger {
             background-color: rgba(230, 126, 34, 0.4) !important;
             border: 1px solid var(--accent-hover) !important;
-            color: var(--text-primary) !important;
-        }
-
-        .date-cell-normal {
-            background-color: var(--bg-tertiary) !important;
-            border: 1px solid var(--table-border) !important;
             color: var(--text-primary) !important;
         }
 
@@ -1549,6 +1545,15 @@
             background: var(--accent-hover) !important;
         }
 
+        /* НОВАЯ КНОПКА ОБНОВИТЬ */
+        .refresh-data-btn {
+            background: var(--accent-color) !important;
+        }
+
+        .refresh-data-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
         .date-input-overlay {
             position: absolute;
             top: 0;
@@ -1708,6 +1713,7 @@
             color: #2ecc71;
         }
 
+        /* УЛУЧШЕННАЯ МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 1200px) {
             .top-controls-panel {
                 height: auto;
@@ -1782,6 +1788,15 @@
                 justify-content: center;
                 width: 100%;
             }
+            
+            /* Улучшение для мобильных: скрыть сложные элементы */
+            .online-status-panel .online-users:last-child {
+                display: none;
+            }
+            
+            .tabs-scroll-btn {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1820,6 +1835,37 @@
             .notification-panel {
                 width: 95%;
                 right: 2.5%;
+            }
+            
+            /* Улучшение для мобильных: компактный вид */
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .user-role-btn {
+                font-size: 0.8rem;
+                min-width: 100px;
+                padding: 0.3rem 0.8rem;
+            }
+            
+            th, td {
+                padding: 0.3rem;
+                font-size: 0.8rem;
+            }
+            
+            th {
+                padding: 6px 4px;
+                font-size: 0.8rem;
+            }
+            
+            /* Мобильная навигация таблицы */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            table {
+                min-width: 600px; /* Минимальная ширина для удобства прокрутки */
             }
         }
 
@@ -1894,6 +1940,35 @@
                 bottom: 50px;
                 right: 10px;
             }
+            
+            /* Улучшение для мобильных: адаптивные кнопки */
+            .sidebar button {
+                font-size: 0.8rem;
+                padding: 0 10px;
+            }
+            
+            .button-text {
+                font-size: 0.8rem;
+            }
+            
+            .custom-button-wrapper {
+                flex-direction: column;
+                gap: 2px;
+            }
+            
+            .button-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            /* Скрыть дополнительные элементы на мобильных */
+            .online-status-panel {
+                font-size: 0.7rem;
+            }
+            
+            .online-users {
+                gap: 8px;
+            }
         }
 
         @media (max-width: 400px) {
@@ -1915,10 +1990,83 @@
                 width: 100%;
                 justify-content: flex-end;
             }
+            
+            /* Дополнительные улучшения для очень маленьких экранов */
+            .header {
+                padding: 8px;
+            }
+            
+            .header-content {
+                gap: 10px;
+            }
+            
+            .logo {
+                height: 30px;
+            }
+            
+            .user-info {
+                gap: 8px;
+            }
+            
+            .user-name {
+                display: none;
+            }
         }
 
         #show-all {
             margin-bottom: 10px !important;
+        }
+        
+        /* Мобильное меню для очень маленьких экранов */
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 576px) {
+            .mobile-menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1001;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100%;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -1943,6 +2091,9 @@
 
     <!-- Основной экран -->
     <div id="main-screen">
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
         <div class="header">
             <div class="header-content">
                 <img id="header-logo" class="logo" src="" alt="Logo" style="display: none;">
@@ -2008,7 +2159,7 @@
         </div>
 
         <div class="container">
-            <div class="sidebar">
+            <div class="sidebar" id="sidebar">
                 <div class="sidebar-buttons">
                     <button id="show-all" title="Показать все столбцы">Отобразить все</button>
                     <div id="custom-buttons"></div>
@@ -2025,6 +2176,10 @@
                     </button>
                     <button id="check-dates-btn" class="check-dates-btn" title="Проверить все даты на истечение срока">
                         <span class="icon">📅</span> Проверка дат
+                    </button>
+                    <!-- НОВАЯ КНОПКА ОБНОВИТЬ -->
+                    <button id="refresh-data-btn" class="refresh-data-btn" title="Загрузить обновленные данные с GitHub">
+                        <span class="icon">🔄</span> Обновить данные
                     </button>
                     <div class="admin-only">
                         <button id="manage-users" class="manage-users-btn" title="Управление пользователями системы">
@@ -3146,6 +3301,12 @@
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
             document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
+            
+            // НОВАЯ КНОПКА ОБНОВИТЬ
+            document.getElementById('refresh-data-btn').addEventListener('click', () => {
+                loadFromGitHub();
+                alert('Данные обновляются с GitHub...');
+            });
 
             // Новые кнопки управления
             document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
@@ -3238,6 +3399,23 @@
                     e.stopPropagation();
                 }
             });
+
+            // Мобильное меню
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            if (mobileMenuToggle && sidebar && sidebarOverlay) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    sidebarOverlay.classList.toggle('active');
+                });
+                
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
         }
 
         function handleGitHubSettingsSave(e) {
@@ -3256,10 +3434,16 @@
             alert('Настройки GitHub сохранены!');
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВХОДА
         function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+
+            // ИСПРАВЛЕНИЕ: Добавляем проверку на пустые поля
+            if (!username || !password) {
+                alert('Пожалуйста, введите имя пользователя и пароль');
+                return;
+            }
 
             const user = users.find(u => u.username === username && u.password === password);
             if (user) {
@@ -5457,6 +5641,7 @@
                     }
                 });
                 
+                // ИСПРАВЛЕНО: Убрана серая подсветка для обычных дат
                 if (value && isValidDate(value)) {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -5468,9 +5653,8 @@
                         td.classList.add('date-cell-danger');
                     } else if (daysDiff <= 30) {
                         td.classList.add('date-cell-warning');
-                    } else {
-                        td.classList.add('date-cell-normal');
                     }
+                    // Убрано добавление класса date-cell-normal для обычных дат
                 }
             } else if (currentUser && currentUser.role === 'admin') {
                 td.addEventListener('click', () => openEditCellModal(td));
