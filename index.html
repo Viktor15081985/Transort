@@ -35,21 +35,20 @@
             transition: all 0.3s ease;
         }
 
-        #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, rgba(47, 47, 47, 0.8) 0%, rgba(37, 37, 37, 0.8) 100%), url('fon.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
+#login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(47, 47, 47, 0.8) 0%, rgba(37, 37, 37, 0.8) 100%), url('fon.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
 
-        @media (max-width: 1920px) {
-            #login-screen {
-                background-attachment: scroll;
-            }
-        }
-
+@media (max-width: 1920px) {
+    #login-screen {
+        background-attachment: scroll;
+    }
+}
         .login-container {
             background: var(--bg-secondary);
             padding: 2.5rem;
@@ -184,39 +183,6 @@
 
         #logout-btn.user-role-btn:hover {
             background: var(--accent-hover);
-        }
-
-        /* НОВАЯ ПАНЕЛЬ СТАТУСА ПОЛЬЗОВАТЕЛЕЙ ОНЛАЙН */
-        .online-status-panel {
-            background: var(--bg-tertiary);
-            padding: 6px 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            height: 30px;
-        }
-
-        .online-users {
-            display: flex;
-            gap: 15px;
-        }
-
-        .online-count {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .online-admins {
-            color: var(--accent-color);
-        }
-
-        .online-users-count {
-            color: var(--text-primary);
-            font-weight: 600;
         }
 
         .top-controls-panel {
@@ -491,7 +457,7 @@
 
         .container {
             display: flex;
-            height: calc(100vh - 165px);
+            height: calc(100vh - 135px);
         }
 
         .sidebar {
@@ -802,7 +768,6 @@
             color: var(--text-primary);
         }
 
-        /* ИСПРАВЛЕНО: Убрана серая подсветка для обычных дат */
         .date-cell-warning {
             background-color: rgba(230, 126, 34, 0.2) !important;
             border: 1px solid var(--accent-color) !important;
@@ -812,6 +777,12 @@
         .date-cell-danger {
             background-color: rgba(230, 126, 34, 0.4) !important;
             border: 1px solid var(--accent-hover) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .date-cell-normal {
+            background-color: var(--bg-tertiary) !important;
+            border: 1px solid var(--table-border) !important;
             color: var(--text-primary) !important;
         }
 
@@ -1545,15 +1516,6 @@
             background: var(--accent-hover) !important;
         }
 
-        /* НОВАЯ КНОПКА ОБНОВИТЬ */
-        .refresh-data-btn {
-            background: var(--accent-color) !important;
-        }
-
-        .refresh-data-btn:hover {
-            background: var(--accent-hover) !important;
-        }
-
         .date-input-overlay {
             position: absolute;
             top: 0;
@@ -1687,11 +1649,10 @@
             margin-left: 8px;
         }
 
-        /* ПЕРЕМЕЩЕННЫЙ СТАТУС СИНХРОНИЗАЦИИ В ПРАВЫЙ НИЖНИЙ УГОЛ */
         .sync-status {
             position: fixed;
             bottom: 10px;
-            right: 10px;
+            left: 10px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -1713,7 +1674,6 @@
             color: #2ecc71;
         }
 
-        /* УЛУЧШЕННАЯ МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 1200px) {
             .top-controls-panel {
                 height: auto;
@@ -1788,15 +1748,6 @@
                 justify-content: center;
                 width: 100%;
             }
-            
-            /* Улучшение для мобильных: скрыть сложные элементы */
-            .online-status-panel .online-users:last-child {
-                display: none;
-            }
-            
-            .tabs-scroll-btn {
-                display: none;
-            }
         }
 
         @media (max-width: 768px) {
@@ -1835,37 +1786,6 @@
             .notification-panel {
                 width: 95%;
                 right: 2.5%;
-            }
-            
-            /* Улучшение для мобильных: компактный вид */
-            .header-title {
-                font-size: 1.2rem;
-            }
-            
-            .user-role-btn {
-                font-size: 0.8rem;
-                min-width: 100px;
-                padding: 0.3rem 0.8rem;
-            }
-            
-            th, td {
-                padding: 0.3rem;
-                font-size: 0.8rem;
-            }
-            
-            th {
-                padding: 6px 4px;
-                font-size: 0.8rem;
-            }
-            
-            /* Мобильная навигация таблицы */
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            table {
-                min-width: 600px; /* Минимальная ширина для удобства прокрутки */
             }
         }
 
@@ -1940,35 +1860,6 @@
                 bottom: 50px;
                 right: 10px;
             }
-            
-            /* Улучшение для мобильных: адаптивные кнопки */
-            .sidebar button {
-                font-size: 0.8rem;
-                padding: 0 10px;
-            }
-            
-            .button-text {
-                font-size: 0.8rem;
-            }
-            
-            .custom-button-wrapper {
-                flex-direction: column;
-                gap: 2px;
-            }
-            
-            .button-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-            
-            /* Скрыть дополнительные элементы на мобильных */
-            .online-status-panel {
-                font-size: 0.7rem;
-            }
-            
-            .online-users {
-                gap: 8px;
-            }
         }
 
         @media (max-width: 400px) {
@@ -1990,83 +1881,10 @@
                 width: 100%;
                 justify-content: flex-end;
             }
-            
-            /* Дополнительные улучшения для очень маленьких экранов */
-            .header {
-                padding: 8px;
-            }
-            
-            .header-content {
-                gap: 10px;
-            }
-            
-            .logo {
-                height: 30px;
-            }
-            
-            .user-info {
-                gap: 8px;
-            }
-            
-            .user-name {
-                display: none;
-            }
         }
 
         #show-all {
             margin-bottom: 10px !important;
-        }
-        
-        /* Мобильное меню для очень маленьких экранов */
-        .mobile-menu-toggle {
-            display: none;
-            background: var(--accent-color);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        
-        @media (max-width: 576px) {
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                z-index: 1001;
-            }
-            
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: -100%;
-                width: 80%;
-                height: 100%;
-                z-index: 1000;
-                transition: left 0.3s ease;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            }
-            
-            .sidebar.active {
-                left: 0;
-            }
-            
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-            }
-            
-            .sidebar-overlay.active {
-                display: block;
-            }
         }
     </style>
 </head>
@@ -2091,9 +1909,6 @@
 
     <!-- Основной экран -->
     <div id="main-screen">
-        <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        
         <div class="header">
             <div class="header-content">
                 <img id="header-logo" class="logo" src="" alt="Logo" style="display: none;">
@@ -2103,23 +1918,6 @@
                 <span class="user-name" id="user-name-display"></span>
                 <button class="user-role-btn" id="user-role">Пользователь</button>
                 <button id="logout-btn" class="user-role-btn">Выйти</button>
-            </div>
-        </div>
-
-        <!-- НОВАЯ ПАНЕЛЬ СТАТУСА ПОЛЬЗОВАТЕЛЕЙ ОНЛАЙН -->
-        <div class="online-status-panel">
-            <div class="online-users">
-                <div class="online-count">
-                    <span>Пользователи онлайн:</span>
-                    <span class="online-users-count" id="online-users-count">0</span>
-                </div>
-                <div class="online-count">
-                    <span class="online-admins">Администраторы:</span>
-                    <span class="online-users-count" id="online-admins-count">0</span>
-                </div>
-            </div>
-            <div class="online-users" id="online-users-list">
-                <!-- Список онлайн пользователей будет здесь -->
             </div>
         </div>
 
@@ -2159,7 +1957,7 @@
         </div>
 
         <div class="container">
-            <div class="sidebar" id="sidebar">
+            <div class="sidebar">
                 <div class="sidebar-buttons">
                     <button id="show-all" title="Показать все столбцы">Отобразить все</button>
                     <div id="custom-buttons"></div>
@@ -2176,10 +1974,6 @@
                     </button>
                     <button id="check-dates-btn" class="check-dates-btn" title="Проверить все даты на истечение срока">
                         <span class="icon">📅</span> Проверка дат
-                    </button>
-                    <!-- НОВАЯ КНОПКА ОБНОВИТЬ -->
-                    <button id="refresh-data-btn" class="refresh-data-btn" title="Загрузить обновленные данные с GitHub">
-                        <span class="icon">🔄</span> Обновить данные
                     </button>
                     <div class="admin-only">
                         <button id="manage-users" class="manage-users-btn" title="Управление пользователями системы">
@@ -2261,7 +2055,7 @@
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
 
-        <!-- Статус синхронизации - ПЕРЕМЕЩЕН В ПРАВЫЙ НИЖНИЙ УГОЛ -->
+        <!-- Статус синхронизации -->
         <div class="sync-status" id="sync-status">Готов к синхронизации</div>
     </div>
 
@@ -2537,189 +2331,21 @@
         // Данные для импорта
         let currentImportData = null;
 
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ УЛУЧШЕННОЙ СИНХРОНИЗАЦИИ
-        let isSyncing = false;
-
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ ОТСЛЕЖИВАНИЯ ОНЛАЙН ПОЛЬЗОВАТЕЛЕЙ
-        let onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-        let onlineStatusInterval = null;
-
-        // Дополнительная проверка целостности данных
-        function validateDataIntegrity() {
-            console.log('🔍 Проверка целостности данных...');
-            
-            if (!Array.isArray(users) || users.length === 0) {
-                users = [
-                    { username: 'admin', password: 'admin', role: 'admin' },
-                    { username: 'user', password: 'user', role: 'user' }
-                ];
-                console.log('🔄 Восстановлены пользователи по умолчанию');
-            }
-            
-            if (!Array.isArray(tableData)) {
-                tableData = [
-                    { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
-                    { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
-                    { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
-                ];
-                console.log('🔄 Восстановлены данные таблицы по умолчанию');
-            }
-            
-            // Проверка остальных структур данных
-            if (!appSettings || typeof appSettings !== 'object') {
-                appSettings = {
-                    headerTitle: 'Основное окно',
-                    headerLogo: '',
-                    fixedColumnsCount: 3,
-                    currentTheme: 'theme-orange'
-                };
-                console.log('🔄 Восстановлены настройки приложения по умолчанию');
-            }
-            
-            if (!Array.isArray(customButtons)) customButtons = [];
-            if (!Array.isArray(customColumns)) customColumns = [];
-            if (!Array.isArray(basicColumns)) {
-                basicColumns = [
-                    { id: 'id', name: '№ п/п', editable: false },
-                    { id: 'name', name: 'Название', editable: true },
-                    { id: 'date', name: 'Дата создания', editable: true },
-                    { id: 'status', name: 'Статус', editable: true }
-                ];
-            }
-            
-            if (!dateValidationColumns || typeof dateValidationColumns !== 'object') {
-                dateValidationColumns = {};
-            }
-            
-            if (!Array.isArray(tabs) || tabs.length === 0) {
-                tabs = [
-                    { id: 'tab1', name: 'Основное окно', data: null }
-                ];
-            }
-            
-            console.log('✅ Проверка целостности данных завершена');
-        }
-
-        // ФУНКЦИЯ ЗАДЕРЖКИ
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // ФУНКЦИИ ДЛЯ ОТСЛЕЖИВАНИЯ ОНЛАЙН ПОЛЬЗОВАТЕЛЕЙ
-        function updateOnlineStatus() {
-            if (!currentUser) return;
-            
-            const now = Date.now();
-            const userKey = `${currentUser.username}_${currentUser.role}`;
-            
-            // Обновляем статус текущего пользователя
-            onlineUsers[userKey] = {
-                username: currentUser.username,
-                role: currentUser.role,
-                lastSeen: now,
-                displayName: currentUser.username
-            };
-            
-            // Очищаем старые записи (более 15 секунд)
-            Object.keys(onlineUsers).forEach(key => {
-                if (now - onlineUsers[key].lastSeen > 15000) {
-                    delete onlineUsers[key];
-                }
-            });
-            
-            // Сохраняем в localStorage
-            localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            
-            // Обновляем отображение
-            updateOnlineStatusDisplay();
-        }
-
-        function updateOnlineStatusDisplay() {
-            const onlineUsersCount = document.getElementById('online-users-count');
-            const onlineAdminsCount = document.getElementById('online-admins-count');
-            const onlineUsersList = document.getElementById('online-users-list');
-            
-            if (!onlineUsersCount) return;
-            
-            const users = Object.values(onlineUsers);
-            const totalUsers = users.length;
-            const admins = users.filter(user => user.role === 'admin');
-            const totalAdmins = admins.length;
-            
-            onlineUsersCount.textContent = totalUsers;
-            onlineAdminsCount.textContent = totalAdmins;
-            
-            // Обновляем список пользователей
-            onlineUsersList.innerHTML = '';
-            
-            users.forEach(user => {
-                const userBadge = document.createElement('div');
-                userBadge.className = 'online-count';
-                userBadge.style.marginLeft = '10px';
-                userBadge.style.fontSize = '0.75rem';
-                
-                const roleIcon = user.role === 'admin' ? '👑' : '👤';
-                userBadge.innerHTML = `<span>${roleIcon} ${user.username}</span>`;
-                
-                onlineUsersList.appendChild(userBadge);
-            });
-        }
-
-        function startOnlineStatusTracking() {
-            updateOnlineStatus();
-            onlineStatusInterval = setInterval(updateOnlineStatus, 5000);
-            
-            // Также обновляем статус при видимости страницы
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    updateOnlineStatus();
-                }
-            });
-        }
-
-        function stopOnlineStatusTracking() {
-            if (onlineStatusInterval) {
-                clearInterval(onlineStatusInterval);
-                onlineStatusInterval = null;
-            }
-            
-            // Удаляем текущего пользователя из онлайн
-            if (currentUser) {
-                const userKey = `${currentUser.username}_${currentUser.role}`;
-                delete onlineUsers[userKey];
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            }
-        }
-
-        // БЕЗОПАСНАЯ СИНХРОНИЗАЦИЯ
-        async function safeSaveToGitHub() {
-            if (isSyncing) {
-                console.log('⚠️ Синхронизация уже выполняется, пропускаем...');
-                return;
-            }
-            
-            isSyncing = true;
-            try {
-                await saveToGitHub();
-            } finally {
-                isSyncing = false;
-            }
-        }
-
-        // УЛУЧШЕННАЯ ФУНКЦИЯ СИНХРОНИЗАЦИИ
+        // НОВАЯ ФУНКЦИЯ saveToGitHub с автоматическим слиянием
         async function saveToGitHub() {
             const statusElement = document.getElementById('sync-status');
             statusElement.textContent = 'Синхронизация...';
             statusElement.className = 'sync-status syncing';
 
             try {
+                // Проверка конфигурации
                 if (!GITHUB_CONFIG.token) {
                     throw new Error('GitHub токен не настроен');
                 }
 
                 console.log('🔄 Начинаем процесс синхронизации...');
 
-                // Подготовка данных
+                // 1. ПОДГОТОВКА ДАННЫХ
                 const dataToSave = {
                     tableData,
                     users,
@@ -2730,13 +2356,18 @@
                     dateValidationColumns,
                     tabs,
                     lastSync: new Date().toISOString(),
-                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9),
-                    lastEditedBy: currentUser ? currentUser.username : 'unknown'
+                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9) // Идентификатор устройства
                 };
 
-                let content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2)));
+                console.log('📊 Данные для сохранения:', {
+                    строки: tableData.length,
+                    пользователи: users.length,
+                    вкладки: tabs.length
+                });
+
+                let content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
                 
-                // Получаем актуальную информацию о файле
+                // 2. ПОЛУЧЕНИЕ ТЕКУЩЕГО СОСТОЯНИЯ ФАЙЛА
                 let sha = null;
                 let remoteData = null;
                 
@@ -2758,6 +2389,10 @@
                         remoteData = JSON.parse(remoteContent);
                         
                         console.log('✅ Текущий SHA:', sha);
+                        console.log('📋 Данные с GitHub:', {
+                            строки: remoteData.tableData?.length || 0,
+                            последняяСинхронизация: remoteData.lastSync
+                        });
                     } else if (fileInfoResponse.status === 404) {
                         console.log('📝 Файл не существует, создаем новый');
                         sha = null;
@@ -2771,18 +2406,22 @@
                     // Продолжаем без информации о удаленном файле
                 }
 
-                // Автоматическое слияние данных (если есть удаленные данные)
+                // 3. АВТОМАТИЧЕСКОЕ СЛИЯНИЕ ДАННЫХ (если есть удаленные данные)
                 let finalData = dataToSave;
                 
                 if (remoteData && remoteData.tableData) {
                     console.log('🔄 Выполняем автоматическое слияние данных...');
                     finalData = mergeData(remoteData, dataToSave);
+                    console.log('✅ Слияние завершено:', {
+                        было_строк: remoteData.tableData.length,
+                        стало_строк: finalData.tableData.length
+                    });
                     
                     // Обновляем контент после слияния
                     content = btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2))));
                 }
 
-                // Сохраняем данные
+                // 4. СОХРАНЕНИЕ ДАННЫХ
                 console.log('💾 Отправляем данные с SHA:', sha);
                 const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
                     method: 'PUT',
@@ -2799,56 +2438,13 @@
                     })
                 });
 
+                // 5. ОБРАБОТКА ОТВЕТА
                 if (!saveResponse.ok) {
                     const error = await saveResponse.json();
                     
                     // Если SHA не совпадает (конфликт версий)
                     if (error.message && error.message.includes('does not match')) {
-                        console.log('⚡ Обнаружен конфликт версий, выполняем улучшенное разрешение...');
-                        
-                        // Используем улучшенное разрешение конфликтов
-                        await resolveConflictAndRetry(dataToSave);
-                        return;
-                    }
-                    
-                    throw new Error(error.message || 'Ошибка сохранения в GitHub');
-                }
-
-                // Успешное сохранение
-                console.log('✅ Успешно сохранено в GitHub');
-                statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
-                statusElement.className = 'sync-status success';
-
-                // Если были объединены данные, обновляем локально
-                if (finalData !== dataToSave) {
-                    updateLocalData(finalData);
-                    saveToLocalStorage();
-                }
-                
-            } catch (error) {
-                console.error('❌ Ошибка синхронизации:', error);
-                statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
-                statusElement.className = 'sync-status error';
-            }
-        }
-
-        // УЛУЧШЕННАЯ ФУНКЦИЯ РАЗРЕШЕНИЯ КОНФЛИКТОВ
-        async function resolveConflictAndRetry(localData) {
-            const statusElement = document.getElementById('sync-status');
-            
-            try {
-                console.log('🔄 Запуск улучшенного разрешения конфликтов...');
-                
-                // Ограничиваем количество попыток
-                const maxRetries = 3;
-                let lastError = null;
-                
-                for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                    try {
-                        console.log(`📝 Попытка разрешения конфликта ${attempt} из ${maxRetries}`);
-                        
-                        // Увеличиваем задержку с каждой попыткой
-                        await delay(1000 * attempt);
+                        console.log('⚡ Обнаружен конфликт версий, выполняем разрешение...');
                         
                         // Получаем самый актуальный SHA
                         const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
@@ -2858,59 +2454,42 @@
                             }
                         });
                         
-                        if (!retryResponse.ok) {
-                            throw new Error(`Не удалось получить актуальные данные: ${retryResponse.status}`);
-                        }
-                        
-                        const latestFileInfo = await retryResponse.json();
-                        const newSha = latestFileInfo.sha;
-                        
-                        console.log(`🔄 Получен новый SHA для попытки ${attempt}:`, newSha);
-                        
-                        // Проверяем, что контент существует и не пустой
-                        if (!latestFileInfo.content) {
-                            throw new Error('Получен пустой файл от GitHub');
-                        }
-                        
-                        // Слияние с самыми актуальными данными
-                        const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
-                        
-                        if (!latestContent || latestContent.trim() === '') {
-                            throw new Error('Содержимое файла пустое');
-                        }
-                        
-                        let latestData;
-                        try {
-                            latestData = JSON.parse(latestContent);
-                        } catch (parseError) {
-                            console.error('❌ Ошибка парсинга данных с GitHub:', parseError);
-                            throw new Error('Неверный формат данных в GitHub');
-                        }
-                        
-                        console.log('🔄 Выполняем слияние данных...');
-                        const mergedData = mergeData(latestData, localData);
-                        const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
-                        
-                        console.log(`💾 Отправка данных с SHA: ${newSha}`);
-                        
-                        // Повторяем запрос с новым SHA и объединенными данными
-                        const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/vnd.github.v3+json'
-                            },
-                            body: JSON.stringify({
-                                message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()}`,
-                                content: mergedContent,
-                                branch: GITHUB_CONFIG.branch,
-                                sha: newSha
-                            })
-                        });
-                        
-                        if (retrySave.ok) {
-                            // Успех!
+                        if (retryResponse.ok) {
+                            const latestFileInfo = await retryResponse.json();
+                            const newSha = latestFileInfo.sha;
+                            
+                            console.log('🔄 Получен новый SHA для повторной попытки:', newSha);
+                            
+                            // СЛИЯНИЕ С САМЫМИ АКТУАЛЬНЫМИ ДАННЫМИ
+                            const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
+                            const latestData = JSON.parse(latestContent);
+                            
+                            console.log('🔄 Повторное слияние с актуальными данными...');
+                            const mergedData = mergeData(latestData, dataToSave);
+                            const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
+                            
+                            // Повторяем запрос с новым SHA и объединенными данными
+                            const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/vnd.github.v3+json'
+                                },
+                                body: JSON.stringify({
+                                    message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()}`,
+                                    content: mergedContent,
+                                    branch: GITHUB_CONFIG.branch,
+                                    sha: newSha
+                                })
+                            });
+                            
+                            if (!retrySave.ok) {
+                                const retryError = await retrySave.json();
+                                throw new Error(`Ошибка при повторной попытке: ${retryError.message}`);
+                            }
+                            
+                            // УСПЕХ ПОВТОРНОЙ ПОПЫТКИ
                             console.log('✅ Успешно сохранено после разрешения конфликта');
                             statusElement.textContent = 'Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString();
                             statusElement.className = 'sync-status success';
@@ -2918,222 +2497,70 @@
                             // Обновляем локальные данные объединенной версией
                             updateLocalData(mergedData);
                             saveToLocalStorage();
-                            return; // Выходим при успехе
+                            return;
                         }
-                        
-                        // Если запрос не удался, анализируем ошибку
-                        const retryError = await retrySave.json();
-                        lastError = retryError;
-                        
-                        if (retryError.message && retryError.message.includes('does not match')) {
-                            console.log(`⚡ SHA снова не совпадает на попытке ${attempt}, продолжаем...`);
-                            continue; // Продолжаем цикл для следующей попытки
-                        } else {
-                            throw new Error(`Ошибка GitHub: ${retryError.message}`);
-                        }
-                        
-                    } catch (attemptError) {
-                        console.error(`❌ Ошибка в попытке ${attempt}:`, attemptError);
-                        lastError = attemptError;
-                        
-                        // Если это последняя попытка, выходим из цикла
-                        if (attempt === maxRetries) break;
-                        
-                        // Иначе продолжаем следующую попытку
-                        console.log(`🔄 Переход к следующей попытке...`);
                     }
+                    
+                    // Другие ошибки
+                    throw new Error(error.message || 'Ошибка сохранения в GitHub');
                 }
-                
-                // Если дошли до здесь, все попытки не удались
-                throw new Error(`Не удалось разрешить конфликт после ${maxRetries} попыток: ${lastError?.message || 'Неизвестная ошибка'}`);
-                
-            } catch (finalError) {
-                console.error('❌ Критическая ошибка при разрешении конфликта:', finalError);
-                statusElement.textContent = 'Ошибка разрешения конфликта: ' + finalError.message;
-                statusElement.className = 'sync-status error';
-                
-                // Предлагаем пользователю варианты действий
-                const userChoice = confirm(
-                    'Обнаружен конфликт данных, который не удалось разрешить автоматически.\n\n' +
-                    'Нажмите OK для загрузки версии с GitHub (ваши локальные изменения будут объединены).\n' +
-                    'Нажмите Отмена для сохранения локальной версии (изменения из GitHub будут потеряны).'
-                );
-                
-                if (userChoice) {
-                    // Пользователь выбрал загрузку с GitHub
-                    await loadFromGitHub();
-                } else {
-                    // Пользователь выбрал принудительное сохранение локальной версии
-                    await forceSaveToGitHub(localData);
-                }
-            }
-        }
 
-        // НОВАЯ ФУНКЦИЯ ПРИНУДИТЕЛЬНОГО СОХРАНЕНИЯ
-        async function forceSaveToGitHub(localData) {
-            const statusElement = document.getElementById('sync-status');
-            statusElement.textContent = 'Принудительное сохранение...';
-            statusElement.className = 'sync-status syncing';
-            
-            try {
-                console.log('💪 Запуск принудительного сохранения...');
-                
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(localData, null, 2))));
-                
-                // Сначала пытаемся получить текущий SHA, но не полагаемся на него полностью
-                let sha = null;
-                try {
-                    const fileInfoResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
-                        headers: {
-                            'Authorization': `token ${GITHUB_CONFIG.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    
-                    if (fileInfoResponse.ok) {
-                        const fileInfo = await fileInfoResponse.json();
-                        sha = fileInfo.sha;
-                        console.log('📡 Получен SHA для принудительного сохранения:', sha);
-                    }
-                } catch (shaError) {
-                    console.log('⚠️ Не удалось получить SHA, продолжаем без него:', shaError.message);
-                }
-                
-                // Отправляем запрос с SHA (если есть) или без него
-                const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_CONFIG.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: `Принудительное сохранение ${new Date().toLocaleString()} (конфликт)`,
-                        content: content,
-                        branch: GITHUB_CONFIG.branch,
-                        ...(sha && { sha: sha }) // Добавляем SHA только если он есть
-                    })
-                });
-                
-                if (!saveResponse.ok) {
-                    const error = await saveResponse.json();
-                    
-                    // Если SHA не совпадает, пробуем без SHA (создаем новый файл)
-                    if (error.message && error.message.includes('does not match')) {
-                        console.log('🔄 SHA не совпадает, пробуем создать новый файл...');
-                        
-                        const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/vnd.github.v3+json'
-                            },
-                            body: JSON.stringify({
-                                message: `Принудительное создание файла ${new Date().toLocaleString()}`,
-                                content: content,
-                                branch: GITHUB_CONFIG.branch
-                                // Не передаем SHA, чтобы создать новый файл
-                            })
-                        });
-                        
-                        if (!retryResponse.ok) {
-                            const retryError = await retryResponse.json();
-                            throw new Error(`Не удалось создать файл: ${retryError.message}`);
-                        }
-                        
-                        console.log('✅ Файл успешно создан заново');
-                    } else {
-                        throw new Error(error.message || 'Ошибка принудительного сохранения');
-                    }
-                }
-                
-                console.log('✅ Принудительное сохранение завершено успешно');
-                statusElement.textContent = 'Синхронизировано (принудительно): ' + new Date().toLocaleTimeString();
+                // УСПЕШНОЕ СОХРАНЕНИЕ
+                console.log('✅ Успешно сохранено в GitHub');
+                statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
                 statusElement.className = 'sync-status success';
+                saveToLocalStorage();
                 
             } catch (error) {
-                console.error('❌ Ошибка принудительного сохранения:', error);
-                statusElement.textContent = 'Ошибка принудительного сохранения: ' + error.message;
+                console.error('❌ Ошибка синхронизации:', error);
+                statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
                 statusElement.className = 'sync-status error';
-                
-                // Сохраняем локально как резервную копию
                 saveToLocalStorage();
-                alert('Данные сохранены локально. Пожалуйста, проверьте настройки GitHub и попробуйте снова.');
             }
         }
 
-        // УЛУЧШЕННАЯ ФУНКЦИЯ СЛИЯНИЯ ДАННЫХ
+        // ФУНКЦИЯ АВТОМАТИЧЕСКОГО СЛИЯНИЯ ДАННЫХ
         function mergeData(remoteData, localData) {
             console.log('🔄 Запуск слияния данных...');
             
             const merged = {
                 ...remoteData,
                 lastSync: new Date().toISOString(),
-                mergeOperation: true,
-                mergedFrom: {
-                    remote: remoteData.lastSync,
-                    local: localData.lastSync
-                }
+                mergeOperation: true
             };
 
-            // Приоритет локальных данных для настроек
-            if (localData.appSettings) {
-                merged.appSettings = {
-                    ...remoteData.appSettings,
-                    ...localData.appSettings
-                };
-            }
-
-            // Умное слияние табличных данных
+            // СЛИЯНИЕ ТАБЛИЧНЫХ ДАННЫХ
             if (localData.tableData && remoteData.tableData) {
                 console.log('📊 Слияние табличных данных...');
                 
-                const remoteMap = new Map(remoteData.tableData.map(row => [row.id, row]));
-                const localMap = new Map(localData.tableData.map(row => [row.id, row]));
+                const remoteRows = new Map(remoteData.tableData.map(row => [row.id, row]));
+                const localRows = new Map(localData.tableData.map(row => [row.id, row]));
                 
-                // Объединяем строки
-                const mergedTableData = [];
-                const allIds = new Set([...remoteMap.keys(), ...localMap.keys()]);
+                // Объединяем строки - локальные изменения имеют приоритет
+                const mergedTableData = [...remoteData.tableData];
                 
-                allIds.forEach(id => {
-                    const remoteRow = remoteMap.get(id);
-                    const localRow = localMap.get(id);
-                    
-                    if (localRow && remoteRow) {
-                        // Обе строки существуют - объединяем с приоритетом локальных изменений
-                        const mergedRow = {
-                            ...remoteRow,
+                localData.tableData.forEach(localRow => {
+                    const existingIndex = mergedTableData.findIndex(row => row.id === localRow.id);
+                    if (existingIndex >= 0) {
+                        // Обновляем существующую строку, сохраняя attachments
+                        const existingAttachments = mergedTableData[existingIndex].attachments;
+                        mergedTableData[existingIndex] = {
                             ...localRow,
-                            // Сохраняем вложения из обеих версий
-                            attachments: { 
-                                ...remoteRow.attachments, 
-                                ...localRow.attachments 
-                            },
-                            customData: {
-                                ...remoteRow.customData,
-                                ...localRow.customData
-                            }
+                            attachments: { ...existingAttachments, ...localRow.attachments }
                         };
-                        mergedTableData.push(mergedRow);
-                        console.log(`✏️ Объединена строка ID: ${id}`);
-                    } else if (localRow) {
-                        // Новая локальная строка
-                        mergedTableData.push(localRow);
-                        console.log(`➕ Добавлена новая локальная строка ID: ${id}`);
+                        console.log(`✏️ Обновлена строка ID: ${localRow.id}`);
                     } else {
-                        // Существующая удаленная строка
-                        mergedTableData.push(remoteRow);
+                        // Добавляем новую строку
+                        mergedTableData.push(localRow);
+                        console.log(`➕ Добавлена новая строка ID: ${localRow.id}`);
                     }
                 });
                 
-                // Сортируем по ID
-                mergedTableData.sort((a, b) => a.id - b.id);
                 merged.tableData = mergedTableData;
                 console.log(`✅ Табличные данные объединены: ${mergedTableData.length} строк`);
             }
 
-            // Слияние пользователей (локальные имеют приоритет)
+            // СЛИЯНИЕ ПОЛЬЗОВАТЕЛЕЙ (административные данные)
             if (localData.users && remoteData.users) {
                 console.log('👥 Слияние пользователей...');
                 const userMap = new Map(remoteData.users.map(user => [user.username, user]));
@@ -3146,12 +2573,22 @@
                 console.log(`✅ Пользователи объединены: ${merged.users.length} пользователей`);
             }
 
-            // Слияние остальных данных
-            ['customButtons', 'customColumns', 'basicColumns', 'dateValidationColumns', 'tabs'].forEach(key => {
-                if (localData[key]) {
-                    merged[key] = localData[key];
-                }
-            });
+            // СЛИЯНИЕ НАСТРОЕК (локальные настройки имеют приоритет)
+            if (localData.appSettings) {
+                console.log('⚙️ Слияние настроек приложения...');
+                merged.appSettings = {
+                    ...remoteData.appSettings,
+                    ...localData.appSettings
+                };
+            }
+
+            // СЛИЯНИЕ КОЛОНОК И КНОПОК
+            if (localData.customButtons) {
+                merged.customButtons = localData.customButtons;
+            }
+            if (localData.customColumns) {
+                merged.customColumns = localData.customColumns;
+            }
 
             console.log('🎉 Слияние завершено успешно');
             return merged;
@@ -3294,40 +2731,46 @@
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
         function initializeAppWithFallback() {
-            validateDataIntegrity();
             setupEventListeners();
             loadAppSettings();
             
-            // Загружаем данные онлайн пользователей
-            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-            updateOnlineStatusDisplay();
-            
-            // ИСПРАВЛЕНИЕ: Правильная инициализация данных
+            // Всегда сначала пытаемся загрузить из GitHub, даже без токена
+            // (на случай, если репозиторий публичный)
             try {
-                loadFromLocalStorage();
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
-                
-                console.log('📁 Загружены локальные данные из localStorage');
+                if (GITHUB_CONFIG.repo && GITHUB_CONFIG.branch) {
+                    console.log('🔄 Попытка загрузки данных из GitHub...');
+                    loadFromGitHub().then(() => {
+                        console.log('✅ Загрузка из GitHub завершена');
+                    }).catch(error => {
+                        console.log('❌ Ошибка загрузки из GitHub:', error);
+                        // При ошибке загружаем из localStorage
+                        loadFromLocalStorageWithNotification();
+                    });
+                } else {
+                    loadFromLocalStorageWithNotification();
+                }
             } catch (error) {
-                console.error('❌ Ошибка инициализации:', error);
-                // Создаем базовые данные при ошибке
-                tableData = [
-                    { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
-                    { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
-                    { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
-                ];
-                saveToLocalStorage();
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
+                console.error('❌ Критическая ошибка инициализации:', error);
+                loadFromLocalStorageWithNotification();
             }
+        }
+
+        // НОВАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
+        function loadFromLocalStorageWithNotification() {
+            loadFromLocalStorage();
+            renderTabs();
+            renderTable();
+            loadCustomButtons();
+            
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Используются локальные данные';
+            statusElement.className = 'sync-status';
+            
+            console.log('📁 Загружены локальные данные из localStorage');
         }
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Инициализация приложения...');
             initializeAppWithFallback();
         });
 
@@ -3347,12 +2790,6 @@
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
             document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
-            
-            // НОВАЯ КНОПКА ОБНОВИТЬ
-            document.getElementById('refresh-data-btn').addEventListener('click', () => {
-                loadFromGitHub();
-                alert('Данные обновляются с GitHub...');
-            });
 
             // Новые кнопки управления
             document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
@@ -3387,7 +2824,7 @@
 
             // GitHub синхронизация
             document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
-            document.getElementById('sync-now-btn').addEventListener('click', () => safeSaveToGitHub());
+            document.getElementById('sync-now-btn').addEventListener('click', () => saveToGitHub());
             document.getElementById('load-from-github-btn').addEventListener('click', () => loadFromGitHub());
 
             // Модальные окна
@@ -3445,23 +2882,6 @@
                     e.stopPropagation();
                 }
             });
-
-            // Мобильное меню
-            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebar-overlay');
-            
-            if (mobileMenuToggle && sidebar && sidebarOverlay) {
-                mobileMenuToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('active');
-                    sidebarOverlay.classList.toggle('active');
-                });
-                
-                sidebarOverlay.addEventListener('click', function() {
-                    sidebar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
         }
 
         function handleGitHubSettingsSave(e) {
@@ -3480,20 +2900,12 @@
             alert('Настройки GitHub сохранены!');
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВХОДА
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
         function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // ИСПРАВЛЕНИЕ: Добавляем проверку на пустые поля
-            if (!username || !password) {
-                alert('Пожалуйста, введите имя пользователя и пароль');
-                return;
-            }
-
-            // ИСПРАВЛЕНИЕ: Правильно ищем пользователя
             const user = users.find(u => u.username === username && u.password === password);
-            
             if (user) {
                 currentUser = user;
                 document.getElementById('login-screen').style.display = 'none';
@@ -3506,25 +2918,19 @@
                     setupAdminFeatures();
                 }
                 
-                // Запускаем отслеживание онлайн статуса
-                startOnlineStatusTracking();
+                // ПЕРЕЗАГРУЖАЕМ ДАННЫЕ ПОСЛЕ ВХОДА
+                if (GITHUB_CONFIG.token) {
+                    loadFromGitHub();
+                } else {
+                    loadFromLocalStorage();
+                    renderTabs();
+                    renderTable();
+                    loadCustomButtons();
+                }
                 
-                // ИСПРАВЛЕНИЕ: Правильно загружаем данные после входа
                 setTimeout(() => {
-                    if (GITHUB_CONFIG.token) {
-                        loadFromGitHub();
-                    } else {
-                        loadFromLocalStorage();
-                        renderTabs();
-                        renderTable();
-                        loadCustomButtons();
-                    }
-                    
-                    setTimeout(() => {
-                        checkAllDates();
-                    }, 1000);
-                }, 100);
-                
+                    checkAllDates();
+                }, 1000);
             } else {
                 alert('Неверное имя пользователя или пароль');
             }
@@ -3537,7 +2943,7 @@
             headerTitle.addEventListener('blur', function() {
                 appSettings.headerTitle = this.textContent;
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
             });
             
             headerTitle.addEventListener('keydown', function(e) {
@@ -3551,9 +2957,6 @@
         }
 
         function handleLogout() {
-            // Останавливаем отслеживание онлайн статуса
-            stopOnlineStatusTracking();
-            
             currentUser = null;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
@@ -3584,7 +2987,7 @@
             }
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             
@@ -3658,7 +3061,7 @@
             
             customButtons.push(buttonData);
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
@@ -3676,7 +3079,7 @@
             });
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             createCustomButton(buttonData);
             renderTable();
@@ -3768,7 +3171,7 @@
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 loadCustomButtons();
             }
         }
@@ -3781,7 +3184,7 @@
             
             customButtons = customButtons.filter(b => b.id !== buttonId);
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             button.columns.forEach(colName => {
                 customColumns = customColumns.filter(col => col.name !== colName);
@@ -3797,7 +3200,7 @@
             });
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             loadCustomButtons();
             renderTable();
@@ -3954,7 +3357,7 @@
             }
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             closeDatePicker();
             renderTable();
@@ -4027,7 +3430,7 @@
                 }
                 
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 renderTable();
                 checkAllDates();
@@ -4491,7 +3894,7 @@
                 }
                 
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 currentEditingCell.textContent = newValue;
             } else {
@@ -4516,7 +3919,7 @@
                 }
                 
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
                 if (cellContent) {
@@ -4543,7 +3946,7 @@
                 }
                 
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 if (currentEditingCell) {
                     loadAttachedFiles(currentEditingCell);
@@ -4605,7 +4008,7 @@
                     }
                     
                     saveToLocalStorage();
-                    safeSaveToGitHub(); // Синхронизируем с GitHub
+                    saveToGitHub(); // Синхронизируем с GitHub
                     
                     loadAttachedFiles(currentEditingCell);
                     renderTable();
@@ -4821,7 +4224,7 @@
             
             users.push({ username, password, role });
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
             document.getElementById('add-user-form').reset();
         }
@@ -4860,7 +4263,7 @@
             user.role = newRole;
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
         };
 
@@ -4868,7 +4271,7 @@
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
                 renderUsersList();
             }
         };
@@ -4897,7 +4300,7 @@
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
                     saveToLocalStorage();
-                    safeSaveToGitHub(); // Синхронизируем с GitHub
+                    saveToGitHub(); // Синхронизируем с GitHub
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -4927,7 +4330,7 @@
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
                 saveToLocalStorage();
-                safeSaveToGitHub(); // Синхронизируем с GitHub
+                saveToGitHub(); // Синхронизируем с GitHub
             }
         }
 
@@ -4949,7 +4352,7 @@
             });
 
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -4998,7 +4401,7 @@
             // Удаляем столбец из customColumns
             customColumns = customColumns.filter(col => col.id !== columnId);
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
 
             renderTable();
             document.getElementById('remove-column-modal').style.display = 'none';
@@ -5139,7 +4542,7 @@
             }
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             document.getElementById('import-excel-modal').style.display = 'none';
@@ -5200,13 +4603,13 @@
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
                             saveToLocalStorage();
-                            safeSaveToGitHub(); // Синхронизируем с GitHub
+                            saveToGitHub(); // Синхронизируем с GitHub
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
                                 saveToLocalStorage();
-                                safeSaveToGitHub(); // Синхронизируем с GitHub
+                                saveToGitHub(); // Синхронизируем с GitHub
                             }
                         } else {
                             this.textContent = tab.name;
@@ -5262,7 +4665,7 @@
             
             tabs.push(newTab);
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             currentTabId = tabId;
             tableData = JSON.parse(JSON.stringify(newTab.data));
@@ -5328,7 +4731,7 @@
             }
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             renderTabs();
             renderTable();
         }
@@ -5692,7 +5095,6 @@
                     }
                 });
                 
-                // ИСПРАВЛЕНО: Убрана серая подсветка для обычных дат
                 if (value && isValidDate(value)) {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -5704,8 +5106,9 @@
                         td.classList.add('date-cell-danger');
                     } else if (daysDiff <= 30) {
                         td.classList.add('date-cell-warning');
+                    } else {
+                        td.classList.add('date-cell-normal');
                     }
-                    // Убрано добавление класса date-cell-normal для обычных дат
                 }
             } else if (currentUser && currentUser.role === 'admin') {
                 td.addEventListener('click', () => openEditCellModal(td));
@@ -5782,7 +5185,7 @@
             }
             
             saveToLocalStorage();
-            safeSaveToGitHub(); // Синхронизируем с GitHub
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -5818,3 +5221,5 @@
     </script>
 </body>
 </html>
+
+
