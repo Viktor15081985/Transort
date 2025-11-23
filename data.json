@@ -125,6 +125,11 @@
       "username": "1",
       "password": "1",
       "role": "user"
+    },
+    {
+      "username": "2",
+      "password": "2",
+      "role": "user"
     }
   ],
   "appSettings": {
@@ -311,6 +316,6 @@
       ]
     }
   ],
-  "lastSync": "2025-11-23T15:16:31.444Z",
+  "lastSync": "2025-11-23T15:16:39.359Z",
   "lastEditor": "admin"
 }
