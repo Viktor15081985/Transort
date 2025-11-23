@@ -2967,6 +2967,8 @@
 
         // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
         function updateStatusBar() {
+            if (!currentUser) return;
+            
             const adminCount = Object.values(onlineUsers).filter(user => user.role === 'admin').length;
             const userCount = Object.values(onlineUsers).filter(user => user.role === 'user').length;
             
@@ -3188,30 +3190,30 @@
         }
 
         // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
-       function loadFromLocalStorageWithNotification() {
-    const data = storageManager.loadFromLocalStorage();
-    
-    tableData = data.tableData;
-    users = data.users;
-    appSettings = data.appSettings;
-    customButtons = data.customButtons;
-    customColumns = data.customColumns;
-    basicColumns = data.basicColumns;
-    dateValidationColumns = data.dateValidationColumns;
-    tabs = data.tabs;
-    storageManager.pendingChanges = data.pendingChanges;
-    
-    // ВОССТАНАВЛИВАЕМ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
-    restoreDateValidationColumns();
-    
-    renderTabs();
-    renderTable();
-    loadCustomButtons();
-    
-    updateSyncStatus('Используются локальные данные', '');
-    
-    console.log('📁 Загружены локальные данные из localStorage');
-}
+        function loadFromLocalStorageWithNotification() {
+            const data = storageManager.loadFromLocalStorage();
+            
+            tableData = data.tableData;
+            users = data.users;
+            appSettings = data.appSettings;
+            customButtons = data.customButtons;
+            customColumns = data.customColumns;
+            basicColumns = data.basicColumns;
+            dateValidationColumns = data.dateValidationColumns;
+            tabs = data.tabs;
+            storageManager.pendingChanges = data.pendingChanges;
+            
+            // ВОССТАНАВЛИВАЕМ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
+            restoreDateValidationColumns();
+            
+            renderTabs();
+            renderTable();
+            loadCustomButtons();
+            
+            updateSyncStatus('Используются локальные данные', '');
+            
+            console.log('📁 Загружены локальные данные из localStorage');
+        }
 
         // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ПОЛЬЗОВАТЕЛЕЙ ИЗ GITHUB
         async function loadUsersFromGitHub() {
@@ -3237,73 +3239,52 @@
             }
             return false;
         }
-function restoreDateValidationColumns() {
-    // Очищаем текущие настройки проверки дат
-    dateValidationColumns = {};
-    
-    // Восстанавливаем из customButtons
-    customButtons.forEach(button => {
-        if (button.dateColumns) {
-            button.dateColumns.forEach(colName => {
-                const column = customColumns.find(col => col.name === colName);
-                if (column) {
-                    dateValidationColumns[column.id] = true;
+
+        function restoreDateValidationColumns() {
+            // Очищаем текущие настройки проверки дат
+            dateValidationColumns = {};
+            
+            // Восстанавливаем из customButtons
+            customButtons.forEach(button => {
+                if (button.dateColumns) {
+                    button.dateColumns.forEach(colName => {
+                        const column = customColumns.find(col => col.name === colName);
+                        if (column) {
+                            dateValidationColumns[column.id] = true;
+                        }
+                    });
                 }
             });
+            
+            console.log('✅ Восстановлены настройки проверки дат:', dateValidationColumns);
         }
-    });
-    
-    console.log('✅ Восстановлены настройки проверки дат:', dateValidationColumns);
-}
+
         // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
-function initializeAppWithFallback() {
-    setupEventListeners();
-    loadAppSettings();
-    updateStatusBar();
-    
-    onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-    
-    // Загружаем пользователей при инициализации
-    if (users.length === 0) {
-        const data = storageManager.loadFromLocalStorage();
-        users = data.users;
-        
-        // Если все еще нет пользователей, пробуем загрузить из GitHub
-        if (users.length === 0) {
-            loadUsersFromGitHub().then(() => {
-                loadFromLocalStorageWithNotification();
-                restoreDateValidationColumns(); // ДОБАВЛЕНО
-            });
-        } else {
-            loadFromLocalStorageWithNotification();
-            restoreDateValidationColumns(); // ДОБАВЛЕНО
-        }
-    } else {
-        loadFromLocalStorageWithNotification();
-        restoreDateValidationColumns(); // ДОБАВЛЕНО
-    }
-    
-    if (currentUser && currentUser.role === 'user') {
-        const config = storageManager.getConfig();
-        if (config.repo && config.branch) {
-            console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
-            loadFromGitHub().then(() => {
-                console.log('✅ Загрузка из GitHub завершена');
+        function initializeAppWithFallback() {
+            setupEventListeners();
+            loadAppSettings();
+            
+            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
+            
+            // Загружаем пользователей при инициализации
+            if (users.length === 0) {
+                const data = storageManager.loadFromLocalStorage();
+                users = data.users;
                 
-                if (storageManager.pendingChanges.length > 0) {
-                    storageManager.trySyncChanges(updateSyncStatus);
+                // Если все еще нет пользователей, пробуем загрузить из GitHub
+                if (users.length === 0) {
+                    loadUsersFromGitHub().then(() => {
+                        loadFromLocalStorageWithNotification();
+                        restoreDateValidationColumns();
+                    });
+                } else {
+                    loadFromLocalStorageWithNotification();
+                    restoreDateValidationColumns();
                 }
-            }).catch(error => {
-                console.log('❌ Ошибка загрузки из GitHub:', error);
+            } else {
                 loadFromLocalStorageWithNotification();
-            });
-        } else {
-            loadFromLocalStorageWithNotification();
-        }
-    } else {
-        loadFromLocalStorageWithNotification();
-    }
-}
+                restoreDateValidationColumns();
+            }
             
             if (currentUser && currentUser.role === 'user') {
                 const config = storageManager.getConfig();
@@ -3325,68 +3306,68 @@ function initializeAppWithFallback() {
             } else {
                 loadFromLocalStorageWithNotification();
             }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeAppWithFallback();
-            
-            setInterval(updateStatusBar, 30000);
-            
-            window.addEventListener('online', function() {
-                updateSyncStatus('Восстановлено соединение', 'success');
-                if (storageManager.pendingChanges.length > 0) {
-                    storageManager.trySyncChanges(updateSyncStatus);
-                }
-            });
-            
-            window.addEventListener('offline', function() {
-                updateSyncStatus('Отсутствует соединение', 'error');
-            });
-        });
+        }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
-        async function handleLogin() {
+        function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             // Попытка загрузить пользователей из GitHub для новых устройств
             if (users.length === 0 || !users.find(u => u.username === 'admin')) {
-                try {
-                    await loadUsersFromGitHub();
-                } catch (error) {
+                loadUsersFromGitHub().then(() => {
+                    // После загрузки пользователей пробуем войти
+                    const user = users.find(u => u.username === username && u.password === password);
+                    if (user) {
+                        completeLogin(user);
+                    } else {
+                        alert('Неверное имя пользователя или пароль');
+                    }
+                }).catch(error => {
                     console.log('Не удалось загрузить пользователей из GitHub:', error);
-                }
-            }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-screen').style.display = 'flex';
-                document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
-                document.getElementById('user-name-display').textContent = user.username;
-                
-                if (user.role === 'admin') {
-                    document.body.classList.add('admin');
-                    setupAdminFeatures();
-                }
-                
-                onlineUsers[user.username] = {
-                    username: user.username,
-                    role: user.role,
-                    lastActive: Date.now()
-                };
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-                updateStatusBar();
-                
-                initializeAppWithFallback();
-                
-                setTimeout(() => {
-                    checkAllDates();
-                }, 1000);
+                    // Пробуем найти пользователя в локальных данных
+                    const user = users.find(u => u.username === username && u.password === password);
+                    if (user) {
+                        completeLogin(user);
+                    } else {
+                        alert('Неверное имя пользователя или пароль');
+                    }
+                });
             } else {
-                alert('Неверное имя пользователя или пароль');
+                const user = users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    completeLogin(user);
+                } else {
+                    alert('Неверное имя пользователя или пароль');
+                }
             }
+        }
+
+        function completeLogin(user) {
+            currentUser = user;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'flex';
+            document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
+            document.getElementById('user-name-display').textContent = user.username;
+            
+            if (user.role === 'admin') {
+                document.body.classList.add('admin');
+                setupAdminFeatures();
+            }
+            
+            onlineUsers[user.username] = {
+                username: user.username,
+                role: user.role,
+                lastActive: Date.now()
+            };
+            localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
+            updateStatusBar();
+            
+            initializeAppWithFallback();
+            
+            setTimeout(() => {
+                checkAllDates();
+            }, 1000);
         }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
@@ -3401,6 +3382,9 @@ function initializeAppWithFallback() {
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
             document.body.classList.remove('admin');
+            
+            // Очищаем форму входа
+            document.getElementById('login-form').reset();
         }
 
         function setupAdminFeatures() {
@@ -3423,7 +3407,7 @@ function initializeAppWithFallback() {
             document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
-        // ОСТАВШИЕСЯ ФУНКЦИИ (без изменений в логике)
+        // ОСТАВШИЕСЯ ФУНКЦИИ (исправленные)
         function setupEventListeners() {
             // Логин
             document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -3661,34 +3645,34 @@ function initializeAppWithFallback() {
         }
 
         function handleAddButton(e) {
-    e.preventDefault();
-    const buttonName = document.getElementById('button-name').value;
-    const columnInputs = document.getElementById('columns-container').querySelectorAll('input');
-    const dateCheckboxes = document.querySelectorAll('.column-date-validation');
-    
-    const columns = Array.from(columnInputs)
-        .map(input => input.value.trim())
-        .filter(name => name !== '');
-    
-    const buttonId = 'btn_' + Date.now();
-    
-    // СОХРАНИТЕ ИНФОРМАЦИЮ О ПРОВЕРКЕ ДАТ В САМОЙ КНОПКЕ
-    const dateColumns = [];
-    dateCheckboxes.forEach((checkbox, index) => {
-        if (checkbox.checked && columns[index]) {
-            dateColumns.push(columns[index]);
-        }
-    });
-    
-    const buttonData = {
-        id: buttonId,
-        name: buttonName,
-        columns: columns,
-        dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
-    };
-    
-    customButtons.push(buttonData);
+            e.preventDefault();
+            const buttonName = document.getElementById('button-name').value;
+            const columnInputs = document.getElementById('columns-container').querySelectorAll('input');
+            const dateCheckboxes = document.querySelectorAll('.column-date-validation');
             
+            const columns = Array.from(columnInputs)
+                .map(input => input.value.trim())
+                .filter(name => name !== '');
+            
+            const buttonId = 'btn_' + Date.now();
+            
+            // СОХРАНИТЕ ИНФОРМАЦИЮ О ПРОВЕРКЕ ДАТ В САМОЙ КНОПКЕ
+            const dateColumns = [];
+            dateCheckboxes.forEach((checkbox, index) => {
+                if (checkbox.checked && columns[index]) {
+                    dateColumns.push(columns[index]);
+                }
+            });
+            
+            const buttonData = {
+                id: buttonId,
+                name: buttonName,
+                columns: columns,
+                dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
+            };
+            
+            customButtons.push(buttonData);
+                    
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
                 if (!customColumns.find(col => col.name === colName)) {
@@ -3761,35 +3745,35 @@ function initializeAppWithFallback() {
                 buttonWrapper.appendChild(button);
             }
             
-button.addEventListener('click', function(e) {
-    if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
-        const columns = JSON.parse(this.dataset.columns);
-        
-        const allCells = document.querySelectorAll('#data-table th, #data-table td');
-        allCells.forEach(cell => cell.style.display = 'none');
-        
-        for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
-            const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
-            const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
-            
-            headerCells.forEach(cell => cell.style.display = '');
-            dataCells.forEach(cell => cell.style.display = '');
-        }
-        
-        columns.forEach(colName => {
-            const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
-            const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
-            
-            customHeaders.forEach(cell => cell.style.display = '');
-            customCells.forEach(cell => cell.style.display = '');
-        });
-        
-        // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
-        setTimeout(() => {
-            checkAllDates();
-        }, 100);
-    }
-});
+            button.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
+                    const columns = JSON.parse(this.dataset.columns);
+                    
+                    const allCells = document.querySelectorAll('#data-table th, #data-table td');
+                    allCells.forEach(cell => cell.style.display = 'none');
+                    
+                    for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
+                        const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
+                        const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+                        
+                        headerCells.forEach(cell => cell.style.display = '');
+                        dataCells.forEach(cell => cell.style.display = '');
+                    }
+                    
+                    columns.forEach(colName => {
+                        const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
+                        const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
+                        
+                        customHeaders.forEach(cell => cell.style.display = '');
+                        customCells.forEach(cell => cell.style.display = '');
+                    });
+                    
+                    // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
+                    setTimeout(() => {
+                        checkAllDates();
+                    }, 100);
+                }
+            });
             
             document.getElementById('custom-buttons').appendChild(buttonWrapper);
         }
@@ -6065,10 +6049,24 @@ button.addEventListener('click', function(e) {
                 });
             });
         }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAppWithFallback();
+            
+            setInterval(updateStatusBar, 30000);
+            
+            window.addEventListener('online', function() {
+                updateSyncStatus('Восстановлено соединение', 'success');
+                if (storageManager.pendingChanges.length > 0) {
+                    storageManager.trySyncChanges(updateSyncStatus);
+                }
+            });
+            
+            window.addEventListener('offline', function() {
+                updateSyncStatus('Отсутствует соединение', 'error');
+            });
+        });
     </script>
 </body>
 </html>
-
-
-
-
