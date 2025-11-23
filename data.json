@@ -5,7 +5,9 @@
       "name": "Новый проект",
       "date": "23.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763922049044_1": "151"
+      },
       "attachments": {},
       "displayId": 1
     },
@@ -37,8 +39,26 @@
     "fixedColumnsCount": 3,
     "currentTheme": "theme-orange"
   },
-  "customButtons": [],
-  "customColumns": [],
+  "customButtons": [
+    {
+      "id": "btn_1763922049043",
+      "name": "тест",
+      "columns": [
+        "тест 1",
+        "тест 2"
+      ]
+    }
+  ],
+  "customColumns": [
+    {
+      "id": "col_1763922049044_0",
+      "name": "тест 1"
+    },
+    {
+      "id": "col_1763922049044_1",
+      "name": "тест 2"
+    }
+  ],
   "basicColumns": [
     {
       "id": "id",
@@ -69,7 +89,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-23T18:20:09.390Z",
+  "lastSync": "2025-11-23T18:21:03.773Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
