@@ -3188,27 +3188,30 @@
         }
 
         // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
-        function loadFromLocalStorageWithNotification() {
-            const data = storageManager.loadFromLocalStorage();
-            
-            tableData = data.tableData;
-            users = data.users;
-            appSettings = data.appSettings;
-            customButtons = data.customButtons;
-            customColumns = data.customColumns;
-            basicColumns = data.basicColumns;
-            dateValidationColumns = data.dateValidationColumns;
-            tabs = data.tabs;
-            storageManager.pendingChanges = data.pendingChanges;
-            
-            renderTabs();
-            renderTable();
-            loadCustomButtons();
-            
-            updateSyncStatus('Используются локальные данные', '');
-            
-            console.log('📁 Загружены локальные данные из localStorage');
-        }
+       function loadFromLocalStorageWithNotification() {
+    const data = storageManager.loadFromLocalStorage();
+    
+    tableData = data.tableData;
+    users = data.users;
+    appSettings = data.appSettings;
+    customButtons = data.customButtons;
+    customColumns = data.customColumns;
+    basicColumns = data.basicColumns;
+    dateValidationColumns = data.dateValidationColumns;
+    tabs = data.tabs;
+    storageManager.pendingChanges = data.pendingChanges;
+    
+    // ВОССТАНАВЛИВАЕМ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
+    restoreDateValidationColumns();
+    
+    renderTabs();
+    renderTable();
+    loadCustomButtons();
+    
+    updateSyncStatus('Используются локальные данные', '');
+    
+    console.log('📁 Загружены локальные данные из localStorage');
+}
 
         // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ПОЛЬЗОВАТЕЛЕЙ ИЗ GITHUB
         async function loadUsersFromGitHub() {
@@ -3234,24 +3237,51 @@
             }
             return false;
         }
-
+function restoreDateValidationColumns() {
+    // Очищаем текущие настройки проверки дат
+    dateValidationColumns = {};
+    
+    // Восстанавливаем из customButtons
+    customButtons.forEach(button => {
+        if (button.dateColumns) {
+            button.dateColumns.forEach(colName => {
+                const column = customColumns.find(col => col.name === colName);
+                if (column) {
+                    dateValidationColumns[column.id] = true;
+                }
+            });
+        }
+    });
+    
+    console.log('✅ Восстановлены настройки проверки дат:', dateValidationColumns);
+}
         // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
-        function initializeAppWithFallback() {
-            setupEventListeners();
-            loadAppSettings();
-            updateStatusBar();
-            
-            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-            
-            // Загружаем пользователей при инициализации
-            if (users.length === 0) {
-                const data = storageManager.loadFromLocalStorage();
-                users = data.users;
-                
-                // Если все еще нет пользователей, пробуем загрузить из GitHub
-                if (users.length === 0) {
-                    loadUsersFromGitHub().then(() => {
-                        loadFromLocalStorageWithNotification();
+function initializeAppWithFallback() {
+    setupEventListeners();
+    loadAppSettings();
+    updateStatusBar();
+    
+    onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
+    
+    // Загружаем пользователей при инициализации
+    if (users.length === 0) {
+        const data = storageManager.loadFromLocalStorage();
+        users = data.users;
+        
+        // Если все еще нет пользователей, пробуем загрузить из GitHub
+        if (users.length === 0) {
+            loadUsersFromGitHub().then(() => {
+                loadFromLocalStorageWithNotification();
+                restoreDateValidationColumns(); // ДОБАВЛЕНО
+            });
+        } else {
+            loadFromLocalStorageWithNotification();
+            restoreDateValidationColumns(); // ДОБАВЛЕНО
+        }
+    } else {
+        loadFromLocalStorageWithNotification();
+        restoreDateValidationColumns(); // ДОБАВЛЕНО
+    }
                     });
                 } else {
                     loadFromLocalStorageWithNotification();
@@ -3717,30 +3747,35 @@
                 buttonWrapper.appendChild(button);
             }
             
-            button.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
-                    const columns = JSON.parse(this.dataset.columns);
-                    
-                    const allCells = document.querySelectorAll('#data-table th, #data-table td');
-                    allCells.forEach(cell => cell.style.display = 'none');
-                    
-                    for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
-                        const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
-                        const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
-                        
-                        headerCells.forEach(cell => cell.style.display = '');
-                        dataCells.forEach(cell => cell.style.display = '');
-                    }
-                    
-                    columns.forEach(colName => {
-                        const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
-                        const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
-                        
-                        customHeaders.forEach(cell => cell.style.display = '');
-                        customCells.forEach(cell => cell.style.display = '');
-                    });
-                }
-            });
+button.addEventListener('click', function(e) {
+    if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
+        const columns = JSON.parse(this.dataset.columns);
+        
+        const allCells = document.querySelectorAll('#data-table th, #data-table td');
+        allCells.forEach(cell => cell.style.display = 'none');
+        
+        for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
+            const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
+            const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+            
+            headerCells.forEach(cell => cell.style.display = '');
+            dataCells.forEach(cell => cell.style.display = '');
+        }
+        
+        columns.forEach(colName => {
+            const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
+            const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
+            
+            customHeaders.forEach(cell => cell.style.display = '');
+            customCells.forEach(cell => cell.style.display = '');
+        });
+        
+        // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
+        setTimeout(() => {
+            checkAllDates();
+        }, 100);
+    }
+});
             
             document.getElementById('custom-buttons').appendChild(buttonWrapper);
         }
@@ -6019,5 +6054,6 @@
     </script>
 </body>
 </html>
+
 
 
