@@ -18,7 +18,8 @@
       "date": "23.11.2025",
       "status": "Активен",
       "customData": {
-        "col_1763922049044_1": "777"
+        "col_1763922049044_1": "777",
+        "col_1763922049044_0": ""
       },
       "attachments": {},
       "displayId": 2
@@ -28,7 +29,10 @@
       "name": "Новый проект",
       "date": "23.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763922049044_0": "",
+        "col_1763922049044_1": ""
+      },
       "attachments": {},
       "displayId": 3
     }
@@ -48,7 +52,7 @@
   "appSettings": {
     "headerTitle": "",
     "headerLogo": "",
-    "fixedColumnsCount": 3,
+    "fixedColumnsCount": 2,
     "currentTheme": "theme-orange"
   },
   "customButtons": [
@@ -58,6 +62,13 @@
       "columns": [
         "тест 1",
         "тест 2"
+      ]
+    },
+    {
+      "id": "btn_1763922603538",
+      "name": "Время",
+      "columns": [
+        "123"
       ]
     }
   ],
@@ -69,6 +80,10 @@
     {
       "id": "col_1763922049044_1",
       "name": "тест 2"
+    },
+    {
+      "id": "col_1763922603538_0",
+      "name": "123"
     }
   ],
   "basicColumns": [
@@ -101,7 +116,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-23T18:29:16.212Z",
+  "lastSync": "2025-11-23T18:30:04.023Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
