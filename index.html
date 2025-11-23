@@ -2607,11 +2607,11 @@
                             remoteData.lastEditor !== currentUser.username && 
                             remoteData.lastSync > localStorage.getItem('lastSyncTime')) {
                             
-                            console.log('⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
+                            console.log(⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
                             
                             return {
                                 conflict: true,
-                                remoteData: result.remoteData,
+                                remoteData: remoteData,
                                 sha: sha
                             };
                         }
