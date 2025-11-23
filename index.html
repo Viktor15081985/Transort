@@ -3210,6 +3210,31 @@
             console.log('📁 Загружены локальные данные из localStorage');
         }
 
+        // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ПОЛЬЗОВАТЕЛЕЙ ИЗ GITHUB
+        async function loadUsersFromGitHub() {
+            try {
+                const result = await storageManager.loadFromGitHub();
+                if (result.success && result.data && result.data.users) {
+                    users = result.data.users;
+                    // Сохраняем пользователей в localStorage для будущих использований
+                    localStorage.setItem('users', JSON.stringify(users));
+                    console.log('✅ Пользователи успешно загружены из GitHub');
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Ошибка загрузки пользователей:', error);
+                // Используем пользователей по умолчанию если загрузка не удалась
+                if (users.length === 0) {
+                    users = [
+                        { username: 'admin', password: 'admin', role: 'admin' },
+                        { username: 'user', password: 'user', role: 'user' }
+                    ];
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+            }
+            return false;
+        }
+
         // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
         function initializeAppWithFallback() {
             setupEventListeners();
@@ -3218,7 +3243,22 @@
             
             onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
             
-            loadFromLocalStorageWithNotification();
+            // Загружаем пользователей при инициализации
+            if (users.length === 0) {
+                const data = storageManager.loadFromLocalStorage();
+                users = data.users;
+                
+                // Если все еще нет пользователей, пробуем загрузить из GitHub
+                if (users.length === 0) {
+                    loadUsersFromGitHub().then(() => {
+                        loadFromLocalStorageWithNotification();
+                    });
+                } else {
+                    loadFromLocalStorageWithNotification();
+                }
+            } else {
+                loadFromLocalStorageWithNotification();
+            }
             
             if (currentUser && currentUser.role === 'user') {
                 const config = storageManager.getConfig();
@@ -3260,7 +3300,86 @@
             });
         });
 
-        // ОСТАВШИЕСЯ ФУНКЦИИ (без изменений)
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
+        async function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Попытка загрузить пользователей из GitHub для новых устройств
+            if (users.length === 0 || !users.find(u => u.username === 'admin')) {
+                try {
+                    await loadUsersFromGitHub();
+                } catch (error) {
+                    console.log('Не удалось загрузить пользователей из GitHub:', error);
+                }
+            }
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-screen').style.display = 'flex';
+                document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
+                document.getElementById('user-name-display').textContent = user.username;
+                
+                if (user.role === 'admin') {
+                    document.body.classList.add('admin');
+                    setupAdminFeatures();
+                }
+                
+                onlineUsers[user.username] = {
+                    username: user.username,
+                    role: user.role,
+                    lastActive: Date.now()
+                };
+                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
+                updateStatusBar();
+                
+                initializeAppWithFallback();
+                
+                setTimeout(() => {
+                    checkAllDates();
+                }, 1000);
+            } else {
+                alert('Неверное имя пользователя или пароль');
+            }
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
+        function handleLogout() {
+            if (currentUser) {
+                delete onlineUsers[currentUser.username];
+                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
+                updateStatusBar();
+            }
+            
+            currentUser = null;
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.body.classList.remove('admin');
+        }
+
+        function setupAdminFeatures() {
+            const headerTitle = document.getElementById('header-title');
+            headerTitle.classList.add('editable');
+            headerTitle.contentEditable = 'true';
+            headerTitle.addEventListener('blur', function() {
+                appSettings.headerTitle = this.textContent;
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+            });
+            
+            headerTitle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+            });
+
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+        }
+
+        // ОСТАВШИЕСЯ ФУНКЦИИ (без изменений в логике)
         function setupEventListeners() {
             // Логин
             document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -3386,7 +3505,7 @@
                 if (!e.target.closest('.filter-dropdown') && !e.target.closest('.filter-btn')) {
                     closeAllFilterDropdowns();
                 }
-                if (!e.target.closest('.date-picker') && !e.target.classList.contains('date-cell')) {
+                if (!e.target.closest('.date-picker') && !e.target.classList.contains('.date-cell')) {
                     closeDatePicker();
                 }
                 if (!e.target.closest('.date-input-overlay') && currentDateInput) {
@@ -3415,77 +3534,6 @@
             alert('Настройки GitHub сохранены!');
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-screen').style.display = 'flex';
-                document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
-                document.getElementById('user-name-display').textContent = user.username;
-                
-                if (user.role === 'admin') {
-                    document.body.classList.add('admin');
-                    setupAdminFeatures();
-                }
-                
-                onlineUsers[user.username] = {
-                    username: user.username,
-                    role: user.role,
-                    lastActive: Date.now()
-                };
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-                updateStatusBar();
-                
-                initializeAppWithFallback();
-                
-                setTimeout(() => {
-                    checkAllDates();
-                }, 1000);
-            } else {
-                alert('Неверное имя пользователя или пароль');
-            }
-        }
-
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
-        function handleLogout() {
-            if (currentUser) {
-                delete onlineUsers[currentUser.username];
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-                updateStatusBar();
-            }
-            
-            currentUser = null;
-            document.getElementById('main-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-            document.body.classList.remove('admin');
-        }
-
-        function setupAdminFeatures() {
-            const headerTitle = document.getElementById('header-title');
-            headerTitle.classList.add('editable');
-            headerTitle.contentEditable = 'true';
-            headerTitle.addEventListener('blur', function() {
-                appSettings.headerTitle = this.textContent;
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-                autoSyncChanges();
-            });
-            
-            headerTitle.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.blur();
-                }
-            });
-
-            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
-        }
-
-        // ОСТАВШИЕСЯ ФУНКЦИИ (без изменений в логике)
         function showAllColumns() {
             const allCells = document.querySelectorAll('#data-table th, #data-table td');
             allCells.forEach(cell => cell.style.display = '');
