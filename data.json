@@ -6,8 +6,7 @@
       "date": "01.10.2023",
       "status": "Активен",
       "customData": {
-        "col_1763840335078_0": "",
-        "col_1763881536167_1": ""
+        "col_1763840335078_0": ""
       },
       "attachments": {
         "col_1763711311027_1": [
@@ -25,10 +24,7 @@
       "name": "Проект Б",
       "date": "05.10.2023",
       "status": "Завершен",
-      "customData": {
-        "col_1763840335078_0": "",
-        "col_1763881536167_1": ""
-      },
+      "customData": {},
       "attachments": {},
       "displayId": 2
     },
@@ -38,9 +34,7 @@
       "date": "10.10.2023",
       "status": "В процессе",
       "customData": {
-        "col_1763840335078_1": "21.11.2025",
-        "col_1763840335078_0": "",
-        "col_1763881536167_1": ""
+        "col_1763840335078_1": "21.11.2025"
       },
       "attachments": {},
       "displayId": 3
@@ -305,7 +299,7 @@
   "appSettings": {
     "headerTitle": "Основное окно",
     "headerLogo": "",
-    "fixedColumnsCount": 5,
+    "fixedColumnsCount": 3,
     "currentTheme": "theme-orange"
   },
   "customButtons": [
@@ -315,14 +309,6 @@
       "columns": [
         "Тест текста",
         "Тест даты"
-      ]
-    },
-    {
-      "id": "btn_1763881536151",
-      "name": "ddd",
-      "columns": [
-        "1",
-        "2"
       ]
     }
   ],
@@ -334,14 +320,6 @@
     {
       "id": "col_1763840335078_1",
       "name": "Тест даты"
-    },
-    {
-      "id": "col_1763881536167_0",
-      "name": "1"
-    },
-    {
-      "id": "col_1763881536167_1",
-      "name": "2"
     }
   ],
   "basicColumns": [
@@ -417,7 +395,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-23T08:17:58.858Z",
+  "lastSync": "2025-11-23T12:25:12.033Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
