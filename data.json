@@ -2,25 +2,27 @@
   "tableData": [
     {
       "id": 1,
-      "name": "Проект А",
-      "date": "01.10.2023",
+      "name": "Новый проект",
+      "date": "23.11.2025",
       "status": "Активен",
       "customData": {},
-      "attachments": {}
+      "attachments": {},
+      "displayId": 1
     },
     {
       "id": 2,
-      "name": "Проект Б", 
-      "date": "05.10.2023",
-      "status": "Завершен",
+      "name": "Новый проект",
+      "date": "23.11.2025",
+      "status": "Активен",
       "customData": {},
-      "attachments": {}
+      "attachments": {},
+      "displayId": 2
     }
   ],
   "users": [
     {
       "username": "admin",
-      "password": "admin", 
+      "password": "admin",
       "role": "admin"
     },
     {
@@ -30,7 +32,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Основное окно",
+    "headerTitle": "",
     "headerLogo": "",
     "fixedColumnsCount": 3,
     "currentTheme": "theme-orange"
@@ -44,7 +46,7 @@
       "editable": false
     },
     {
-      "id": "name", 
+      "id": "name",
       "name": "Название",
       "editable": true
     },
@@ -55,7 +57,7 @@
     },
     {
       "id": "status",
-      "name": "Статус", 
+      "name": "Статус",
       "editable": true
     }
   ],
@@ -67,6 +69,7 @@
       "data": null
     }
   ],
-  "lastSync": "2024-01-01T00:00:00.000Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-23T18:16:21.799Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
