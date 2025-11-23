@@ -2607,11 +2607,11 @@
                             remoteData.lastEditor !== currentUser.username && 
                             remoteData.lastSync > localStorage.getItem('lastSyncTime')) {
                             
-                            console.log(⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
+                            console.log('⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
                             
                             return {
                                 conflict: true,
-                                remoteData: remoteData,
+                                remoteData: result.remoteData,
                                 sha: sha
                             };
                         }
@@ -2667,84 +2667,67 @@
             }
 
             // Загрузка из GitHub
-           async loadFromGitHub() {
-    try {
-        console.log('📥 Начинаем загрузку данных из GitHub...');
-        
-        if (!this.GITHUB_CONFIG.token && !this.GITHUB_CONFIG.repo) {
-            throw new Error('Настройки GitHub не настроены');
-        }
+            async loadFromGitHub() {
+                try {
+                    console.log('📥 Начинаем загрузку данных из GitHub...');
+                    
+                    if (!this.GITHUB_CONFIG.token && !this.GITHUB_CONFIG.repo) {
+                        throw new Error('Настройки GitHub не настроены');
+                    }
 
-        const headers = {
-            'Accept': 'application/vnd.github.v3+json'
-        };
-        if (this.GITHUB_CONFIG.token) {
-            headers['Authorization'] = `token ${this.GITHUB_CONFIG.token}`;
-        }
+                    const headers = {
+                        'Accept': 'application/vnd.github.v3+json'
+                    };
+                    if (this.GITHUB_CONFIG.token) {
+                        headers['Authorization'] = `token ${this.GITHUB_CONFIG.token}`;
+                    }
 
-        const response = await fetch(`https://api.github.com/repos/${this.GITHUB_CONFIG.repo}/contents/data.json?ref=${this.GITHUB_CONFIG.branch}`, {
-            headers: headers
-        });
+                    const response = await fetch(`https://api.github.com/repos/${this.GITHUB_CONFIG.repo}/contents/data.json?ref=${this.GITHUB_CONFIG.branch}`, {
+                        headers: headers
+                    });
 
-        console.log('📡 Статус загрузки:', response.status);
+                    console.log('📡 Статус загрузки:', response.status);
 
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.log('📝 Файл данных не найден, создаем данные по умолчанию');
-                // Возвращаем данные по умолчанию вместо ошибки
-                return { 
-                    success: true, 
-                    data: this.getDefaultData() 
-                };
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.log('📝 Файл данных не найден, будет создан при первой синхронизации');
+                            return { notFound: true };
+                        }
+                        const error = await response.json();
+                        throw new Error(error.message || `Ошибка загрузки: ${response.status}`);
+                    }
+
+                    const fileInfo = await response.json();
+                    console.log('✅ Файл найден, размер:', fileInfo.size, 'байт');
+
+                    if (!fileInfo.content || fileInfo.size === 0) {
+                        throw new Error('Файл данных пуст');
+                    }
+
+                    const content = decodeURIComponent(escape(atob(fileInfo.content)));
+                    
+                    if (!content || content.trim() === '') {
+                        throw new Error('Файл данных пуст');
+                    }
+
+                    console.log('🔍 Парсим данные...');
+                    let data;
+                    try {
+                        data = JSON.parse(content);
+                    } catch (parseError) {
+                        console.error('❌ Ошибка парсинга JSON:', parseError);
+                        throw new Error('Файл данных поврежден');
+                    }
+
+                    console.log('✅ Данные успешно загружены');
+                    return { success: true, data: data };
+
+                } catch (error) {
+                    console.error('❌ Ошибка загрузки:', error);
+                    throw error;
+                }
             }
-            const error = await response.json();
-            throw new Error(error.message || `Ошибка загрузки: ${response.status}`);
-        }
 
-        const fileInfo = await response.json();
-        console.log('✅ Файл найден, размер:', fileInfo.size, 'байт');
-
-        if (!fileInfo.content || fileInfo.size === 0) {
-            console.log('📝 Файл данных пуст, создаем данные по умолчанию');
-            return { 
-                success: true, 
-                data: this.getDefaultData() 
-            };
-        }
-
-        const content = decodeURIComponent(escape(atob(fileInfo.content)));
-        
-        if (!content || content.trim() === '') {
-            console.log('📝 Файл данных пуст, создаем данные по умолчанию');
-            return { 
-                success: true, 
-                data: this.getDefaultData() 
-            };
-        }
-
-        console.log('🔍 Парсим данные...');
-        let data;
-        try {
-            data = JSON.parse(content);
-        } catch (parseError) {
-            console.error('❌ Ошибка парсинга JSON, используем данные по умолчанию:', parseError);
-            return { 
-                success: true, 
-                data: this.getDefaultData() 
-            };
-        }
-
-        console.log('✅ Данные успешно загружены');
-        return { success: true, data: data };
-
-    } catch (error) {
-        console.error('❌ Ошибка загрузки, используем данные по умолчанию:', error);
-        return { 
-            success: true, 
-            data: this.getDefaultData() 
-        };
-    }
-}
             // Автоматическая синхронизация изменений
             async autoSyncChanges(data, currentUser, updateSyncStatus) {
                 if (currentUser && currentUser.role === 'admin') {
@@ -5980,4 +5963,3 @@
     </script>
 </body>
 </html>
-
