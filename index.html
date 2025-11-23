@@ -2023,6 +2023,29 @@
         #close-file-modal {
             display: none;
         }
+
+        .cell-editing {
+            position: relative;
+            z-index: 100;
+        }
+
+        .cell-input {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--accent-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 4px 8px;
+            font-size: inherit;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .text-cell-editing {
+            cursor: text;
+            background-color: var(--table-hover);
+            box-shadow: inset 0 0 0 2px var(--accent-color);
+        }
     </style>
 </head>
 <body class="theme-orange">
@@ -2588,7 +2611,7 @@
                             
                             return {
                                 conflict: true,
-                                remoteData: remoteData,
+                                remoteData: result.remoteData,
                                 sha: sha
                             };
                         }
@@ -2938,6 +2961,9 @@
         let lastDataHash = localStorage.getItem('lastDataHash') || '';
         let adminConflictData = null;
         let currentConflict = null;
+
+        // Глобальная переменная для управления файлами
+        let currentFileManagementCell = null;
 
         // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
         function updateStatusBar() {
@@ -3329,6 +3355,7 @@
             document.getElementById('save-cell-btn').addEventListener('click', saveCellChanges);
             document.getElementById('close-file-modal').addEventListener('click', function() {
                 document.getElementById('edit-cell-modal').style.display = 'none';
+                currentFileManagementCell = null;
             });
 
             // Кнопки предпросмотра
@@ -4335,32 +4362,15 @@
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
 
-        function openEditCellModal(cell) {
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ДЛЯ ФАЙЛОВ
+        function openFileManagementModal(rowId, columnId) {
             if (currentUser.role !== 'admin') return;
             
-            currentEditingCell = cell;
-            isEditingHeader = false;
-            
-            const textContent = Array.from(cell.childNodes)
-                .filter(node => node.nodeType === Node.TEXT_NODE)
-                .map(node => node.textContent)
-                .join('')
-                .trim();
-                
-            document.getElementById('cell-value').value = textContent;
-            document.getElementById('edit-cell-title').textContent = 'Редактирование ячейки';
-            
-            document.querySelector('.form-group:nth-child(3)').style.display = 'block';
-            document.getElementById('save-cell-btn').style.display = 'block';
-            document.getElementById('close-file-modal').style.display = 'none';
-            
-            loadAttachedFiles(cell);
-            document.getElementById('edit-cell-modal').style.display = 'flex';
-        }
-
-        function openFileManagementModal(rowId, columnId) {
             currentEditingCell = null;
             isEditingHeader = false;
+            
+            // Сохраняем информацию о ячейке для загрузки файлов
+            currentFileManagementCell = { rowId, columnId };
             
             document.getElementById('edit-cell-title').textContent = 'Управление файлами ячейки';
             document.querySelector('.form-group:nth-child(2)').style.display = 'none';
@@ -4526,14 +4536,14 @@
             });
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ФАЙЛОВ
         function handleFileUpload(files) {
-            if (!currentEditingCell && !isEditingHeader) {
+            if (!currentFileManagementCell) {
                 alert('Сначала выберите ячейку для редактирования!');
                 return;
             }
             
-            const columnId = currentEditingCell ? currentEditingCell.dataset.columnId : null;
-            const rowId = currentEditingCell ? parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent) : null;
+            const { rowId, columnId } = currentFileManagementCell;
             
             if (!columnId || !rowId) {
                 alert('Не удалось определить ячейку для прикрепления файлов');
@@ -4561,9 +4571,9 @@
                     storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
                     autoSyncChanges();
                     
-                    if (currentEditingCell) {
-                        loadAttachedFiles(currentEditingCell);
-                    }
+                    // Обновляем список файлов в модальном окне
+                    loadAttachedFilesForCell(rowId, columnId);
+                    // Перерисовываем таблицу для отображения новых иконок файлов
                     renderTable();
                     
                     alert(`Файл "${file.name}" успешно добавлен!`);
@@ -4575,6 +4585,9 @@
                 
                 reader.readAsDataURL(file);
             });
+            
+            // Очищаем input файлов после загрузки
+            document.getElementById('file-input').value = '';
         }
 
         function openFilePreview(file, rowId, columnId, fileIndex) {
@@ -5665,28 +5678,11 @@
             return th;
         }
 
+        // ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ФУНКЦИЯ СОЗДАНИЯ ЯЧЕЙКИ ДАННЫХ
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
             
             const isDateColumn = dateValidationColumns[column.id];
-            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
-                td.classList.add('editable-cell');
-                td.contentEditable = true;
-                
-                td.addEventListener('blur', function() {
-                    const newValue = this.textContent;
-                    saveTextCellValue(rowData, column, newValue);
-                });
-                
-                td.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.blur();
-                    }
-                });
-            } else if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
-                td.classList.add('editable');
-            }
             
             td.dataset.columnId = column.id;
             td.dataset.rowId = rowData.id;
@@ -5709,40 +5705,6 @@
                     : '';
             }
             
-            if (isDateColumn) {
-                td.classList.add('date-cell');
-                
-                td.addEventListener('dblclick', (e) => {
-                    if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
-                        openDateInput(td, value);
-                    }
-                });
-                
-                td.addEventListener('click', (e) => {
-                    if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
-                        openDatePicker(td, value);
-                    }
-                });
-                
-                if (value && isValidDate(value)) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const cellDate = parseDate(value);
-                    const timeDiff = cellDate.getTime() - today.getTime();
-                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                    
-                    if (daysDiff < 0) {
-                        td.classList.add('date-cell-danger');
-                    } else if (daysDiff <= 30) {
-                        td.classList.add('date-cell-warning');
-                    } else {
-                        td.classList.remove('date-cell-warning', 'date-cell-danger');
-                    }
-                }
-            } else if (currentUser && currentUser.role === 'admin' && !td.classList.contains('editable-cell')) {
-                td.addEventListener('click', () => openEditCellModal(td));
-            }
-            
             const cellContent = document.createElement('div');
             cellContent.className = 'cell-content';
             
@@ -5761,27 +5723,154 @@
             cellContent.appendChild(fileIcons);
             td.appendChild(cellContent);
             
+            // Обработчики событий для ячейки
+            if (currentUser && currentUser.role === 'admin') {
+                if (isDateColumn) {
+                    // Для ячеек с датами - специальная обработка
+                    td.classList.add('date-cell');
+                    
+                    td.addEventListener('dblclick', (e) => {
+                        if (!e.target.closest('.file-icons')) {
+                            openDateInput(td, value);
+                        }
+                    });
+                    
+                    td.addEventListener('click', (e) => {
+                        if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay')) {
+                            openDatePicker(td, value);
+                        }
+                    });
+                    
+                    if (value && isValidDate(value)) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const cellDate = parseDate(value);
+                        const timeDiff = cellDate.getTime() - today.getTime();
+                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        
+                        if (daysDiff < 0) {
+                            td.classList.add('date-cell-danger');
+                        } else if (daysDiff <= 30) {
+                            td.classList.add('date-cell-warning');
+                        } else {
+                            td.classList.remove('date-cell-warning', 'date-cell-danger');
+                        }
+                    }
+                } else {
+                    // Для обычных текстовых ячеек - новый алгоритм
+                    let clickTimer = null;
+                    let isEditing = false;
+                    
+                    // Одинарный клик - редактирование текста
+                    td.addEventListener('click', (e) => {
+                        if (e.target.closest('.file-icons') || isEditing) return;
+                        
+                        if (clickTimer) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                            return;
+                        }
+                        
+                        clickTimer = setTimeout(() => {
+                            // Одинарный клик - редактирование текста
+                            startTextEditing(td, rowData, column, type, value);
+                            isEditing = true;
+                            clickTimer = null;
+                        }, 300);
+                    });
+                    
+                    // Двойной клик - открытие модального окна для файлов
+                    td.addEventListener('dblclick', (e) => {
+                        if (e.target.closest('.file-icons') || isEditing) return;
+                        
+                        if (clickTimer) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                        }
+                        
+                        // Двойной клик - открытие модального окна для файлов
+                        openFileManagementModal(rowData.id, column.id);
+                    });
+                    
+                    // Добавляем визуальный курсор для указания возможности редактирования
+                    td.style.cursor = 'text';
+                }
+            }
+            
             return td;
         }
 
-        function saveTextCellValue(rowData, column, newValue) {
-            if (column.type === 'basic') {
-                switch(column.id) {
-                    case 'name': rowData.name = newValue; break;
-                    case 'status': rowData.status = newValue; break;
+        // НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
+        function startTextEditing(cell, rowData, column, type, currentValue) {
+            const originalContent = cell.innerHTML;
+            
+            // Создаем input для редактирования
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentValue || '';
+            input.style.width = '100%';
+            input.style.height = '100%';
+            input.style.border = '2px solid var(--accent-color)';
+            input.style.background = 'var(--bg-primary)';
+            input.style.color = 'var(--text-primary)';
+            input.style.padding = '4px';
+            input.style.borderRadius = '4px';
+            input.style.outline = 'none';
+            input.className = 'cell-input';
+            
+            // Заменяем содержимое ячейки на input
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+            
+            // Функция сохранения
+            const saveChanges = () => {
+                const newValue = input.value.trim();
+                
+                if (type === 'basic') {
+                    switch(column.id) {
+                        case 'name': rowData.name = newValue; break;
+                        case 'status': rowData.status = newValue; break;
+                        default: 
+                            if (column.editable) {
+                                rowData[column.id] = newValue;
+                            }
+                    }
+                } else {
+                    if (!rowData.customData) rowData.customData = {};
+                    rowData.customData[column.id] = newValue;
                 }
-            } else {
-                if (!rowData.customData) rowData.customData = {};
-                rowData.customData[column.id] = newValue;
-            }
+                
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab) {
+                    currentTab.data = JSON.parse(JSON.stringify(tableData));
+                }
+                
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+                
+                // Восстанавливаем ячейку с новым значением
+                renderTable();
+            };
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
+            // Обработчики для input
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    saveChanges();
+                } else if (e.key === 'Escape') {
+                    // Отмена редактирования - восстанавливаем оригинальное содержимое
+                    cell.innerHTML = originalContent;
+                }
+            });
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-            autoSyncChanges();
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (document.activeElement !== input) {
+                        saveChanges();
+                    }
+                }, 100);
+            });
         }
 
         function addFileIconsToCell(container, files, rowId, columnId) {
