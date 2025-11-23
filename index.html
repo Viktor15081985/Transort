@@ -3617,25 +3617,33 @@
         }
 
         function handleAddButton(e) {
-            e.preventDefault();
-            const buttonName = document.getElementById('button-name').value;
-            const columnInputs = document.getElementById('columns-container').querySelectorAll('input');
-            const dateCheckboxes = document.querySelectorAll('.column-date-validation');
-            
-            const columns = Array.from(columnInputs)
-                .map(input => input.value.trim())
-                .filter(name => name !== '');
-            
-            const buttonId = 'btn_' + Date.now();
-            const buttonData = {
-                id: buttonId,
-                name: buttonName,
-                columns: columns
-            };
-            
-            customButtons.push(buttonData);
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-            autoSyncChanges();
+    e.preventDefault();
+    const buttonName = document.getElementById('button-name').value;
+    const columnInputs = document.getElementById('columns-container').querySelectorAll('input');
+    const dateCheckboxes = document.querySelectorAll('.column-date-validation');
+    
+    const columns = Array.from(columnInputs)
+        .map(input => input.value.trim())
+        .filter(name => name !== '');
+    
+    const buttonId = 'btn_' + Date.now();
+    
+    // СОХРАНИТЕ ИНФОРМАЦИЮ О ПРОВЕРКЕ ДАТ В САМОЙ КНОПКЕ
+    const dateColumns = [];
+    dateCheckboxes.forEach((checkbox, index) => {
+        if (checkbox.checked && columns[index]) {
+            dateColumns.push(columns[index]);
+        }
+    });
+    
+    const buttonData = {
+        id: buttonId,
+        name: buttonName,
+        columns: columns,
+        dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
+    };
+    
+    customButtons.push(buttonData);
             
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
@@ -6011,4 +6019,5 @@
     </script>
 </body>
 </html>
+
 
