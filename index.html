@@ -186,7 +186,6 @@
             background: var(--accent-hover);
         }
 
-        /* НОВАЯ СТРОКА СОСТОЯНИЯ В ХЕДЕРЕ */
         .status-bar-header {
             background: var(--bg-tertiary);
             color: var(--text-primary);
@@ -851,7 +850,6 @@
             color: var(--text-primary);
         }
 
-        /* Убрали серый фон для обычных ячеек с датами */
         .date-cell-warning {
             background-color: rgba(230, 126, 34, 0.2) !important;
             border: 1px solid var(--accent-color) !important;
@@ -865,7 +863,6 @@
         }
 
         .date-cell-normal {
-            /* Убрали background-color для нормальных ячеек с датами */
             border: 1px solid var(--table-border) !important;
             color: var(--text-primary) !important;
         }
@@ -1733,9 +1730,6 @@
             margin-left: 8px;
         }
 
-        /* УДАЛЕНА СТАРАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ */
-
-        /* КНОПКА ОБНОВЛЕНИЯ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ */
         .refresh-data-btn {
             background: var(--accent-color) !important;
         }
@@ -1744,7 +1738,6 @@
             background: var(--accent-hover) !important;
         }
 
-        /* МОДАЛЬНОЕ ОКНО ДЛЯ РАЗРЕШЕНИЯ КОНФЛИКТОВ */
         .conflict-modal {
             z-index: 10001;
         }
@@ -1767,7 +1760,6 @@
             border-bottom: none;
         }
 
-        /* АДАПТИВНАЯ ВЕРСИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
         @media (max-width: 1200px) {
             .top-controls-panel {
                 height: auto;
@@ -1821,7 +1813,6 @@
                 width: 100%;
             }
             
-            /* УБИРАЕМ КНОПКИ ПРОКРУТКИ ВКЛАДОК НА МОБИЛЬНЫХ */
             .tabs-scroll-btn {
                 display: none !important;
             }
@@ -2007,7 +1998,6 @@
             margin-bottom: 10px !important;
         }
 
-        /* Стили для прямого редактирования ячеек */
         .editable-cell {
             cursor: text;
             outline: none;
@@ -2018,7 +2008,6 @@
             box-shadow: inset 0 0 0 2px var(--accent-color);
         }
 
-        /* Стили для модального окна управления файлами */
         .file-management-modal .form-group:nth-child(2) {
             display: none;
         }
@@ -2064,7 +2053,6 @@
             </div>
             <div class="user-info">
                 <span class="user-name" id="user-name-display"></span>
-                <!-- НОВАЯ СТРОКА СОСТОЯНИЯ В ХЕДЕРЕ -->
                 <div class="status-bar-header" id="status-bar-header" data-tooltip="">
                     <div class="status-info-header">
                         <div class="status-sync-header">
@@ -2102,7 +2090,6 @@
                     <span class="icon">⌕</span> Фильтр выделенного
                 </button>
                 
-                <!-- Кнопка импорта Excel теперь только для администратора -->
                 <button class="import-excel-btn admin-only" id="import-excel-btn" title="Импорт данных из Excel файла">
                     <span class="icon">↓</span> Импорт Excel
                 </button>
@@ -2125,11 +2112,9 @@
                             <span class="icon">+</span> Добавить кнопку
                         </button>
                     </div>
-                    <!-- Кнопка "Обновить" для пользователей -->
                     <button id="refresh-data-btn" class="refresh-data-btn user-only" title="Загрузить обновленные данные с GitHub">
                         <span class="icon">↻</span> Обновить данные
                     </button>
-                    <!-- Кнопка "Добавить строку" теперь видна для пользователей, но очень маленькая -->
                     <button id="add-row-btn" class="add-row-btn" title="Добавить новую строку в таблицу">
                         <span class="icon">+</span> Добавить строку
                     </button>
@@ -2143,7 +2128,6 @@
                         <button id="github-sync-btn" class="manage-users-btn" title="Настройки синхронизации с GitHub">
                             <span class="icon">🔗</span> GitHub Синхронизация
                         </button>
-                        <!-- ЗАМЕНА: Вместо принудительной синхронизации теперь кнопка сохранения изменений -->
                         <button id="save-changes-btn" class="manage-users-btn" title="Сохранить изменения на GitHub">
                             <span class="icon">💾</span> Сохранить изменения
                         </button>
@@ -2173,43 +2157,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="checkbox" class="row-checkbox" data-row-id="1" title="Выделить строку"></td>
-                                <td>1</td>
-                                <td class="editable" title="Клик для редактирования">Проект А</td>
-                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">01.10.2023</td>
-                                <td class="editable" title="Клик для редактирования">Активен</td>
-                                <td class="admin-only">
-                                    <button class="delete-row-btn" title="Удалить строку">×</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox" class="row-checkbox" data-row-id="2" title="Выделить строку"></td>
-                                <td>2</td>
-                                <td class="editable" title="Клик для редактирования">Проект Б</td>
-                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">05.10.2023</td>
-                                <td class="editable" title="Клик для редактирования">Завершен</td>
-                                <td class="admin-only">
-                                    <button class="delete-row-btn" title="Удалить строку">×</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox" class="row-checkbox" data-row-id="3" title="Выделить строку"></td>
-                                <td>3</td>
-                                <td class="editable" title="Клик для редактирования">Проект В</td>
-                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">10.10.2023</td>
-                                <td class="editable" title="Клик для редактирования">В процессе</td>
-                                <td class="admin-only">
-                                    <button class="delete-row-btn" title="Удалить строку">×</button>
-                                </td>
-                            </tr>
+                            <!-- Данные будут загружаться динамически -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Кнопки управления столбцами - теперь отображаются и у пользователей, но в уменьшенном виде -->
+        <!-- Кнопки управления столбцами -->
         <div class="column-controls">
             <button class="column-control-btn" id="add-column-btn" title="Добавить столбец">+</button>
             <button class="column-control-btn" id="remove-column-btn" title="Удалить столбец">-</button>
@@ -2217,12 +2172,10 @@
             <button class="column-control-btn" id="move-column-right-btn" title="Переместить столбец вправо">→</button>
         </div>
 
-        <!-- Настройки фиксированных столбцов - только для администратора -->
+        <!-- Настройки фиксированных столбцов -->
         <div class="fixed-columns-setting admin-only">
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
-
-        <!-- УДАЛЕНА СТАРАЯ ПЛАВАЮЩАЯ СТРОКА СОСТОЯНИЯ -->
     </div>
 
     <!-- Модальное окно для добавления кнопки -->
@@ -2542,13 +2495,13 @@
         // Данные для импорта
         let currentImportData = null;
 
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СИСТЕМЫ ОНЛАЙН-ПОЛЬЗОВАТЕЛЕЙ И КОНФЛИКТОВ
+        // Переменные для системы онлайн-пользователей и конфликтов
         let onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
         let lastDataHash = localStorage.getItem('lastDataHash') || '';
         let adminConflictData = null;
         let currentConflict = null;
 
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ АВТОМАТИЧЕСКОЙ СИНХРОНИЗАЦИИ
+        // Переменные для автоматической синхронизации
         let isSyncing = false;
         let pendingChanges = [];
         let syncRetryCount = 0;
@@ -2560,7 +2513,6 @@
             const adminCount = Object.values(onlineUsers).filter(user => user.role === 'admin').length;
             const userCount = Object.values(onlineUsers).filter(user => user.role === 'user').length;
             
-            // Обновляем данные о текущем пользователе
             if (currentUser) {
                 onlineUsers[currentUser.username] = {
                     username: currentUser.username,
@@ -2570,16 +2522,14 @@
                 localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
             }
             
-            // Очищаем неактивных пользователей (более 5 минут)
             const now = Date.now();
             Object.keys(onlineUsers).forEach(username => {
-                if (now - onlineUsers[username].lastActive > 300000) { // 5 минут
+                if (now - onlineUsers[username].lastActive > 300000) {
                     delete onlineUsers[username];
                 }
             });
             localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
             
-            // Обновляем подсказку
             const statusBar = document.getElementById('status-bar-header');
             statusBar.setAttribute('data-tooltip', `Администраторов: ${adminCount}, Пользователей: ${userCount}`);
         }
@@ -2591,15 +2541,12 @@
             
             statusElement.textContent = message;
             
-            // Удаляем все классы статуса
             statusBar.classList.remove('syncing', 'success', 'error');
             
-            // Добавляем соответствующий класс
             if (type) {
                 statusBar.classList.add(type);
             }
             
-            // Обновляем иконку в зависимости от статуса
             const syncIcon = statusBar.querySelector('.sync-icon');
             if (type === 'syncing') {
                 syncIcon.textContent = '🔄';
@@ -2612,10 +2559,9 @@
             }
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ АВТОМАТИЧЕСКОЙ СИНХРОНИЗАЦИИ ПРИ ИЗМЕНЕНИЯХ
+        // ФУНКЦИЯ ДЛЯ АВТОМАТИЧЕСКОЙ СИНХРОНИЗАЦИИ ПРИ ИЗМЕНЕНИЯХ
         function autoSyncChanges() {
             if (currentUser && currentUser.role === 'admin') {
-                // Добавляем изменение в очередь
                 const change = {
                     timestamp: Date.now(),
                     data: getAllAppData(),
@@ -2625,30 +2571,27 @@
                 pendingChanges.push(change);
                 localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
                 
-                // Пытаемся сразу синхронизировать
                 trySyncChanges();
             }
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ПОПЫТКИ СИНХРОНИЗАЦИИ ИЗМЕНЕНИЙ
+        // ФУНКЦИЯ ДЛЯ ПОПЫТКИ СИНХРОНИЗАЦИИ ИЗМЕНЕНИЙ
         function trySyncChanges() {
             if (isSyncing || pendingChanges.length === 0) return;
             
             isSyncing = true;
             updateSyncStatus('Синхронизация...', 'syncing');
             
-            const change = pendingChanges[0]; // Берем самое старое изменение
+            const change = pendingChanges[0];
             
             saveToGitHub(change.data)
                 .then(() => {
-                    // Успешная синхронизация - удаляем изменение из очереди
                     pendingChanges.shift();
                     localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
                     syncRetryCount = 0;
                     
                     updateSyncStatus('Синхронизировано: ' + new Date().toLocaleTimeString(), 'success');
                     
-                    // Пытаемся синхронизировать следующие изменения
                     if (pendingChanges.length > 0) {
                         setTimeout(trySyncChanges, 1000);
                     }
@@ -2659,11 +2602,9 @@
                     
                     if (syncRetryCount <= MAX_SYNC_RETRIES) {
                         updateSyncStatus(`Ошибка, повтор через ${syncRetryCount * 2} сек...`, 'error');
-                        // Планируем повторную попытку
                         syncRetryTimeout = setTimeout(trySyncChanges, syncRetryCount * 2000);
                     } else {
                         updateSyncStatus('Ошибка синхронизации', 'error');
-                        // Прекращаем попытки, ждем ручного сохранения
                     }
                 })
                 .finally(() => {
@@ -2671,25 +2612,23 @@
                 });
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ПРИНУДИТЕЛЬНОГО СОХРАНЕНИЯ ИЗМЕНЕНИЙ
+        // ФУНКЦИЯ ДЛЯ ПРИНУДИТЕЛЬНОГО СОХРАНЕНИЯ ИЗМЕНЕНИЙ
         function forceSaveChanges() {
             if (pendingChanges.length === 0) {
                 alert('Нет изменений для сохранения');
                 return;
             }
             
-            // Сбрасываем счетчик попыток
             syncRetryCount = 0;
             if (syncRetryTimeout) {
                 clearTimeout(syncRetryTimeout);
                 syncRetryTimeout = null;
             }
             
-            // Пытаемся синхронизировать
             trySyncChanges();
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ ВСЕХ ДАННЫХ ПРИЛОЖЕНИЯ
+        // ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ ВСЕХ ДАННЫХ ПРИЛОЖЕНИЯ
         function getAllAppData() {
             return {
                 tableData,
@@ -2705,7 +2644,7 @@
             };
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ СИНХРОНИЗАЦИИ С GITHUB
+        // УЛУЧШЕННАЯ ФУНКЦИЯ СИНХРОНИЗАЦИИ С GITHUB
         async function saveToGitHub(dataToSave) {
             if (!GITHUB_CONFIG.token) {
                 throw new Error('GitHub токен не настроен');
@@ -2715,7 +2654,6 @@
 
             let content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
             
-            // ПОЛУЧЕНИЕ ТЕКУЩЕГО СОСТОЯНИЯ ФАЙЛА
             let sha = null;
             let remoteData = null;
             
@@ -2732,32 +2670,27 @@
                     const fileInfo = await fileInfoResponse.json();
                     sha = fileInfo.sha;
                     
-                    // Декодируем и парсим текущие данные с GitHub
                     const remoteContent = decodeURIComponent(escape(atob(fileInfo.content)));
                     remoteData = JSON.parse(remoteContent);
                     
                     console.log('✅ Текущий SHA:', sha);
 
-                    // ПРОВЕРКА КОНФЛИКТОВ ДЛЯ АДМИНИСТРАТОРОВ
                     if (currentUser.role === 'admin' && remoteData.lastEditor && 
                         remoteData.lastEditor !== currentUser.username && 
                         remoteData.lastSync > localStorage.getItem('lastSyncTime')) {
                         
                         console.log('⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
                         
-                        // Сохраняем данные конфликта для разрешения
                         adminConflictData = {
                             remoteData: remoteData,
                             localData: dataToSave,
                             sha: sha
                         };
                         
-                        // Показываем модальное окно разрешения конфликтов
                         showConflictResolution(remoteData, dataToSave);
-                        throw new Error('Конфликт данных'); // Прерываем сохранение до разрешения конфликта
+                        throw new Error('Конфликт данных');
                     }
                     
-                    // Автоматическое слияние данных
                     console.log('🔄 Выполняем автоматическое слияние данных...');
                     const mergedData = mergeData(remoteData, dataToSave);
                     content = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
@@ -2771,10 +2704,8 @@
                 }
             } catch (e) {
                 console.log('⚠️ Ошибка при получении информации о файле:', e.message);
-                // Продолжаем без информации о удаленном файле
             }
 
-            // СОХРАНЕНИЕ ДАННЫХ
             console.log('💾 Отправляем данные на GitHub...');
             const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
                 method: 'PUT',
@@ -2791,25 +2722,21 @@
                 })
             });
 
-            // ОБРАБОТКА ОТВЕТА
             if (!saveResponse.ok) {
                 const error = await saveResponse.json();
                 
-                // Если SHA не совпадает (конфликт версий)
                 if (error.message && error.message.includes('does not match')) {
                     console.log('⚡ Обнаружен конфликт SHA, обновляем данные...');
-                    await loadFromGitHub(); // Загружаем актуальные данные
+                    await loadFromGitHub();
                     
-                    // Повторяем сохранение с обновленными данными
                     const retryData = {
                         ...dataToSave,
-                        tableData: tableData, // Используем обновленные данные
+                        tableData: tableData,
                         lastSync: new Date().toISOString()
                     };
                     
                     const retryContent = btoa(unescape(encodeURIComponent(JSON.stringify(retryData, null, 2))));
                     
-                    // Получаем актуальный SHA
                     const retryInfoResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
                         headers: {
                             'Authorization': `token ${GITHUB_CONFIG.token}`,
@@ -2850,7 +2777,6 @@
                 throw new Error(error.message || 'Ошибка сохранения в GitHub');
             }
 
-            // УСПЕШНОЕ СОХРАНЕНИЕ
             console.log('✅ Успешно сохранено в GitHub');
             localStorage.setItem('lastSyncTime', new Date().toISOString());
         }
@@ -2860,7 +2786,6 @@
             const modal = document.getElementById('conflict-resolution-modal');
             const detailsContainer = document.getElementById('conflict-details');
             
-            // Определяем изменения
             const changes = findDataChanges(remoteData, localData);
             
             let detailsHTML = '<div><strong>Изменения другого администратора (' + remoteData.lastEditor + '):</strong></div>';
@@ -2874,21 +2799,17 @@
             
             detailsContainer.innerHTML = detailsHTML;
             
-            // Настройка обработчиков кнопок
             document.getElementById('overwrite-conflict-btn').onclick = function() {
-                // Перезаписываем данные - используем локальные данные
                 continueSaveAfterConflict('overwrite');
                 modal.style.display = 'none';
             };
             
             document.getElementById('keep-changes-btn').onclick = function() {
-                // Сохраняем изменения - используем объединенные данные
                 continueSaveAfterConflict('merge');
                 modal.style.display = 'none';
             };
             
             document.getElementById('cancel-conflict-btn').onclick = function() {
-                // Отменяем сохранение
                 modal.style.display = 'none';
                 updateSyncStatus('Сохранение отменено из-за конфликта', 'error');
             };
@@ -2904,11 +2825,9 @@
             let finalData = localData;
             
             if (resolution === 'merge') {
-                // Слияние данных
                 finalData = mergeData(remoteData, localData);
             }
             
-            // Сохраняем данные
             try {
                 await saveToGitHub(finalData);
                 console.log('✅ Успешно сохранено после разрешения конфликта');
@@ -2918,7 +2837,6 @@
                     updateLocalData(finalData);
                 }
                 
-                // Удаляем синхронизированное изменение из очереди
                 if (pendingChanges.length > 0) {
                     pendingChanges.shift();
                     localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
@@ -2934,21 +2852,18 @@
         function findDataChanges(remoteData, localData) {
             const changes = [];
             
-            // Сравниваем количество строк
             if (remoteData.tableData && localData.tableData) {
                 if (remoteData.tableData.length !== localData.tableData.length) {
                     changes.push(`Количество строк: ${remoteData.tableData.length} → ${localData.tableData.length}`);
                 }
             }
             
-            // Сравниваем пользователей
             if (remoteData.users && localData.users) {
                 if (remoteData.users.length !== localData.users.length) {
                     changes.push(`Количество пользователей: ${remoteData.users.length} → ${localData.users.length}`);
                 }
             }
             
-            // Добавляем информацию о редакторе
             if (remoteData.lastEditor) {
                 changes.push(`Последний редактор: ${remoteData.lastEditor}`);
             }
@@ -2968,23 +2883,20 @@
                 ...remoteData,
                 lastSync: new Date().toISOString(),
                 mergeOperation: true,
-                lastEditor: currentUser.username // Указываем текущего редактора
+                lastEditor: currentUser.username
             };
 
-            // СЛИЯНИЕ ТАБЛИЧНЫХ ДАННЫХ
             if (localData.tableData && remoteData.tableData) {
                 console.log('📊 Слияние табличных данных...');
                 
                 const remoteRows = new Map(remoteData.tableData.map(row => [row.id, row]));
                 const localRows = new Map(localData.tableData.map(row => [row.id, row]));
                 
-                // Объединяем строки - локальные изменения имеют приоритет
                 const mergedTableData = [...remoteData.tableData];
                 
                 localData.tableData.forEach(localRow => {
                     const existingIndex = mergedTableData.findIndex(row => row.id === localRow.id);
                     if (existingIndex >= 0) {
-                        // Обновляем существующую строку, сохраняя attachments
                         const existingAttachments = mergedTableData[existingIndex].attachments;
                         mergedTableData[existingIndex] = {
                             ...localRow,
@@ -2992,7 +2904,6 @@
                         };
                         console.log(`✏️ Обновлена строка ID: ${localRow.id}`);
                     } else {
-                        // Добавляем новую строку
                         mergedTableData.push(localRow);
                         console.log(`➕ Добавлена новая строка ID: ${localRow.id}`);
                     }
@@ -3002,7 +2913,6 @@
                 console.log(`✅ Табличные данные объединены: ${mergedTableData.length} строк`);
             }
 
-            // СЛИЯНИЕ ПОЛЬЗОВАТЕЛЕЙ (административные данные)
             if (localData.users && remoteData.users) {
                 console.log('👥 Слияние пользователей...');
                 const userMap = new Map(remoteData.users.map(user => [user.username, user]));
@@ -3015,7 +2925,6 @@
                 console.log(`✅ Пользователи объединены: ${merged.users.length} пользователей`);
             }
 
-            // СЛИЯНИЕ НАСТРОЕК (локальные настройки имеют приоритет)
             if (localData.appSettings) {
                 console.log('⚙️ Слияние настроек приложения...');
                 merged.appSettings = {
@@ -3024,7 +2933,6 @@
                 };
             }
 
-            // СЛИЯНИЕ КОЛОНОК И КНОПОК
             if (localData.customButtons) {
                 merged.customButtons = localData.customButtons;
             }
@@ -3051,7 +2959,6 @@
             
             console.log('✅ Локальные данные обновлены');
             
-            // Перерисовываем интерфейс
             renderTabs();
             renderTable();
             loadCustomButtons();
@@ -3094,7 +3001,6 @@
                 const fileInfo = await response.json();
                 console.log('✅ Файл найден, размер:', fileInfo.size, 'байт');
 
-                // Проверяем, что файл не пустой
                 if (!fileInfo.content || fileInfo.size === 0) {
                     throw new Error('Файл данных пуст');
                 }
@@ -3116,7 +3022,6 @@
 
                 console.log('✅ Данные успешно загружены');
                 
-                // Обновляем локальные данные
                 updateLocalData(data);
                 saveToLocalStorage();
                 localStorage.setItem('lastSyncTime', new Date().toISOString());
@@ -3127,7 +3032,6 @@
                 console.error('❌ Ошибка загрузки:', error);
                 updateSyncStatus('Ошибка загрузки: ' + error.message, 'error');
                 
-                // При ошибке загружаем данные из localStorage
                 loadFromLocalStorageWithNotification();
             }
         }
@@ -3142,7 +3046,6 @@
             localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
             localStorage.setItem('tabs', JSON.stringify(tabs));
             
-            // Сохраняем хэш данных для обнаружения конфликтов
             const dataHash = JSON.stringify(tableData) + JSON.stringify(users) + JSON.stringify(appSettings);
             localStorage.setItem('lastDataHash', dataHash);
         }
@@ -3157,49 +3060,41 @@
             dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || dateValidationColumns;
             tabs = JSON.parse(localStorage.getItem('tabs')) || tabs;
             
-            // Загружаем очередь изменений
             pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
+        // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
         function initializeAppWithFallback() {
             setupEventListeners();
             loadAppSettings();
             updateStatusBar();
             
-            // Загружаем данные онлайн-пользователей
             onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
             
-            // Загружаем данные из localStorage
             loadFromLocalStorage();
             
-            // Для администратора НЕ загружаем автоматически из GitHub
             if (currentUser && currentUser.role === 'user') {
-                // Для пользователей загружаем из GitHub
                 if (GITHUB_CONFIG.repo && GITHUB_CONFIG.branch) {
                     console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
                     loadFromGitHub().then(() => {
                         console.log('✅ Загрузка из GitHub завершена');
                         
-                        // После загрузки пробуем синхронизировать ожидающие изменения
                         if (pendingChanges.length > 0) {
                             trySyncChanges();
                         }
                     }).catch(error => {
                         console.log('❌ Ошибка загрузки из GitHub:', error);
-                        // При ошибке используем локальные данные
                         loadFromLocalStorageWithNotification();
                     });
                 } else {
                     loadFromLocalStorageWithNotification();
                 }
             } else {
-                // Для администратора используем только локальные данные
                 loadFromLocalStorageWithNotification();
             }
         }
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
+        // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
         function loadFromLocalStorageWithNotification() {
             loadFromLocalStorage();
             renderTabs();
@@ -3215,10 +3110,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeAppWithFallback();
             
-            // Периодическое обновление статуса онлайн-пользователей
-            setInterval(updateStatusBar, 30000); // Каждые 30 секунд
+            setInterval(updateStatusBar, 30000);
             
-            // Обработчик восстановления соединения
             window.addEventListener('online', function() {
                 updateSyncStatus('Восстановлено соединение', 'success');
                 if (pendingChanges.length > 0) {
@@ -3247,8 +3140,6 @@
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
             document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
-            
-            // ЗАМЕНА: Вместо принудительной синхронизации теперь сохранение изменений
             document.getElementById('save-changes-btn').addEventListener('click', forceSaveChanges);
 
             // КНОПКА ОБНОВЛЕНИЯ ДАННЫХ
@@ -3297,7 +3188,6 @@
             // GitHub синхронизация
             document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
             document.getElementById('sync-now-btn').addEventListener('click', () => {
-                // Используем текущие данные для синхронизации
                 saveToGitHub(getAllAppData())
                     .then(() => {
                         updateSyncStatus('Синхронизировано вручную: ' + new Date().toLocaleTimeString(), 'success');
@@ -3375,7 +3265,6 @@
             GITHUB_CONFIG.repo = document.getElementById('github-repo').value;
             GITHUB_CONFIG.branch = document.getElementById('github-branch').value;
             
-            // Сохраняем настройки в localStorage
             localStorage.setItem('githubToken', GITHUB_CONFIG.token);
             localStorage.setItem('githubRepo', GITHUB_CONFIG.repo);
             localStorage.setItem('githubBranch', GITHUB_CONFIG.branch);
@@ -3402,7 +3291,6 @@
                     setupAdminFeatures();
                 }
                 
-                // Обновляем статус онлайн-пользователей
                 onlineUsers[user.username] = {
                     username: user.username,
                     role: user.role,
@@ -3411,7 +3299,6 @@
                 localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
                 updateStatusBar();
                 
-                // ПЕРЕЗАГРУЖАЕМ ДАННЫЕ ПОСЛЕ ВХОДА
                 initializeAppWithFallback();
                 
                 setTimeout(() => {
@@ -3424,7 +3311,6 @@
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
         function handleLogout() {
-            // Удаляем пользователя из онлайн-списка
             if (currentUser) {
                 delete onlineUsers[currentUser.username];
                 localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
@@ -3444,7 +3330,7 @@
             headerTitle.addEventListener('blur', function() {
                 appSettings.headerTitle = this.textContent;
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при изменении
+                autoSyncChanges();
             });
             
             headerTitle.addEventListener('keydown', function(e) {
@@ -3457,7 +3343,7 @@
             document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
-        // ОСТАВШИЕСЯ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЙ 
+        // ОСТАВШИЕСЯ ФУНКЦИИ 
         function showAllColumns() {
             const allCells = document.querySelectorAll('#data-table th, #data-table td');
             allCells.forEach(cell => cell.style.display = '');
@@ -3482,7 +3368,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при добавлении строки
+            autoSyncChanges();
             
             renderTable();
             
@@ -3558,7 +3444,7 @@
             
             customButtons.push(buttonData);
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при добавлении кнопки
+            autoSyncChanges();
             
             columns.forEach((colName, index) => {
                 const columnId = 'col_' + Date.now() + '_' + index;
@@ -3576,7 +3462,7 @@
             });
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация
+            autoSyncChanges();
             
             createCustomButton(buttonData);
             renderTable();
@@ -3584,7 +3470,7 @@
             document.getElementById('add-button-form').reset();
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ - КНОПКИ РЯДОМ
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ
         function createCustomButton(buttonData) {
             const buttonWrapper = document.createElement('div');
             buttonWrapper.className = 'custom-button-wrapper';
@@ -3668,7 +3554,7 @@
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при редактировании
+                autoSyncChanges();
                 loadCustomButtons();
             }
         }
@@ -3681,7 +3567,7 @@
             
             customButtons = customButtons.filter(b => b.id !== buttonId);
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при удалении
+            autoSyncChanges();
             
             button.columns.forEach(colName => {
                 customColumns = customColumns.filter(col => col.name !== colName);
@@ -3697,7 +3583,7 @@
             });
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация
+            autoSyncChanges();
             
             loadCustomButtons();
             renderTable();
@@ -3854,7 +3740,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при изменении даты
+            autoSyncChanges();
             
             closeDatePicker();
             renderTable();
@@ -3927,7 +3813,7 @@
                 }
                 
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при изменении даты
+                autoSyncChanges();
                 
                 renderTable();
                 checkAllDates();
@@ -4125,9 +4011,8 @@
             filterDropdown.style.top = thRect.bottom + 'px';
             filterDropdown.style.zIndex = '10000';
             
-            // Исправление проблемы с уходом фильтра за границы экрана
             const viewportWidth = window.innerWidth;
-            const filterWidth = 320; // Примерная ширина фильтра
+            const filterWidth = 320;
             if (thRect.left + filterWidth > viewportWidth) {
                 filterDropdown.style.left = (viewportWidth - filterWidth - 10) + 'px';
             }
@@ -4439,7 +4324,7 @@
                 }
                 
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при редактировании заголовка
+                autoSyncChanges();
                 
                 currentEditingCell.textContent = newValue;
             } else {
@@ -4464,7 +4349,7 @@
                 }
                 
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при редактировании ячейки
+                autoSyncChanges();
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
                 if (cellContent) {
@@ -4491,7 +4376,7 @@
                 }
                 
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при удалении файла
+                autoSyncChanges();
                 
                 if (currentEditingCell) {
                     loadAttachedFiles(currentEditingCell);
@@ -4558,7 +4443,7 @@
                     }
                     
                     saveToLocalStorage();
-                    autoSyncChanges(); // Автоматическая синхронизация при загрузке файла
+                    autoSyncChanges();
                     
                     if (currentEditingCell) {
                         loadAttachedFiles(currentEditingCell);
@@ -4776,7 +4661,7 @@
             
             users.push({ username, password, role });
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при добавлении пользователя
+            autoSyncChanges();
             renderUsersList();
             document.getElementById('add-user-form').reset();
         }
@@ -4815,7 +4700,7 @@
             user.role = newRole;
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при редактировании пользователя
+            autoSyncChanges();
             renderUsersList();
         };
 
@@ -4823,7 +4708,7 @@
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при удалении пользователя
+                autoSyncChanges();
                 renderUsersList();
             }
         };
@@ -4852,7 +4737,7 @@
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
                     saveToLocalStorage();
-                    autoSyncChanges(); // Автоматическая синхронизация при загрузке логотипа
+                    autoSyncChanges();
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -4882,7 +4767,7 @@
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
                 saveToLocalStorage();
-                autoSyncChanges(); // Автоматическая синхронизация при изменении настроек
+                autoSyncChanges();
             }
         }
 
@@ -4897,18 +4782,16 @@
                 name: columnName
             });
 
-            // Добавляем столбец во все строки
             tableData.forEach(row => {
                 if (!row.customData) row.customData = {};
                 row.customData[columnId] = '';
             });
 
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при добавлении столбца
+            autoSyncChanges();
             
             renderTable();
             
-            // Предлагаем переместить столбец
             if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
                 showMoveColumnModal();
             }
@@ -4918,7 +4801,6 @@
             const select = document.getElementById('column-to-remove');
             select.innerHTML = '';
 
-            // Добавляем только кастомные столбцы (базовые нельзя удалять)
             customColumns.forEach(column => {
                 const option = document.createElement('option');
                 option.value = column.id;
@@ -4948,17 +4830,15 @@
             const column = customColumns.find(col => col.id === columnId);
             if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
 
-            // Удаляем столбец из всех строк
             tableData.forEach(row => {
                 if (row.customData && row.customData[columnId]) {
                     delete row.customData[columnId];
                 }
             });
 
-            // Удаляем столбец из customColumns
             customColumns = customColumns.filter(col => col.id !== columnId);
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при удалении столбца
+            autoSyncChanges();
 
             renderTable();
             document.getElementById('remove-column-modal').style.display = 'none';
@@ -4972,17 +4852,16 @@
             
             select.innerHTML = '';
             
-            // Добавляем все столбцы (кроме первого - чекбокса и последнего - действий)
             const allColumns = [...basicColumns, ...customColumns];
             allColumns.forEach((column, index) => {
                 const option = document.createElement('option');
                 option.value = column.id;
                 option.textContent = column.name;
-                option.dataset.index = index + 1; // +1 потому что первый столбец - чекбокс
+                option.dataset.index = index + 1;
                 select.appendChild(option);
             });
 
-            maxPositionSpan.textContent = allColumns.length + 1; // +1 потому что можно переместить после последнего
+            maxPositionSpan.textContent = allColumns.length + 1;
             
             document.getElementById('column-position').value = allColumns.length + 1;
             document.getElementById('column-position').max = allColumns.length + 1;
@@ -4999,7 +4878,6 @@
             
             if (!columnId || !newPosition) return;
             
-            // Находим столбец для перемещения
             const allColumns = [...basicColumns, ...customColumns];
             const columnIndex = allColumns.findIndex(col => col.id === columnId);
             
@@ -5007,15 +4885,13 @@
             
             const columnToMove = allColumns[columnIndex];
             
-            // Удаляем столбец из текущей позиции
             if (columnIndex < basicColumns.length) {
                 basicColumns.splice(columnIndex, 1);
             } else {
                 customColumns.splice(columnIndex - basicColumns.length, 1);
             }
             
-            // Вставляем столбец в новую позицию
-            const targetPosition = newPosition - 2; // -2 потому что первый столбец - чекбокс
+            const targetPosition = newPosition - 2;
             
             if (targetPosition < basicColumns.length) {
                 basicColumns.splice(targetPosition, 0, columnToMove);
@@ -5024,7 +4900,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при перемещении столбца
+            autoSyncChanges();
             
             renderTable();
             document.getElementById('move-column-modal').style.display = 'none';
@@ -5033,7 +4909,6 @@
         }
 
         function moveColumn(direction) {
-            // Эта функция для быстрого перемещения столбцов с помощью кнопок
             alert('Используйте модальное окно для точного перемещения столбцов');
             showMoveColumnModal();
         }
@@ -5171,7 +5046,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при импорте данных
+            autoSyncChanges();
             
             renderTable();
             document.getElementById('import-excel-modal').style.display = 'none';
@@ -5202,7 +5077,6 @@
                 closeBtn.innerHTML = '×';
                 closeBtn.title = 'Закрыть вкладку';
                 
-                // Скрываем крестик закрытия вкладки для пользователей
                 if (currentUser && currentUser.role !== 'admin') {
                     closeBtn.style.display = 'none';
                 } else if (tabs.length > 1) {
@@ -5232,13 +5106,13 @@
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
                             saveToLocalStorage();
-                            autoSyncChanges(); // Автоматическая синхронизация при изменении названия вкладки
+                            autoSyncChanges();
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
                                 saveToLocalStorage();
-                                autoSyncChanges(); // Автоматическая синхронизация при изменении заголовка
+                                autoSyncChanges();
                             }
                         } else {
                             this.textContent = tab.name;
@@ -5294,7 +5168,7 @@
             
             tabs.push(newTab);
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при создании вкладки
+            autoSyncChanges();
             
             currentTabId = tabId;
             tableData = JSON.parse(JSON.stringify(newTab.data));
@@ -5360,7 +5234,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при удалении вкладки
+            autoSyncChanges();
             renderTabs();
             renderTable();
         }
@@ -5684,7 +5558,6 @@
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
             
-            // Для администраторов делаем ячейки редактируемыми (кроме дат)
             const isDateColumn = dateValidationColumns[column.id];
             if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin' && !isDateColumn) {
                 td.classList.add('editable-cell');
@@ -5726,7 +5599,6 @@
                     : '';
             }
             
-            // Для ячеек с датами оставляем специальные обработчики
             if (isDateColumn) {
                 td.classList.add('date-cell');
                 
@@ -5754,12 +5626,10 @@
                     } else if (daysDiff <= 30) {
                         td.classList.add('date-cell-warning');
                     } else {
-                        // Убрали класс date-cell-normal - теперь обычные ячейки с датами не подсвечиваются
                         td.classList.remove('date-cell-warning', 'date-cell-danger');
                     }
                 }
             } else if (currentUser && currentUser.role === 'admin' && !td.classList.contains('editable-cell')) {
-                // Для нередактируемых ячеек оставляем модальное окно
                 td.addEventListener('click', () => openEditCellModal(td));
             }
             
@@ -5789,7 +5659,6 @@
                 switch(column.id) {
                     case 'name': rowData.name = newValue; break;
                     case 'status': rowData.status = newValue; break;
-                    // id и date не редактируем таким образом
                 }
             } else {
                 if (!rowData.customData) rowData.customData = {};
@@ -5829,10 +5698,8 @@
                 fileIcon.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (currentUser && currentUser.role === 'admin') {
-                        // Для администраторов открываем управление файлами
                         openFileManagementModal(rowId, columnId);
                     } else {
-                        // Для пользователей открываем просмотр
                         openFilePreview(file, rowId, columnId, index);
                     }
                 });
@@ -5861,7 +5728,7 @@
             }
             
             saveToLocalStorage();
-            autoSyncChanges(); // Автоматическая синхронизация при удалении строки
+            autoSyncChanges();
             
             renderTable();
         }
