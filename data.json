@@ -6,7 +6,8 @@
       "date": "23.11.2025",
       "status": "Активен",
       "customData": {
-        "col_1763922049044_1": "151"
+        "col_1763922049044_1": "151",
+        "col_1763922049044_0": "15.08.1985"
       },
       "attachments": {},
       "displayId": 1
@@ -16,7 +17,9 @@
       "name": "Новый проект",
       "date": "23.11.2025",
       "status": "Активен",
-      "customData": {},
+      "customData": {
+        "col_1763922049044_1": "777"
+      },
       "attachments": {},
       "displayId": 2
     }
@@ -89,7 +92,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-23T18:21:03.773Z",
+  "lastSync": "2025-11-23T18:22:44.530Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
