@@ -1,0 +1,72 @@
+{
+  "tableData": [
+    {
+      "id": 1,
+      "name": "Проект А",
+      "date": "01.10.2023",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {}
+    },
+    {
+      "id": 2,
+      "name": "Проект Б", 
+      "date": "05.10.2023",
+      "status": "Завершен",
+      "customData": {},
+      "attachments": {}
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin", 
+      "role": "admin"
+    },
+    {
+      "username": "user",
+      "password": "user",
+      "role": "user"
+    }
+  ],
+  "appSettings": {
+    "headerTitle": "Основное окно",
+    "headerLogo": "",
+    "fixedColumnsCount": 3,
+    "currentTheme": "theme-orange"
+  },
+  "customButtons": [],
+  "customColumns": [],
+  "basicColumns": [
+    {
+      "id": "id",
+      "name": "№ п/п",
+      "editable": false
+    },
+    {
+      "id": "name", 
+      "name": "Название",
+      "editable": true
+    },
+    {
+      "id": "date",
+      "name": "Дата создания",
+      "editable": true
+    },
+    {
+      "id": "status",
+      "name": "Статус", 
+      "editable": true
+    }
+  ],
+  "dateValidationColumns": {},
+  "tabs": [
+    {
+      "id": "tab1",
+      "name": "Основное окно",
+      "data": null
+    }
+  ],
+  "lastSync": "2024-01-01T00:00:00.000Z",
+  "lastEditor": "admin"
+}
