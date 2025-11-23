@@ -1,1 +1,32 @@
-
+{
+  "tableData": [
+    {
+      "id": 1,
+      "name": "Новый проект",
+      "date": "23.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {}
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin",
+      "role": "admin"
+    },
+    {
+      "username": "user",
+      "password": "user",
+      "role": "user"
+    }
+  ],
+  "appSettings": {},
+  "customButtons": [],
+  "customColumns": [],
+  "basicColumns": [],
+  "dateValidationColumns": {},
+  "tabs": [],
+  "lastSync": "2025-11-23T17:16:51.924Z",
+  "lastEditor": "admin"
+}
