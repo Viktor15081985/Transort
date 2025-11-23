@@ -3282,13 +3282,28 @@ function initializeAppWithFallback() {
         loadFromLocalStorageWithNotification();
         restoreDateValidationColumns(); // ДОБАВЛЕНО
     }
-                    });
-                } else {
-                    loadFromLocalStorageWithNotification();
+    
+    if (currentUser && currentUser.role === 'user') {
+        const config = storageManager.getConfig();
+        if (config.repo && config.branch) {
+            console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
+            loadFromGitHub().then(() => {
+                console.log('✅ Загрузка из GitHub завершена');
+                
+                if (storageManager.pendingChanges.length > 0) {
+                    storageManager.trySyncChanges(updateSyncStatus);
                 }
-            } else {
+            }).catch(error => {
+                console.log('❌ Ошибка загрузки из GitHub:', error);
                 loadFromLocalStorageWithNotification();
-            }
+            });
+        } else {
+            loadFromLocalStorageWithNotification();
+        }
+    } else {
+        loadFromLocalStorageWithNotification();
+    }
+}
             
             if (currentUser && currentUser.role === 'user') {
                 const config = storageManager.getConfig();
