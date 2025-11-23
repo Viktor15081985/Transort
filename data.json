@@ -47,6 +47,11 @@
       "username": "user",
       "password": "user",
       "role": "user"
+    },
+    {
+      "username": "1",
+      "password": "1",
+      "role": "user"
     }
   ],
   "appSettings": {
@@ -116,7 +121,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-23T18:30:04.023Z",
+  "lastSync": "2025-11-23T18:31:55.955Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
