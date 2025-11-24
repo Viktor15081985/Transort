@@ -434,7 +434,7 @@
             gap: 8px;
             background: var(--bg-dark-controls);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            borderRadius: 8px;
             padding: 6px 12px;
             min-width: 240px;
             height: 40px;
@@ -2879,6 +2879,19 @@
                     merged.customColumns = localData.customColumns;
                 }
 
+                // Слияние вкладок
+                if (localData.tabs && remoteData.tabs) {
+                    console.log('📑 Слияние вкладок...');
+                    const tabMap = new Map(remoteData.tabs.map(tab => [tab.id, tab]));
+                    
+                    localData.tabs.forEach(localTab => {
+                        tabMap.set(localTab.id, localTab);
+                    });
+                    
+                    merged.tabs = Array.from(tabMap.values());
+                    console.log(`✅ Вкладки объединены: ${merged.tabs.length} вкладок`);
+                }
+
                 console.log('🎉 Слияние завершено успешно');
                 return merged;
             }
@@ -3141,6 +3154,12 @@
                 }
             }
             
+            if (remoteData.tabs && localData.tabs) {
+                if (remoteData.tabs.length !== localData.tabs.length) {
+                    changes.push(`Количество вкладок: ${remoteData.tabs.length} → ${localData.tabs.length}`);
+                }
+            }
+            
             if (remoteData.lastEditor) {
                 changes.push(`Последний редактор: ${remoteData.lastEditor}`);
             }
@@ -3221,7 +3240,9 @@
             renderTabs();
             renderTable();
             loadCustomButtons();
-            checkAllDates();
+            
+            // УБИРАЕМ АВТОМАТИЧЕСКУЮ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
+            // checkAllDates();
             
             updateSyncStatus('Используются локальные данные', '');
             
@@ -4110,6 +4131,7 @@
             }
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ ДАТ
         function checkAllDates() {
             const expiredDates = [];
             const upcomingDates = [];
@@ -4117,12 +4139,12 @@
             today.setHours(0, 0, 0, 0);
             
             tableData.forEach(row => {
-                basicColumns.forEach(column => {
-                    if (dateValidationColumns[column.id] && row[column.id]) {
-                        checkDateCell(row, column.id, column.name, today, expiredDates, upcomingDates);
-                    }
-                });
+                // Проверяем базовые столбцы с датами
+                if (dateValidationColumns['date'] && row.date) {
+                    checkDateCell(row, 'date', 'Дата создания', today, expiredDates, upcomingDates);
+                }
                 
+                // Проверяем пользовательские столбцы с датами
                 customColumns.forEach(column => {
                     if (dateValidationColumns[column.id] && row.customData && row.customData[column.id]) {
                         checkDateCell(row, column.id, column.name, today, expiredDates, upcomingDates);
@@ -4815,1299 +4837,1347 @@
         }
 
         function printPreviewFile() {
-    if (!currentPreviewFile) return;
-    
-    const printWindow = window.open('', '_blank');
-    
-    if (currentPreviewFile.file.type.startsWith('image/')) {
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Печать ${currentPreviewFile.file.name}</title>
-                    <style>
-                        body { 
-                            margin: 0; 
-                            padding: 20px; 
-                            text-align: center;
-                            font-family: Arial, sans-serif;
-                        }
-                        img { 
-                            max-width: 100%; 
-                            max-height: 90vh; 
-                            border-radius: 5px;
-                        }
-                        .file-info {
-                            margin-bottom: 20px;
-                            padding: 10px;
-                            background: #f5f5f5;
-                            border-radius: 5px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="file-info">
-                        <h2>${currentPreviewFile.file.name}</h2>
-                        <p>${getFileTypeDescription(currentPreviewFile.file.type)}</p>
-                    </div>
-                    <img src="${currentPreviewFile.file.data}" alt="${currentPreviewFile.file.name}">
-                </body>
-            </html>
-        `);
-    } else if (currentPreviewFile.file.type.includes('pdf')) {
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Печать ${currentPreviewFile.file.name}</title>
-                    <style>
-                        body { margin: 0; padding: 0; }
-                        embed { width: 100%; height: 100vh; }
-                    </style>
-                </head>
-                <body>
-                    <embed src="${currentPreviewFile.file.data}" type="application/pdf">
-                </body>
-            </html>
-        `);
-    } else {
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Печать ${currentPreviewFile.file.name}</title>
-                    <style>
-                        body { 
-                            margin: 0; 
-                            padding: 40px; 
-                            font-family: Arial, sans-serif;
-                            text-align: center;
-                        }
-                        .file-info {
-                            margin-bottom: 30px;
-                            padding: 20px;
-                            background: #f5f5f5;
-                            border-radius: 10px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="file-info">
-                        <h1>${currentPreviewFile.file.name}</h1>
-                        <h3>${getFileTypeDescription(currentPreviewFile.file.type)}</h3>
-                        <p>Прямая печать недоступна для этого типа файла.</p>
-                        <p>Пожалуйста, сохраните файл и откройте его в соответствующей программе для печати.</p>
-                    </div>
-                </body>
-            </html>
-        `);
-    }
-    
-    printWindow.document.close();
-    setTimeout(() => {
-        printWindow.print();
-    }, 500);
-}
+            if (!currentPreviewFile) return;
+            
+            const printWindow = window.open('', '_blank');
+            
+            if (currentPreviewFile.file.type.startsWith('image/')) {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    text-align: center;
+                                    font-family: Arial, sans-serif;
+                                }
+                                img { 
+                                    max-width: 100%; 
+                                    max-height: 90vh; 
+                                    border-radius: 5px;
+                                }
+                                .file-info {
+                                    margin-bottom: 20px;
+                                    padding: 10px;
+                                    background: #f5f5f5;
+                                    border-radius: 5px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="file-info">
+                                <h2>${currentPreviewFile.file.name}</h2>
+                                <p>${getFileTypeDescription(currentPreviewFile.file.type)}</p>
+                            </div>
+                            <img src="${currentPreviewFile.file.data}" alt="${currentPreviewFile.file.name}">
+                        </body>
+                    </html>
+                `);
+            } else if (currentPreviewFile.file.type.includes('pdf')) {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { margin: 0; padding: 0; }
+                                embed { width: 100%; height: 100vh; }
+                            </style>
+                        </head>
+                        <body>
+                            <embed src="${currentPreviewFile.file.data}" type="application/pdf">
+                        </body>
+                    </html>
+                `);
+            } else {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Печать ${currentPreviewFile.file.name}</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 40px; 
+                                    font-family: Arial, sans-serif;
+                                    text-align: center;
+                                }
+                                .file-info {
+                                    margin-bottom: 30px;
+                                    padding: 20px;
+                                    background: #f5f5f5;
+                                    border-radius: 10px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="file-info">
+                                <h1>${currentPreviewFile.file.name}</h1>
+                                <h3>${getFileTypeDescription(currentPreviewFile.file.type)}</h3>
+                                <p>Прямая печать недоступна для этого типа файла.</p>
+                                <p>Пожалуйста, сохраните файл и откройте его в соответствующей программе для печати.</p>
+                            </div>
+                        </body>
+                    </html>
+                `);
+            }
+            
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
 
-// ФУНКЦИИ УПРАВЛЕНИЯ ПОЛЬЗОВАТЕЛЯМИ
-function handleAddUser(e) {
-    e.preventDefault();
-    const username = document.getElementById('new-username').value;
-    const password = document.getElementById('new-password').value;
-    const role = document.getElementById('new-role').value;
-    
-    if (users.find(u => u.username === username)) {
-        alert('Пользователь уже существует');
-        return;
-    }
-    
-    users.push({ username, password, role });
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    renderUsersList();
-    document.getElementById('add-user-form').reset();
-}
-
-function renderUsersList() {
-    const container = document.getElementById('users-list');
-    container.innerHTML = '';
-    
-    users.forEach((user, index) => {
-        if (user.username === currentUser.username) return;
-        
-        const div = document.createElement('div');
-        div.className = 'user-item';
-        div.innerHTML = `
-            <div>
-                <strong>${user.username}</strong>
-                <span class="user-role">${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</span>
-            </div>
-            <div class="user-actions">
-                <button class="btn-edit" onclick="editUser(${index})">✎</button>
-                <button class="btn-danger" onclick="deleteUser(${index})">×</button>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-window.editUser = function(index) {
-    const user = users[index];
-    const newUsername = prompt('Новое имя пользователя:', user.username);
-    const newPassword = prompt('Новый пароль (оставьте пустым чтобы не менять):');
-    const newRole = confirm('Сделать администратором?') ? 'admin' : 'user';
-    
-    if (newUsername) user.username = newUsername;
-    if (newPassword) user.password = newPassword;
-    user.role = newRole;
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    renderUsersList();
-};
-
-window.deleteUser = function(index) {
-    if (confirm('Удалить этого пользователя?')) {
-        users.splice(index, 1);
-        storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-        autoSyncChanges();
-        renderUsersList();
-    }
-};
-
-function loadAppSettings() {
-    document.getElementById('header-title').textContent = appSettings.headerTitle;
-    if (appSettings.headerLogo) {
-        document.getElementById('header-logo').src = appSettings.headerLogo;
-        document.getElementById('header-logo').style.display = 'block';
-    }
-    document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
-}
-
-function triggerLogoUpload() {
-    if (currentUser && currentUser.role === 'admin') {
-        document.getElementById('logo-upload').click();
-    }
-}
-
-function handleLogoUpload(e) {
-    const file = e.target.files[0];
-    if (file && file.type === 'image/png') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('header-logo').src = e.target.result;
-            document.getElementById('header-logo').style.display = 'block';
-            appSettings.headerLogo = e.target.result;
+        // ФУНКЦИИ УПРАВЛЕНИЯ ПОЛЬЗОВАТЕЛЯМИ
+        function handleAddUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('new-role').value;
+            
+            if (users.find(u => u.username === username)) {
+                alert('Пользователь уже существует');
+                return;
+            }
+            
+            users.push({ username, password, role });
             storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
             autoSyncChanges();
+            renderUsersList();
+            document.getElementById('add-user-form').reset();
+        }
+
+        function renderUsersList() {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                if (user.username === currentUser.username) return;
+                
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${user.username}</strong>
+                        <span class="user-role">${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</span>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn-edit" onclick="editUser(${index})">✎</button>
+                        <button class="btn-danger" onclick="deleteUser(${index})">×</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.editUser = function(index) {
+            const user = users[index];
+            const newUsername = prompt('Новое имя пользователя:', user.username);
+            const newPassword = prompt('Новый пароль (оставьте пустым чтобы не менять):');
+            const newRole = confirm('Сделать администратором?') ? 'admin' : 'user';
+            
+            if (newUsername) user.username = newUsername;
+            if (newPassword) user.password = newPassword;
+            user.role = newRole;
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            renderUsersList();
         };
-        reader.readAsDataURL(file);
-    } else {
-        alert('Пожалуйста, выберите PNG файл');
-    }
-}
 
-// ФУНКЦИИ ПРОКРУТКИ ВКЛАДОК
-function scrollTabsLeft() {
-    const container = document.getElementById('tabs-container');
-    container.scrollBy({
-        left: -200,
-        behavior: 'smooth'
-    });
-}
-
-function scrollTabsRight() {
-    const container = document.getElementById('tabs-container');
-    container.scrollBy({
-        left: 200,
-        behavior: 'smooth'
-    });
-}
-
-function updateFixedColumnsCount() {
-    const count = parseInt(document.getElementById('fixed-columns-count').value);
-    if (count >= 1 && count <= 10) {
-        appSettings.fixedColumnsCount = count;
-        storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-        autoSyncChanges();
-    }
-}
-
-// ФУНКЦИИ УПРАВЛЕНИЯ СТОЛБЦАМИ
-function addNewColumn() {
-    const columnName = prompt('Введите название нового столбца:');
-    if (!columnName) return;
-
-    const columnId = 'col_' + Date.now();
-    customColumns.push({
-        id: columnId,
-        name: columnName
-    });
-
-    tableData.forEach(row => {
-        if (!row.customData) row.customData = {};
-        row.customData[columnId] = '';
-    });
-
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    
-    renderTable();
-    
-    if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
-        showMoveColumnModal();
-    }
-}
-
-function showRemoveColumnModal() {
-    const select = document.getElementById('column-to-remove');
-    select.innerHTML = '';
-
-    customColumns.forEach(column => {
-        const option = document.createElement('option');
-        option.value = column.id;
-        option.textContent = column.name;
-        select.appendChild(option);
-    });
-
-    if (customColumns.length === 0) {
-        const option = document.createElement('option');
-        option.textContent = 'Нет пользовательских столбцов для удаления';
-        option.disabled = true;
-        select.appendChild(option);
-        document.getElementById('confirm-remove-column').disabled = true;
-    } else {
-        document.getElementById('confirm-remove-column').disabled = false;
-    }
-
-    document.getElementById('remove-column-modal').style.display = 'flex';
-}
-
-function removeSelectedColumn() {
-    const select = document.getElementById('column-to-remove');
-    const columnId = select.value;
-
-    if (!columnId) return;
-
-    const column = customColumns.find(col => col.id === columnId);
-    if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
-
-    tableData.forEach(row => {
-        if (row.customData && row.customData[columnId]) {
-            delete row.customData[columnId];
-        }
-    });
-
-    customColumns = customColumns.filter(col => col.id !== columnId);
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-
-    renderTable();
-    document.getElementById('remove-column-modal').style.display = 'none';
-    
-    alert(`Столбец "${column.name}" успешно удален!`);
-}
-
-function showMoveColumnModal() {
-    const select = document.getElementById('column-to-move');
-    const maxPositionSpan = document.getElementById('max-position');
-    
-    select.innerHTML = '';
-    
-    const allColumns = [...basicColumns, ...customColumns];
-    allColumns.forEach((column, index) => {
-        const option = document.createElement('option');
-        option.value = column.id;
-        option.textContent = column.name;
-        option.dataset.index = index + 1;
-        select.appendChild(option);
-    });
-
-    maxPositionSpan.textContent = allColumns.length + 1;
-    
-    document.getElementById('column-position').value = allColumns.length + 1;
-    document.getElementById('column-position').max = allColumns.length + 1;
-    
-    document.getElementById('move-column-modal').style.display = 'flex';
-}
-
-function moveSelectedColumn() {
-    const select = document.getElementById('column-to-move');
-    const positionInput = document.getElementById('column-position');
-    
-    const columnId = select.value;
-    const newPosition = parseInt(positionInput.value);
-    
-    if (!columnId || !newPosition) return;
-    
-    const allColumns = [...basicColumns, ...customColumns];
-    const columnIndex = allColumns.findIndex(col => col.id === columnId);
-    
-    if (columnIndex === -1) return;
-    
-    const columnToMove = allColumns[columnIndex];
-    
-    if (columnIndex < basicColumns.length) {
-        basicColumns.splice(columnIndex, 1);
-    } else {
-        customColumns.splice(columnIndex - basicColumns.length, 1);
-    }
-    
-    const targetPosition = newPosition - 2;
-    
-    if (targetPosition < basicColumns.length) {
-        basicColumns.splice(targetPosition, 0, columnToMove);
-    } else {
-        customColumns.splice(targetPosition - basicColumns.length, 0, columnToMove);
-    }
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    
-    renderTable();
-    document.getElementById('move-column-modal').style.display = 'none';
-    
-    alert(`Столбец "${columnToMove.name}" успешно перемещен на позицию ${newPosition}!`);
-}
-
-function moveColumn(direction) {
-    alert('Используйте модальное окно для точного перемещения столбцов');
-    showMoveColumnModal();
-}
-
-// ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
-function handleExcelFileSelect(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (typeof XLSX === 'undefined') {
-        alert('Библиотека для чтения Excel файлов загружается. Попробуйте еще раз через несколько секунд.');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            
-            showImportPreview(jsonData);
-        } catch (error) {
-            alert('Ошибка при чтении файла: ' + error.message);
-        }
-    };
-    reader.onerror = function() {
-        alert('Ошибка при чтении файла');
-    };
-    reader.readAsArrayBuffer(file);
-}
-
-function showImportPreview(data) {
-    const previewContainer = document.getElementById('import-preview');
-    const previewTable = document.getElementById('import-preview-table');
-    const confirmBtn = document.getElementById('confirm-import-btn');
-    
-    previewTable.innerHTML = '';
-    
-    if (data.length === 0) {
-        previewContainer.style.display = 'none';
-        confirmBtn.style.display = 'none';
-        return;
-    }
-    
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    
-    const headers = data[0];
-    headers.forEach(header => {
-        const th = document.createElement('th');
-        th.textContent = header || 'Столбец';
-        th.style.textAlign = 'center';
-        headerRow.appendChild(th);
-    });
-    
-    thead.appendChild(headerRow);
-    previewTable.appendChild(thead);
-    
-    const tbody = document.createElement('tbody');
-    const rowsToShow = Math.min(5, data.length - 1);
-    
-    for (let i = 1; i <= rowsToShow; i++) {
-        const row = document.createElement('tr');
-        if (data[i]) {
-            data[i].forEach(cell => {
-                const td = document.createElement('td');
-                td.textContent = cell || '';
-                td.style.textAlign = 'center';
-                row.appendChild(td);
-            });
-            tbody.appendChild(row);
-        }
-    }
-    
-    previewTable.appendChild(tbody);
-    previewContainer.style.display = 'block';
-    confirmBtn.style.display = 'block';
-    
-    currentImportData = data;
-}
-
-function confirmImport() {
-    if (!currentImportData || currentImportData.length < 2) {
-        alert('Нет данных для импорта');
-        return;
-    }
-    
-    const importMode = document.getElementById('import-mode').value;
-    const headers = currentImportData[0];
-    const rows = currentImportData.slice(1);
-    
-    if (importMode === 'replace') {
-        tableData = [];
-    }
-    
-    let nextId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
-    
-    rows.forEach(row => {
-        if (row && row.length > 0) {
-            const newRow = {
-                id: nextId++,
-                name: row[0] || 'Новый проект',
-                date: row[1] || formatDate(new Date()),
-                status: row[2] || 'Активен',
-                customData: {},
-                attachments: {}
-            };
-            
-            for (let i = 3; i < headers.length; i++) {
-                if (headers[i]) {
-                    const columnName = headers[i];
-                    const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
-                    
-                    if (!customColumns.find(col => col.name === columnName)) {
-                        customColumns.push({
-                            id: columnId,
-                            name: columnName
-                        });
-                    }
-                    
-                    newRow.customData[columnId] = row[i] || '';
-                }
+        window.deleteUser = function(index) {
+            if (confirm('Удалить этого пользователя?')) {
+                users.splice(index, 1);
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+                renderUsersList();
             }
-            
-            tableData.push(newRow);
-        }
-    });
-    
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        currentTab.data = JSON.parse(JSON.stringify(tableData));
-    }
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    
-    renderTable();
-    document.getElementById('import-excel-modal').style.display = 'none';
-    alert(`Успешно импортировано ${rows.length} строк`);
-    
-    currentImportData = null;
-    document.getElementById('excel-file-input').value = '';
-    document.getElementById('import-preview').style.display = 'none';
-    document.getElementById('confirm-import-btn').style.display = 'none';
-}
+        };
 
-// НОВЫЕ ФУНКЦИИ ДЛЯ ВКЛАДОК
-function renderTabs() {
-    const container = document.getElementById('tabs-container');
-    container.innerHTML = '';
-    
-    tabs.forEach(tab => {
-        const tabElement = document.createElement('div');
-        tabElement.className = `tab ${tab.id === currentTabId ? 'active' : ''}`;
-        tabElement.dataset.tabId = tab.id;
-        
-        const tabName = document.createElement('span');
-        tabName.textContent = tab.name;
-        tabName.className = 'tab-name';
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'tab-close';
-        closeBtn.innerHTML = '×';
-        closeBtn.title = 'Закрыть вкладку';
-        
-        if (currentUser && currentUser.role !== 'admin') {
-            closeBtn.style.display = 'none';
-        } else if (tabs.length > 1) {
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeTab(tab.id);
-            });
-        } else {
-            closeBtn.style.display = 'none';
-        }
-        
-        tabElement.appendChild(tabName);
-        tabElement.appendChild(closeBtn);
-        
-        tabElement.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('tab-close')) {
-                switchTab(tab.id);
+        function loadAppSettings() {
+            document.getElementById('header-title').textContent = appSettings.headerTitle;
+            if (appSettings.headerLogo) {
+                document.getElementById('header-logo').src = appSettings.headerLogo;
+                document.getElementById('header-logo').style.display = 'block';
             }
-        });
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+        }
 
-        if (currentUser && currentUser.role === 'admin') {
-            tabName.classList.add('editable');
-            tabName.contentEditable = 'true';
-            
-            tabName.addEventListener('blur', function() {
-                const newName = this.textContent.trim();
-                if (newName && newName !== tab.name) {
-                    tab.name = newName;
+        function triggerLogoUpload() {
+            if (currentUser && currentUser.role === 'admin') {
+                document.getElementById('logo-upload').click();
+            }
+        }
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'image/png') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('header-logo').src = e.target.result;
+                    document.getElementById('header-logo').style.display = 'block';
+                    appSettings.headerLogo = e.target.result;
                     storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
                     autoSyncChanges();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Пожалуйста, выберите PNG файл');
+            }
+        }
+
+        // ФУНКЦИИ ПРОКРУТКИ ВКЛАДОК
+        function scrollTabsLeft() {
+            const container = document.getElementById('tabs-container');
+            container.scrollBy({
+                left: -200,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollTabsRight() {
+            const container = document.getElementById('tabs-container');
+            container.scrollBy({
+                left: 200,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateFixedColumnsCount() {
+            const count = parseInt(document.getElementById('fixed-columns-count').value);
+            if (count >= 1 && count <= 10) {
+                appSettings.fixedColumnsCount = count;
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+            }
+        }
+
+        // ФУНКЦИИ УПРАВЛЕНИЯ СТОЛБЦАМИ
+        function addNewColumn() {
+            const columnName = prompt('Введите название нового столбца:');
+            if (!columnName) return;
+
+            const columnId = 'col_' + Date.now();
+            customColumns.push({
+                id: columnId,
+                name: columnName
+            });
+
+            tableData.forEach(row => {
+                if (!row.customData) row.customData = {};
+                row.customData[columnId] = '';
+            });
+
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            
+            renderTable();
+            
+            if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
+                showMoveColumnModal();
+            }
+        }
+
+        function showRemoveColumnModal() {
+            const select = document.getElementById('column-to-remove');
+            select.innerHTML = '';
+
+            // Добавляем базовые столбцы
+            basicColumns.forEach(column => {
+                const option = document.createElement('option');
+                option.value = column.id;
+                option.textContent = column.name;
+                select.appendChild(option);
+            });
+
+            // Добавляем пользовательские столбцы
+            customColumns.forEach(column => {
+                const option = document.createElement('option');
+                option.value = column.id;
+                option.textContent = column.name;
+                select.appendChild(option);
+            });
+
+            if (basicColumns.length === 0 && customColumns.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'Нет столбцов для удаления';
+                option.disabled = true;
+                select.appendChild(option);
+                document.getElementById('confirm-remove-column').disabled = true;
+            } else {
+                document.getElementById('confirm-remove-column').disabled = false;
+            }
+
+            document.getElementById('remove-column-modal').style.display = 'flex';
+        }
+
+        function removeSelectedColumn() {
+            const select = document.getElementById('column-to-remove');
+            const columnId = select.value;
+
+            if (!columnId) return;
+
+            const column = [...basicColumns, ...customColumns].find(col => col.id === columnId);
+            if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
+
+            // Удаляем из базовых столбцов
+            basicColumns = basicColumns.filter(col => col.id !== columnId);
+            
+            // Удаляем из пользовательских столбцов
+            customColumns = customColumns.filter(col => col.id !== columnId);
+            
+            // Удаляем данные из таблицы
+            tableData.forEach(row => {
+                if (row.customData && row.customData[columnId]) {
+                    delete row.customData[columnId];
+                }
+            });
+
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+
+            renderTable();
+            document.getElementById('remove-column-modal').style.display = 'none';
+            
+            alert(`Столбец "${column.name}" успешно удален!`);
+        }
+
+        function showMoveColumnModal() {
+            const select = document.getElementById('column-to-move');
+            const maxPositionSpan = document.getElementById('max-position');
+            
+            select.innerHTML = '';
+            
+            const allColumns = [...basicColumns, ...customColumns];
+            allColumns.forEach((column, index) => {
+                const option = document.createElement('option');
+                option.value = column.id;
+                option.textContent = column.name;
+                option.dataset.index = index + 1;
+                select.appendChild(option);
+            });
+
+            maxPositionSpan.textContent = allColumns.length + 1;
+            
+            document.getElementById('column-position').value = allColumns.length + 1;
+            document.getElementById('column-position').max = allColumns.length + 1;
+            
+            document.getElementById('move-column-modal').style.display = 'flex';
+        }
+
+        function moveSelectedColumn() {
+            const select = document.getElementById('column-to-move');
+            const positionInput = document.getElementById('column-position');
+            
+            const columnId = select.value;
+            const newPosition = parseInt(positionInput.value);
+            
+            if (!columnId || !newPosition) return;
+            
+            const allColumns = [...basicColumns, ...customColumns];
+            const columnIndex = allColumns.findIndex(col => col.id === columnId);
+            
+            if (columnIndex === -1) return;
+            
+            const columnToMove = allColumns[columnIndex];
+            
+            if (columnIndex < basicColumns.length) {
+                basicColumns.splice(columnIndex, 1);
+            } else {
+                customColumns.splice(columnIndex - basicColumns.length, 1);
+            }
+            
+            const targetPosition = newPosition - 2;
+            
+            if (targetPosition < basicColumns.length) {
+                basicColumns.splice(targetPosition, 0, columnToMove);
+            } else {
+                customColumns.splice(targetPosition - basicColumns.length, 0, columnToMove);
+            }
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            
+            renderTable();
+            document.getElementById('move-column-modal').style.display = 'none';
+            
+            alert(`Столбец "${columnToMove.name}" успешно перемещен на позицию ${newPosition}!`);
+        }
+
+        function moveColumn(direction) {
+            alert('Используйте модальное окно для точного перемещения столбцов');
+            showMoveColumnModal();
+        }
+
+        // ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
+        function handleExcelFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                alert('Библиотека для чтения Excel файлов загружается. Попробуйте еще раз через несколько секунд.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
                     
-                    if (tab.id === currentTabId) {
-                        document.getElementById('header-title').textContent = newName;
-                        appSettings.headerTitle = newName;
-                        storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-                        autoSyncChanges();
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    showImportPreview(jsonData);
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                }
+            };
+            reader.onerror = function() {
+                alert('Ошибка при чтении файла');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showImportPreview(data) {
+            const previewContainer = document.getElementById('import-preview');
+            const previewTable = document.getElementById('import-preview-table');
+            const confirmBtn = document.getElementById('confirm-import-btn');
+            
+            previewTable.innerHTML = '';
+            
+            if (data.length === 0) {
+                previewContainer.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                return;
+            }
+            
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            const headers = data[0];
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header || 'Столбец';
+                th.style.textAlign = 'center';
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            previewTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            const rowsToShow = Math.min(5, data.length - 1);
+            
+            for (let i = 1; i <= rowsToShow; i++) {
+                const row = document.createElement('tr');
+                if (data[i]) {
+                    data[i].forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell || '';
+                        td.style.textAlign = 'center';
+                        row.appendChild(td);
+                    });
+                    tbody.appendChild(row);
+                }
+            }
+            
+            previewTable.appendChild(tbody);
+            previewContainer.style.display = 'block';
+            confirmBtn.style.display = 'block';
+            
+            currentImportData = data;
+        }
+
+        function confirmImport() {
+            if (!currentImportData || currentImportData.length < 2) {
+                alert('Нет данных для импорта');
+                return;
+            }
+            
+            const importMode = document.getElementById('import-mode').value;
+            const headers = currentImportData[0];
+            const rows = currentImportData.slice(1);
+            
+            if (importMode === 'replace') {
+                tableData = [];
+            }
+            
+            let nextId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
+            
+            rows.forEach(row => {
+                if (row && row.length > 0) {
+                    const newRow = {
+                        id: nextId++,
+                        name: row[0] || 'Новый проект',
+                        date: row[1] || formatDate(new Date()),
+                        status: row[2] || 'Активен',
+                        customData: {},
+                        attachments: {}
+                    };
+                    
+                    for (let i = 3; i < headers.length; i++) {
+                        if (headers[i]) {
+                            const columnName = headers[i];
+                            const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
+                            
+                            if (!customColumns.find(col => col.name === columnName)) {
+                                customColumns.push({
+                                    id: columnId,
+                                    name: columnName
+                                });
+                            }
+                            
+                            newRow.customData[columnId] = row[i] || '';
+                        }
                     }
-                } else {
-                    this.textContent = tab.name;
+                    
+                    tableData.push(newRow);
                 }
             });
             
-            tabName.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.blur();
-                }
-            });
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            
+            renderTable();
+            document.getElementById('import-excel-modal').style.display = 'none';
+            alert(`Успешно импортировано ${rows.length} строк`);
+            
+            currentImportData = null;
+            document.getElementById('excel-file-input').value = '';
+            document.getElementById('import-preview').style.display = 'none';
+            document.getElementById('confirm-import-btn').style.display = 'none';
         }
-        
-        container.appendChild(tabElement);
-    });
-    
-    if (currentTabId && currentTabId !== 'tab1') {
-        const currentTab = tabs.find(tab => tab.id === currentTabId);
-        if (currentTab && currentTab.data) {
-            tableData = currentTab.data;
+
+        // НОВЫЕ ФУНКЦИИ ДЛЯ ВКЛАДОК
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+            
+            tabs.forEach(tab => {
+                const tabElement = document.createElement('div');
+                tabElement.className = `tab ${tab.id === currentTabId ? 'active' : ''}`;
+                tabElement.dataset.tabId = tab.id;
+                
+                const tabName = document.createElement('span');
+                tabName.textContent = tab.name;
+                tabName.className = 'tab-name';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'tab-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.title = 'Закрыть вкладку';
+                
+                if (currentUser && currentUser.role !== 'admin') {
+                    closeBtn.style.display = 'none';
+                } else if (tabs.length > 1) {
+                    closeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeTab(tab.id);
+                    });
+                } else {
+                    closeBtn.style.display = 'none';
+                }
+                
+                tabElement.appendChild(tabName);
+                tabElement.appendChild(closeBtn);
+                
+                tabElement.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        switchTab(tab.id);
+                    }
+                });
+
+                if (currentUser && currentUser.role === 'admin') {
+                    tabName.classList.add('editable');
+                    tabName.contentEditable = 'true';
+                    
+                    tabName.addEventListener('blur', function() {
+                        const newName = this.textContent.trim();
+                        if (newName && newName !== tab.name) {
+                            tab.name = newName;
+                            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                            autoSyncChanges();
+                            
+                            if (tab.id === currentTabId) {
+                                document.getElementById('header-title').textContent = newName;
+                                appSettings.headerTitle = newName;
+                                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                                autoSyncChanges();
+                            }
+                        } else {
+                            this.textContent = tab.name;
+                        }
+                    });
+                    
+                    tabName.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.blur();
+                        }
+                    });
+                }
+                
+                container.appendChild(tabElement);
+            });
+            
+            if (currentTabId && currentTabId !== 'tab1') {
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab && currentTab.data) {
+                    tableData = currentTab.data;
+                    renderTable();
+                }
+            }
+
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                document.getElementById('header-title').textContent = currentTab.name;
+            }
+        }
+
+        function createNewTab() {
+            if (currentUser.role !== 'admin') {
+                alert('Только администраторы могут создавать новые вкладки');
+                return;
+            }
+
+            const tabId = 'tab_' + Date.now();
+            const tabName = `Таблица ${tabs.length + 1}`;
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            const newTab = {
+                id: tabId,
+                name: tabName,
+                data: [
+                    { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
+                ]
+            };
+            
+            tabs.push(newTab);
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            
+            currentTabId = tabId;
+            tableData = JSON.parse(JSON.stringify(newTab.data));
+            
+            renderTabs();
+            renderTable();
+            resetFiltersAndSearch();
+        }
+
+        function switchTab(tabId) {
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            currentTabId = tabId;
+            const newTab = tabs.find(tab => tab.id === tabId);
+            
+            if (newTab && newTab.data) {
+                tableData = JSON.parse(JSON.stringify(newTab.data));
+            } else {
+                if (tabId === 'tab1') {
+                    const data = storageManager.loadFromLocalStorage();
+                    tableData = data.tableData;
+                }
+            }
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            renderTabs();
+            renderTable();
+            resetFiltersAndSearch();
+        }
+
+        function closeTab(tabId) {
+            if (currentUser.role !== 'admin') {
+                alert('Только администраторы могут удалять вкладки');
+                return;
+            }
+
+            if (tabs.length <= 1) return;
+            
+            const tabIndex = tabs.findIndex(tab => tab.id === tabId);
+            if (tabIndex === -1) return;
+            
+            tabs.splice(tabIndex, 1);
+            
+            if (tabId === currentTabId) {
+                currentTabId = tabs[0].id;
+                const firstTab = tabs[0];
+                
+                if (firstTab.data) {
+                    tableData = JSON.parse(JSON.stringify(firstTab.data));
+                } else if (firstTab.id === 'tab1') {
+                    const data = storageManager.loadFromLocalStorage();
+                    tableData = data.tableData;
+                }
+            }
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            renderTabs();
             renderTable();
         }
-    }
 
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        document.getElementById('header-title').textContent = currentTab.name;
-    }
-}
-
-function createNewTab() {
-    if (currentUser.role !== 'admin') {
-        alert('Только администраторы могут создавать новые вкладки');
-        return;
-    }
-
-    const tabId = 'tab_' + Date.now();
-    const tabName = `Таблица ${tabs.length + 1}`;
-    
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        currentTab.data = JSON.parse(JSON.stringify(tableData));
-    }
-    
-    const newTab = {
-        id: tabId,
-        name: tabName,
-        data: [
-            { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
-        ]
-    };
-    
-    tabs.push(newTab);
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    
-    currentTabId = tabId;
-    tableData = JSON.parse(JSON.stringify(newTab.data));
-    
-    renderTabs();
-    renderTable();
-    resetFiltersAndSearch();
-}
-
-function switchTab(tabId) {
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        currentTab.data = JSON.parse(JSON.stringify(tableData));
-    }
-    
-    currentTabId = tabId;
-    const newTab = tabs.find(tab => tab.id === tabId);
-    
-    if (newTab && newTab.data) {
-        tableData = JSON.parse(JSON.stringify(newTab.data));
-    } else {
-        if (tabId === 'tab1') {
-            const data = storageManager.loadFromLocalStorage();
-            tableData = data.tableData;
+        function resetFiltersAndSearch() {
+            currentFilters = {};
+            searchTerm = '';
+            selectedRows.clear();
+            document.getElementById('table-search').value = '';
+            document.getElementById('select-all-checkbox').checked = false;
+            closeAllFilterDropdowns();
         }
-    }
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    renderTabs();
-    renderTable();
-    resetFiltersAndSearch();
-}
 
-function closeTab(tabId) {
-    if (currentUser.role !== 'admin') {
-        alert('Только администраторы могут удалять вкладки');
-        return;
-    }
-
-    if (tabs.length <= 1) return;
-    
-    const tabIndex = tabs.findIndex(tab => tab.id === tabId);
-    if (tabIndex === -1) return;
-    
-    tabs.splice(tabIndex, 1);
-    
-    if (tabId === currentTabId) {
-        currentTabId = tabs[0].id;
-        const firstTab = tabs[0];
-        
-        if (firstTab.data) {
-            tableData = JSON.parse(JSON.stringify(firstTab.data));
-        } else if (firstTab.id === 'tab1') {
-            const data = storageManager.loadFromLocalStorage();
-            tableData = data.tableData;
-        }
-    }
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    renderTabs();
-    renderTable();
-}
-
-function resetFiltersAndSearch() {
-    currentFilters = {};
-    searchTerm = '';
-    selectedRows.clear();
-    document.getElementById('table-search').value = '';
-    document.getElementById('select-all-checkbox').checked = false;
-    closeAllFilterDropdowns();
-}
-
-// ФУНКЦИИ ДЛЯ ЧЕКБОКСОВ И ФИЛЬТРАЦИИ
-function handleSelectAll(e) {
-    const isChecked = e.target.checked;
-    
-    if (isChecked) {
-        currentFilters = {};
-        searchTerm = '';
-        selectedRows.clear();
-        document.getElementById('table-search').value = '';
-        closeAllFilterDropdowns();
-        renderTable();
-    }
-}
-
-function handleRowCheckboxChange(rowId, isChecked) {
-    if (isChecked) {
-        selectedRows.add(rowId);
-    } else {
-        selectedRows.delete(rowId);
-    }
-}
-
-function filterSelectedRows() {
-    if (selectedRows.size === 0) {
-        alert('Выберите строки для фильтрации!');
-        return;
-    }
-    
-    currentFilters.selectedRows = Array.from(selectedRows);
-    renderTable();
-}
-
-// ФУНКЦИЯ ПОИСКА
-function handleSearch(e) {
-    searchTerm = e.target.value.toLowerCase().trim();
-    renderTable();
-}
-
-function clearSearch() {
-    document.getElementById('table-search').value = '';
-    searchTerm = '';
-    renderTable();
-}
-
-function applySearch(data) {
-    if (!searchTerm) return data;
-    
-    return data.filter(row => {
-        const searchableFields = [
-            row.id.toString(),
-            row.name || '',
-            row.date || '',
-            row.status || ''
-        ];
-        
-        if (row.customData) {
-            Object.values(row.customData).forEach(value => {
-                searchableFields.push(value.toString());
-            });
-        }
-        
-        return searchableFields.some(field => 
-            field.toLowerCase().includes(searchTerm)
-        );
-    });
-}
-
-// ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
-function exportToExcel() {
-    const exportData = [];
-    const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
-    
-    customColumns.forEach(col => {
-        headers.push(col.name);
-    });
-    
-    exportData.push(headers);
-    
-    tableData.forEach(row => {
-        const rowData = [
-            row.displayId || row.id,
-            row.name || '',
-            row.date || '',
-            row.status || ''
-        ];
-        
-        customColumns.forEach(col => {
-            const value = row.customData && row.customData[col.id] ? row.customData[col.id] : '';
-            rowData.push(value);
-        });
-        
-        exportData.push(rowData);
-    });
-    
-    let csvContent = '\uFEFF';
-    exportData.forEach(row => {
-        const escapedRow = row.map(field => {
-            if (field === null || field === undefined) return '';
-            const stringField = String(field);
-            if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
-                return '"' + stringField.replace(/"/g, '""') + '"';
+        // ФУНКЦИИ ДЛЯ ЧЕКБОКСОВ И ФИЛЬТРАЦИИ
+        function handleSelectAll(e) {
+            const isChecked = e.target.checked;
+            
+            if (isChecked) {
+                currentFilters = {};
+                searchTerm = '';
+                selectedRows.clear();
+                document.getElementById('table-search').value = '';
+                closeAllFilterDropdowns();
+                renderTable();
             }
-            return stringField;
-        });
-        csvContent += escapedRow.join(';') + '\n';
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    const fileName = currentTab ? currentTab.name : 'таблица';
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${fileName}_${formatDate(new Date())}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    alert(`Данные из "${fileName}" успешно экспортированы в CSV файл!`);
-}
-
-// ОБНОВЛЕННАЯ ФУНКЦИЯ РЕНДЕРА ТАБЛИЦЫ
-function renderTable() {
-    const thead = document.querySelector('#data-table thead tr');
-    const tbody = document.querySelector('#data-table tbody');
-    
-    thead.innerHTML = '';
-    
-    const selectAllTh = document.createElement('th');
-    selectAllTh.style.minWidth = '50px';
-    selectAllTh.style.maxWidth = '60px';
-    selectAllTh.style.width = '50px';
-    const selectAllCheckbox = document.createElement('input');
-    selectAllCheckbox.type = 'checkbox';
-    selectAllCheckbox.className = 'select-all-checkbox';
-    selectAllCheckbox.id = 'select-all-checkbox';
-    selectAllCheckbox.title = 'Показать все строки';
-    selectAllCheckbox.checked = Object.keys(currentFilters).length === 0 && searchTerm === '';
-    selectAllCheckbox.addEventListener('change', handleSelectAll);
-    selectAllTh.appendChild(selectAllCheckbox);
-    thead.appendChild(selectAllTh);
-    
-    basicColumns.forEach((column, index) => {
-        const th = createHeaderCell(column, index, 'basic');
-        thead.appendChild(th);
-    });
-    
-    customColumns.forEach((column, index) => {
-        const th = createHeaderCell(column, index, 'custom');
-        thead.appendChild(th);
-    });
-    
-    if (currentUser && currentUser.role === 'admin') {
-        const actionsTh = document.createElement('th');
-        actionsTh.className = 'admin-only actions-header';
-        actionsTh.innerHTML = `
-            <div class="th-content">
-                <div class="th-main">
-                    <div class="th-title">×</div>
-                    <div class="filter-controls">
-                    </div>
-                </div>
-            </div>
-        `;
-        actionsTh.style.minWidth = '40px';
-        actionsTh.style.maxWidth = '50px';
-        actionsTh.style.width = '40px';
-        actionsTh.style.zIndex = '10';
-        thead.appendChild(actionsTh);
-    }
-    
-    tbody.innerHTML = '';
-    
-    let filteredData = applyFilters(tableData);
-    filteredData = applySearch(filteredData);
-    let sortedData = applySorting(filteredData);
-    
-    sortedData.forEach((rowData, index) => {
-        rowData.displayId = index + 1;
-    });
-    
-    sortedData.forEach(rowData => {
-        const row = document.createElement('tr');
-        
-        const checkboxTd = document.createElement('td');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'row-checkbox';
-        checkbox.dataset.rowId = rowData.id;
-        checkbox.checked = selectedRows.has(rowData.id);
-        checkbox.addEventListener('change', (e) => {
-            handleRowCheckboxChange(rowData.id, e.target.checked);
-        });
-        checkboxTd.appendChild(checkbox);
-        row.appendChild(checkboxTd);
-        
-        basicColumns.forEach(column => {
-            const td = createDataCell(rowData, column, 'basic');
-            row.appendChild(td);
-        });
-        
-        customColumns.forEach(column => {
-            const td = createDataCell(rowData, column, 'custom');
-            row.appendChild(td);
-        });
-        
-        if (currentUser && currentUser.role === 'admin') {
-            const actionsTd = document.createElement('td');
-            actionsTd.className = 'admin-only';
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-row-btn';
-            deleteBtn.innerHTML = '×';
-            deleteBtn.title = 'Удалить строку';
-            deleteBtn.onclick = () => deleteRow(rowData.id);
-            actionsTd.appendChild(deleteBtn);
-            row.appendChild(actionsTd);
         }
-        
-        tbody.appendChild(row);
-    });
-    
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        currentTab.data = JSON.parse(JSON.stringify(tableData));
-        storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    }
-}
 
-function createHeaderCell(column, index, type) {
-    const th = document.createElement('th');
-    th.dataset.columnId = column.id;
-    th.dataset.columnType = type;
-    th.dataset.columnIndex = index;
-    
-    if (type === 'custom') {
-        th.dataset.columnName = column.name;
-    }
-    
-    const thContent = document.createElement('div');
-    thContent.className = 'th-content';
-    
-    const thMain = document.createElement('div');
-    thMain.className = 'th-main';
-    
-    const thTitle = document.createElement('div');
-    thTitle.className = 'th-title';
-    thTitle.textContent = column.name;
-    
-    if (currentSort.column === column.id) {
-        thTitle.classList.add(`sort-${currentSort.direction}`);
-        const sortIndicator = document.createElement('span');
-        sortIndicator.className = 'sort-indicator';
-        thTitle.appendChild(sortIndicator);
-    }
-    
-    const filterControls = document.createElement('div');
-    filterControls.className = 'filter-controls';
-    
-    const sortBtn = document.createElement('button');
-    sortBtn.className = 'sort-btn';
-    sortBtn.innerHTML = '↕';
-    sortBtn.title = 'Сортировка';
-    sortBtn.onclick = (e) => {
-        e.stopPropagation();
-        handleSort(column.id);
-    };
-    
-    const filterBtn = document.createElement('button');
-    filterBtn.className = 'filter-btn';
-    filterBtn.innerHTML = '⌕';
-    filterBtn.title = 'Фильтр';
-    
-    if (currentFilters[column.id]) {
-        filterBtn.classList.add('filtered');
-    }
-    
-    filterBtn.onclick = (e) => {
-        e.stopPropagation();
-        toggleFilter(column.id, filterBtn, th);
-    };
-    
-    filterControls.appendChild(sortBtn);
-    filterControls.appendChild(filterBtn);
-    
-    thMain.appendChild(thTitle);
-    thMain.appendChild(filterControls);
-    thContent.appendChild(thMain);
-    th.appendChild(thContent);
-    
-    if (currentUser && currentUser.role === 'admin' && (type === 'custom' || column.editable)) {
-        th.classList.add('editable-header');
-        th.style.cursor = 'pointer';
-        th.addEventListener('click', (e) => {
-            if (!e.target.closest('.filter-controls')) {
-                e.stopPropagation();
-                openEditHeaderModal(th);
+        function handleRowCheckboxChange(rowId, isChecked) {
+            if (isChecked) {
+                selectedRows.add(rowId);
+            } else {
+                selectedRows.delete(rowId);
             }
-        });
-    }
-    
-    return th;
-}
-
-// ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ФУНКЦИЯ СОЗДАНИЯ ЯЧЕЙКИ ДАННЫХ
-function createDataCell(rowData, column, type) {
-    const td = document.createElement('td');
-    
-    const isDateColumn = dateValidationColumns[column.id];
-    
-    td.dataset.columnId = column.id;
-    td.dataset.rowId = rowData.id;
-    
-    if (type === 'custom') {
-        td.dataset.columnName = column.name;
-    }
-    
-    let value = '';
-    if (type === 'basic') {
-        switch(column.id) {
-            case 'id': value = rowData.displayId || rowData.id; break;
-            case 'name': value = rowData.name || ''; break;
-            case 'date': value = rowData.date || ''; break;
-            case 'status': value = rowData.status || ''; break;
         }
-    } else {
-        value = rowData.customData && rowData.customData[column.id] 
-            ? rowData.customData[column.id] 
-            : '';
-    }
-    
-    const cellContent = document.createElement('div');
-    cellContent.className = 'cell-content';
-    
-    const cellText = document.createElement('div');
-    cellText.className = 'cell-text';
-    cellText.textContent = value;
-    
-    const fileIcons = document.createElement('div');
-    fileIcons.className = 'file-icons';
-    
-    if (rowData.attachments && rowData.attachments[column.id]) {
-        addFileIconsToCell(fileIcons, rowData.attachments[column.id], rowData.id, column.id);
-    }
-    
-    cellContent.appendChild(cellText);
-    cellContent.appendChild(fileIcons);
-    td.appendChild(cellContent);
-    
-    // Обработчики событий для ячейки
-    if (currentUser && currentUser.role === 'admin') {
-        if (isDateColumn) {
-            // Для ячеек с датами - специальная обработка
-            td.classList.add('date-cell');
-            
-            td.addEventListener('dblclick', (e) => {
-                if (!e.target.closest('.file-icons')) {
-                    openDateInput(td, value);
-                }
-            });
-            
-            td.addEventListener('click', (e) => {
-                if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay')) {
-                    openDatePicker(td, value);
-                }
-            });
-            
-            if (value && isValidDate(value)) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const cellDate = parseDate(value);
-                const timeDiff = cellDate.getTime() - today.getTime();
-                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                
-                if (daysDiff < 0) {
-                    td.classList.add('date-cell-danger');
-                } else if (daysDiff <= 30) {
-                    td.classList.add('date-cell-warning');
-                } else {
-                    td.classList.remove('date-cell-warning', 'date-cell-danger');
-                }
+
+        function filterSelectedRows() {
+            if (selectedRows.size === 0) {
+                alert('Выберите строки для фильтрации!');
+                return;
             }
-        } else {
-            // Для обычных текстовых ячеек - новый алгоритм
-            let clickTimer = null;
-            let isEditing = false;
             
-            // Одинарный клик - редактирование текста
-            td.addEventListener('click', (e) => {
-                if (e.target.closest('.file-icons') || isEditing) return;
-                
-                if (clickTimer) {
-                    clearTimeout(clickTimer);
-                    clickTimer = null;
-                    return;
-                }
-                
-                clickTimer = setTimeout(() => {
-                    // Одинарный клик - редактирование текста
-                    startTextEditing(td, rowData, column, type, value);
-                    isEditing = true;
-                    clickTimer = null;
-                }, 300);
-            });
-            
-            // Двойной клик - открытие модального окна для файлов
-            td.addEventListener('dblclick', (e) => {
-                if (e.target.closest('.file-icons') || isEditing) return;
-                
-                if (clickTimer) {
-                    clearTimeout(clickTimer);
-                    clickTimer = null;
-                }
-                
-                // Двойной клик - открытие модального окна для файлов
-                openFileManagementModal(rowData.id, column.id);
-            });
-            
-            // Добавляем визуальный курсор для указания возможности редактирования
-            td.style.cursor = 'text';
+            currentFilters.selectedRows = Array.from(selectedRows);
+            renderTable();
         }
-    }
-    
-    return td;
-}
 
-// НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
-function startTextEditing(cell, rowData, column, type, currentValue) {
-    const originalContent = cell.innerHTML;
-    
-    // Создаем input для редактирования
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentValue || '';
-    input.style.width = '100%';
-    input.style.height = '100%';
-    input.style.border = '2px solid var(--accent-color)';
-    input.style.background = 'var(--bg-primary)';
-    input.style.color = 'var(--text-primary)';
-    input.style.padding = '4px';
-    input.style.borderRadius = '4px';
-    input.style.outline = 'none';
-    input.className = 'cell-input';
-    
-    // Заменяем содержимое ячейки на input
-    cell.innerHTML = '';
-    cell.appendChild(input);
-    input.focus();
-    input.select();
-    
-    // Функция сохранения
-    const saveChanges = () => {
-        const newValue = input.value.trim();
-        
-        if (type === 'basic') {
-            switch(column.id) {
-                case 'name': rowData.name = newValue; break;
-                case 'status': rowData.status = newValue; break;
-                default: 
-                    if (column.editable) {
-                        rowData[column.id] = newValue;
+        // ФУНКЦИЯ ПОИСКА
+        function handleSearch(e) {
+            searchTerm = e.target.value.toLowerCase().trim();
+            renderTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('table-search').value = '';
+            searchTerm = '';
+            renderTable();
+        }
+
+        function applySearch(data) {
+            if (!searchTerm) return data;
+            
+            return data.filter(row => {
+                const searchableFields = [
+                    row.id.toString(),
+                    row.name || '',
+                    row.date || '',
+                    row.status || ''
+                ];
+                
+                if (row.customData) {
+                    Object.values(row.customData).forEach(value => {
+                        searchableFields.push(value.toString());
+                    });
+                }
+                
+                return searchableFields.some(field => 
+                    field.toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
+        function exportToExcel() {
+            const exportData = [];
+            const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
+            
+            customColumns.forEach(col => {
+                headers.push(col.name);
+            });
+            
+            exportData.push(headers);
+            
+            tableData.forEach(row => {
+                const rowData = [
+                    row.displayId || row.id,
+                    row.name || '',
+                    row.date || '',
+                    row.status || ''
+                ];
+                
+                customColumns.forEach(col => {
+                    const value = row.customData && row.customData[col.id] ? row.customData[col.id] : '';
+                    rowData.push(value);
+                });
+                
+                exportData.push(rowData);
+            });
+            
+            let csvContent = '\uFEFF';
+            exportData.forEach(row => {
+                const escapedRow = row.map(field => {
+                    if (field === null || field === undefined) return '';
+                    const stringField = String(field);
+                    if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+                        return '"' + stringField.replace(/"/g, '""') + '"';
                     }
-            }
-        } else {
-            if (!rowData.customData) rowData.customData = {};
-            rowData.customData[column.id] = newValue;
+                    return stringField;
+                });
+                csvContent += escapedRow.join(';') + '\n';
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            const fileName = currentTab ? currentTab.name : 'таблица';
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${fileName}_${formatDate(new Date())}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert(`Данные из "${fileName}" успешно экспортированы в CSV файл!`);
         }
-        
-        const currentTab = tabs.find(tab => tab.id === currentTabId);
-        if (currentTab) {
-            currentTab.data = JSON.parse(JSON.stringify(tableData));
-        }
-        
-        storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-        autoSyncChanges();
-        
-        // Восстанавливаем ячейку с новым значением
-        renderTable();
-    };
-    
-    // Обработчики для input
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            saveChanges();
-        } else if (e.key === 'Escape') {
-            // Отмена редактирования - восстанавливаем оригинальное содержимое
-            cell.innerHTML = originalContent;
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (document.activeElement !== input) {
-                saveChanges();
-            }
-        }, 100);
-    });
-}
 
-function addFileIconsToCell(container, files, rowId, columnId) {
-    files.forEach((file, index) => {
-        const fileIcon = document.createElement('div');
-        fileIcon.className = 'file-icon-small';
-        
-        let icon = '📄';
-        if (file.type.startsWith('image/')) {
-            icon = '🖼';
-        } else if (file.type.includes('pdf')) {
-            icon = '📕';
-        } else if (file.type.includes('word') || file.type.includes('document')) {
-            icon = '📝';
-        } else if (file.type.includes('excel') || file.type.includes('spreadsheet')) {
-            icon = '📊';
-        } else if (file.type.includes('text')) {
-            icon = '📃';
-        }
-        
-        fileIcon.innerHTML = icon;
-        fileIcon.title = file.name;
-        
-        fileIcon.addEventListener('click', (e) => {
-            e.stopPropagation();
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ РЕНДЕРА ТАБЛИЦЫ
+        function renderTable() {
+            const thead = document.querySelector('#data-table thead tr');
+            const tbody = document.querySelector('#data-table tbody');
+            
+            thead.innerHTML = '';
+            
+            const selectAllTh = document.createElement('th');
+            selectAllTh.style.minWidth = '50px';
+            selectAllTh.style.maxWidth = '60px';
+            selectAllTh.style.width = '50px';
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.className = 'select-all-checkbox';
+            selectAllCheckbox.id = 'select-all-checkbox';
+            selectAllCheckbox.title = 'Показать все строки';
+            selectAllCheckbox.checked = Object.keys(currentFilters).length === 0 && searchTerm === '';
+            selectAllCheckbox.addEventListener('change', handleSelectAll);
+            selectAllTh.appendChild(selectAllCheckbox);
+            thead.appendChild(selectAllTh);
+            
+            basicColumns.forEach((column, index) => {
+                const th = createHeaderCell(column, index, 'basic');
+                thead.appendChild(th);
+            });
+            
+            customColumns.forEach((column, index) => {
+                const th = createHeaderCell(column, index, 'custom');
+                thead.appendChild(th);
+            });
+            
             if (currentUser && currentUser.role === 'admin') {
-                openFileManagementModal(rowId, columnId);
-            } else {
-                openFilePreview(file, rowId, columnId, index);
+                const actionsTh = document.createElement('th');
+                actionsTh.className = 'admin-only actions-header';
+                actionsTh.innerHTML = `
+                    <div class="th-content">
+                        <div class="th-main">
+                            <div class="th-title">×</div>
+                            <div class="filter-controls">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                actionsTh.style.minWidth = '40px';
+                actionsTh.style.maxWidth = '50px';
+                actionsTh.style.width = '40px';
+                actionsTh.style.zIndex = '10';
+                thead.appendChild(actionsTh);
             }
-        });
-        
-        container.appendChild(fileIcon);
-    });
-}
-
-// ОБНОВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ СТРОКИ
-function deleteRow(rowId) {
-    if (!confirm('Вы уверены, что хотите удалить эту строку?')) {
-        return;
-    }
-    
-    tableData = tableData.filter(row => row.id !== rowId);
-    
-    tableData.forEach((row, index) => {
-        row.displayId = index + 1;
-    });
-    
-    selectedRows.delete(rowId);
-    
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
-    if (currentTab) {
-        currentTab.data = JSON.parse(JSON.stringify(tableData));
-    }
-    
-    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-    autoSyncChanges();
-    
-    renderTable();
-}
-
-// ОБНОВЛЕННАЯ ФУНКЦИЯ ПРИМЕНЕНИЯ ФИЛЬТРОВ
-function applyFilters(data) {
-    if (Object.keys(currentFilters).length === 0) return data;
-    
-    return data.filter(row => {
-        return Object.entries(currentFilters).every(([filterType, filterValue]) => {
-            if (filterType === 'selectedRows') {
-                return filterValue.includes(row.id);
-            } else {
-                let value;
+            
+            tbody.innerHTML = '';
+            
+            let filteredData = applyFilters(tableData);
+            filteredData = applySearch(filteredData);
+            let sortedData = applySorting(filteredData);
+            
+            sortedData.forEach((rowData, index) => {
+                rowData.displayId = index + 1;
+            });
+            
+            sortedData.forEach(rowData => {
+                const row = document.createElement('tr');
                 
-                if (customColumns.find(col => col.id === filterType)) {
-                    value = row.customData && row.customData[filterType] ? row.customData[filterType] : '';
+                const checkboxTd = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'row-checkbox';
+                checkbox.dataset.rowId = rowData.id;
+                checkbox.checked = selectedRows.has(rowData.id);
+                checkbox.addEventListener('change', (e) => {
+                    handleRowCheckboxChange(rowData.id, e.target.checked);
+                });
+                checkboxTd.appendChild(checkbox);
+                row.appendChild(checkboxTd);
+                
+                basicColumns.forEach(column => {
+                    const td = createDataCell(rowData, column, 'basic');
+                    row.appendChild(td);
+                });
+                
+                customColumns.forEach(column => {
+                    const td = createDataCell(rowData, column, 'custom');
+                    row.appendChild(td);
+                });
+                
+                if (currentUser && currentUser.role === 'admin') {
+                    const actionsTd = document.createElement('td');
+                    actionsTd.className = 'admin-only';
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-row-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.title = 'Удалить строку';
+                    deleteBtn.onclick = () => deleteRow(rowData.id);
+                    actionsTd.appendChild(deleteBtn);
+                    row.appendChild(actionsTd);
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            }
+        }
+
+        function createHeaderCell(column, index, type) {
+            const th = document.createElement('th');
+            th.dataset.columnId = column.id;
+            th.dataset.columnType = type;
+            th.dataset.columnIndex = index;
+            
+            if (type === 'custom') {
+                th.dataset.columnName = column.name;
+            }
+            
+            const thContent = document.createElement('div');
+            thContent.className = 'th-content';
+            
+            const thMain = document.createElement('div');
+            thMain.className = 'th-main';
+            
+            const thTitle = document.createElement('div');
+            thTitle.className = 'th-title';
+            thTitle.textContent = column.name;
+            
+            if (currentSort.column === column.id) {
+                thTitle.classList.add(`sort-${currentSort.direction}`);
+                const sortIndicator = document.createElement('span');
+                sortIndicator.className = 'sort-indicator';
+                thTitle.appendChild(sortIndicator);
+            }
+            
+            const filterControls = document.createElement('div');
+            filterControls.className = 'filter-controls';
+            
+            const sortBtn = document.createElement('button');
+            sortBtn.className = 'sort-btn';
+            sortBtn.innerHTML = '↕';
+            sortBtn.title = 'Сортировка';
+            sortBtn.onclick = (e) => {
+                e.stopPropagation();
+                handleSort(column.id);
+            };
+            
+            const filterBtn = document.createElement('button');
+            filterBtn.className = 'filter-btn';
+            filterBtn.innerHTML = '⌕';
+            filterBtn.title = 'Фильтр';
+            
+            if (currentFilters[column.id]) {
+                filterBtn.classList.add('filtered');
+            }
+            
+            filterBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFilter(column.id, filterBtn, th);
+            };
+            
+            filterControls.appendChild(sortBtn);
+            filterControls.appendChild(filterBtn);
+            
+            thMain.appendChild(thTitle);
+            thMain.appendChild(filterControls);
+            thContent.appendChild(thMain);
+            th.appendChild(thContent);
+            
+            if (currentUser && currentUser.role === 'admin' && (type === 'custom' || column.editable)) {
+                th.classList.add('editable-header');
+                th.style.cursor = 'pointer';
+                th.addEventListener('click', (e) => {
+                    if (!e.target.closest('.filter-controls')) {
+                        e.stopPropagation();
+                        openEditHeaderModal(th);
+                    }
+                });
+            }
+            
+            return th;
+        }
+
+        // ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ФУНКЦИЯ СОЗДАНИЯ ЯЧЕЙКИ ДАННЫХ
+        function createDataCell(rowData, column, type) {
+            const td = document.createElement('td');
+            
+            const isDateColumn = dateValidationColumns[column.id];
+            
+            td.dataset.columnId = column.id;
+            td.dataset.rowId = rowData.id;
+            
+            if (type === 'custom') {
+                td.dataset.columnName = column.name;
+            }
+            
+            let value = '';
+            if (type === 'basic') {
+                switch(column.id) {
+                    case 'id': value = rowData.displayId || rowData.id; break;
+                    case 'name': value = rowData.name || ''; break;
+                    case 'date': value = rowData.date || ''; break;
+                    case 'status': value = rowData.status || ''; break;
+                }
+            } else {
+                value = rowData.customData && rowData.customData[column.id] 
+                    ? rowData.customData[column.id] 
+                    : '';
+            }
+            
+            const cellContent = document.createElement('div');
+            cellContent.className = 'cell-content';
+            
+            const cellText = document.createElement('div');
+            cellText.className = 'cell-text';
+            cellText.textContent = value;
+            
+            const fileIcons = document.createElement('div');
+            fileIcons.className = 'file-icons';
+            
+            if (rowData.attachments && rowData.attachments[column.id]) {
+                addFileIconsToCell(fileIcons, rowData.attachments[column.id], rowData.id, column.id);
+            }
+            
+            cellContent.appendChild(cellText);
+            cellContent.appendChild(fileIcons);
+            td.appendChild(cellContent);
+            
+            // Обработчики событий для ячейки
+            if (currentUser && currentUser.role === 'admin') {
+                if (isDateColumn) {
+                    // Для ячеек с датами - специальная обработка
+                    td.classList.add('date-cell');
+                    
+                    td.addEventListener('dblclick', (e) => {
+                        if (!e.target.closest('.file-icons')) {
+                            openDateInput(td, value);
+                        }
+                    });
+                    
+                    td.addEventListener('click', (e) => {
+                        if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay')) {
+                            openDatePicker(td, value);
+                        }
+                    });
+                    
+                    // ПРОВЕРКА ДАТ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+                    if (value && isValidDate(value)) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const cellDate = parseDate(value);
+                        const timeDiff = cellDate.getTime() - today.getTime();
+                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        
+                        if (daysDiff < 0) {
+                            td.classList.add('date-cell-danger');
+                        } else if (daysDiff <= 30) {
+                            td.classList.add('date-cell-warning');
+                        } else {
+                            td.classList.remove('date-cell-warning', 'date-cell-danger');
+                        }
+                    }
                 } else {
-                    switch(filterType) {
-                        case 'id': value = row.id.toString(); break;
-                        case 'name': value = row.name || ''; break;
-                        case 'date': value = row.date || ''; break;
-                        case 'status': value = row.status || ''; break;
-                        default: value = '';
+                    // Для обычных текстовых ячеек - новый алгоритм
+                    let clickTimer = null;
+                    let isEditing = false;
+                    
+                    // Одинарный клик - редактирование текста
+                    td.addEventListener('click', (e) => {
+                        if (e.target.closest('.file-icons') || isEditing) return;
+                        
+                        if (clickTimer) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                            return;
+                        }
+                        
+                        clickTimer = setTimeout(() => {
+                            // Одинарный клик - редактирование текста
+                            startTextEditing(td, rowData, column, type, value);
+                            isEditing = true;
+                            clickTimer = null;
+                        }, 300);
+                    });
+                    
+                    // Двойной клик - открытие модального окна для файлов
+                    td.addEventListener('dblclick', (e) => {
+                        if (e.target.closest('.file-icons') || isEditing) return;
+                        
+                        if (clickTimer) {
+                            clearTimeout(clickTimer);
+                            clickTimer = null;
+                        }
+                        
+                        // Двойной клик - открытие модального окна для файлов
+                        openFileManagementModal(rowData.id, column.id);
+                    });
+                    
+                    // Добавляем визуальный курсор для указания возможности редактирования
+                    td.style.cursor = 'text';
+                }
+            } else {
+                // ДЛЯ ПОЛЬЗОВАТЕЛЕЙ - ТОЛЬКО ПРОСМОТР
+                if (isDateColumn) {
+                    // Проверка дат для пользователей
+                    td.classList.add('date-cell');
+                    
+                    if (value && isValidDate(value)) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const cellDate = parseDate(value);
+                        const timeDiff = cellDate.getTime() - today.getTime();
+                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        
+                        if (daysDiff < 0) {
+                            td.classList.add('date-cell-danger');
+                        } else if (daysDiff <= 30) {
+                            td.classList.add('date-cell-warning');
+                        } else {
+                            td.classList.remove('date-cell-warning', 'date-cell-danger');
+                        }
                     }
                 }
                 
-                return filterValue.includes(value);
+                // Пользователи могут только просматривать файлы
+                td.addEventListener('dblclick', (e) => {
+                    if (e.target.closest('.file-icons')) return;
+                    
+                    if (rowData.attachments && rowData.attachments[column.id] && rowData.attachments[column.id].length > 0) {
+                        openFilePreview(rowData.attachments[column.id][0], rowData.id, column.id, 0);
+                    }
+                });
             }
-        });
-    });
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAppWithFallback();
-    
-    setInterval(updateStatusBar, 30000);
-    
-    window.addEventListener('online', function() {
-        updateSyncStatus('Восстановлено соединение', 'success');
-        if (storageManager.pendingChanges.length > 0) {
-            storageManager.trySyncChanges(updateSyncStatus);
+            
+            return td;
         }
-    });
-    
-    window.addEventListener('offline', function() {
-        updateSyncStatus('Отсутствует соединение', 'error');
-    });
-});
-</script>
+
+        // НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
+        function startTextEditing(cell, rowData, column, type, currentValue) {
+            const originalContent = cell.innerHTML;
+            
+            // Создаем input для редактирования
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentValue || '';
+            input.style.width = '100%';
+            input.style.height = '100%';
+            input.style.border = '2px solid var(--accent-color)';
+            input.style.background = 'var(--bg-primary)';
+            input.style.color = 'var(--text-primary)';
+            input.style.padding = '4px';
+            input.style.borderRadius = '4px';
+            input.style.outline = 'none';
+            input.className = 'cell-input';
+            
+            // Заменяем содержимое ячейки на input
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+            
+            // Функция сохранения
+            const saveChanges = () => {
+                const newValue = input.value.trim();
+                
+                if (type === 'basic') {
+                    switch(column.id) {
+                        case 'name': rowData.name = newValue; break;
+                        case 'status': rowData.status = newValue; break;
+                        default: 
+                            if (column.editable) {
+                                rowData[column.id] = newValue;
+                            }
+                    }
+                } else {
+                    if (!rowData.customData) rowData.customData = {};
+                    rowData.customData[column.id] = newValue;
+                }
+                
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab) {
+                    currentTab.data = JSON.parse(JSON.stringify(tableData));
+                }
+                
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+                
+                // Восстанавливаем ячейку с новым значением
+                renderTable();
+            };
+            
+            // Обработчики для input
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    saveChanges();
+                } else if (e.key === 'Escape') {
+                    // Отмена редактирования - восстанавливаем оригинальное содержимое
+                    cell.innerHTML = originalContent;
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (document.activeElement !== input) {
+                        saveChanges();
+                    }
+                }, 100);
+            });
+        }
+
+        function addFileIconsToCell(container, files, rowId, columnId) {
+            files.forEach((file, index) => {
+                const fileIcon = document.createElement('div');
+                fileIcon.className = 'file-icon-small';
+                
+                let icon = '📄';
+                if (file.type.startsWith('image/')) {
+                    icon = '🖼';
+                } else if (file.type.includes('pdf')) {
+                    icon = '📕';
+                } else if (file.type.includes('word') || file.type.includes('document')) {
+                    icon = '📝';
+                } else if (file.type.includes('excel') || file.type.includes('spreadsheet')) {
+                    icon = '📊';
+                } else if (file.type.includes('text')) {
+                    icon = '📃';
+                }
+                
+                fileIcon.innerHTML = icon;
+                fileIcon.title = file.name;
+                
+                fileIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentUser && currentUser.role === 'admin') {
+                        openFileManagementModal(rowId, columnId);
+                    } else {
+                        openFilePreview(file, rowId, columnId, index);
+                    }
+                });
+                
+                container.appendChild(fileIcon);
+            });
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ СТРОКИ
+        function deleteRow(rowId) {
+            if (!confirm('Вы уверены, что хотите удалить эту строку?')) {
+                return;
+            }
+            
+            tableData = tableData.filter(row => row.id !== rowId);
+            
+            tableData.forEach((row, index) => {
+                row.displayId = index + 1;
+            });
+            
+            selectedRows.delete(rowId);
+            
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            autoSyncChanges();
+            
+            renderTable();
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ПРИМЕНЕНИЯ ФИЛЬТРОВ
+        function applyFilters(data) {
+            if (Object.keys(currentFilters).length === 0) return data;
+            
+            return data.filter(row => {
+                return Object.entries(currentFilters).every(([filterType, filterValue]) => {
+                    if (filterType === 'selectedRows') {
+                        return filterValue.includes(row.id);
+                    } else {
+                        let value;
+                        
+                        if (customColumns.find(col => col.id === filterType)) {
+                            value = row.customData && row.customData[filterType] ? row.customData[filterType] : '';
+                        } else {
+                            switch(filterType) {
+                                case 'id': value = row.id.toString(); break;
+                                case 'name': value = row.name || ''; break;
+                                case 'date': value = row.date || ''; break;
+                                case 'status': value = row.status || ''; break;
+                                default: value = '';
+                            }
+                        }
+                        
+                        return filterValue.includes(value);
+                    }
+                });
+            });
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация происходит только после входа в систему
+            // initializeAppWithFallback();
+            
+            setInterval(updateStatusBar, 30000);
+            
+            window.addEventListener('online', function() {
+                updateSyncStatus('Восстановлено соединение', 'success');
+                if (storageManager.pendingChanges.length > 0) {
+                    storageManager.trySyncChanges(updateSyncStatus);
+                }
+            });
+            
+            window.addEventListener('offline', function() {
+                updateSyncStatus('Отсутствует соединение', 'error');
+            });
+        });
+    </script>
 </body>
 </html>
