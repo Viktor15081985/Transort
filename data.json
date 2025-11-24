@@ -85,7 +85,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "",
+    "headerTitle": "asdf",
     "headerLogo": "",
     "fixedColumnsCount": 4,
     "currentTheme": "theme-orange"
@@ -125,11 +125,6 @@
     {
       "id": "col_1763960675780_1",
       "name": "2"
-    },
-    {
-      "id": "id",
-      "name": "№ п/п",
-      "editable": false
     }
   ],
   "basicColumns": [
@@ -162,7 +157,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-24T05:23:33.857Z",
+  "lastSync": "2025-11-24T05:24:55.152Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
