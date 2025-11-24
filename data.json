@@ -10,7 +10,7 @@
     },
     {
       "id": 2,
-      "name": "Проект Б", 
+      "name": "Проект Б",
       "date": "05.10.2023",
       "status": "Завершен",
       "customData": {},
@@ -20,7 +20,7 @@
   "users": [
     {
       "username": "admin",
-      "password": "admin", 
+      "password": "admin",
       "role": "admin"
     },
     {
@@ -44,7 +44,7 @@
       "editable": false
     },
     {
-      "id": "name", 
+      "id": "name",
       "name": "Название",
       "editable": true
     },
@@ -55,7 +55,7 @@
     },
     {
       "id": "status",
-      "name": "Статус", 
+      "name": "Статус",
       "editable": true
     }
   ],
@@ -67,6 +67,7 @@
       "data": null
     }
   ],
-  "lastSync": "2024-01-01T00:00:00.000Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-24T19:27:43.473Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
