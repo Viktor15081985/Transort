@@ -2471,15 +2471,10 @@
             }
 
             // Получение всех данных приложения
-            getAllAppData(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs, currentUser) {
+            getAllAppData(users, appSettings, tabs, currentUser) {
                 return {
-                    tableData,
                     users,
                     appSettings,
-                    customButtons,
-                    customColumns,
-                    basicColumns,
-                    dateValidationColumns,
                     tabs,
                     lastSync: new Date().toISOString(),
                     lastEditor: currentUser.username
@@ -2487,19 +2482,11 @@
             }
 
             // Сохранение всех данных в localStorage
-            saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs) {
+            saveToLocalStorage(users, appSettings, tabs) {
                 try {
-                    localStorage.setItem('tableData', JSON.stringify(tableData));
                     localStorage.setItem('users', JSON.stringify(users));
                     localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                    localStorage.setItem('customButtons', JSON.stringify(customButtons));
-                    localStorage.setItem('customColumns', JSON.stringify(customColumns));
-                    localStorage.setItem('basicColumns', JSON.stringify(basicColumns));
-                    localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
                     localStorage.setItem('tabs', JSON.stringify(tabs));
-                    
-                    const dataHash = JSON.stringify(tableData) + JSON.stringify(users) + JSON.stringify(appSettings);
-                    localStorage.setItem('lastDataHash', dataHash);
                     
                     return true;
                 } catch (error) {
@@ -2511,24 +2498,14 @@
             // Загрузка всех данных из localStorage
             loadFromLocalStorage() {
                 try {
-                    const tableData = JSON.parse(localStorage.getItem('tableData')) || [];
                     const users = JSON.parse(localStorage.getItem('users')) || [];
                     const appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
-                    const customButtons = JSON.parse(localStorage.getItem('customButtons')) || [];
-                    const customColumns = JSON.parse(localStorage.getItem('customColumns')) || [];
-                    const basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || [];
-                    const dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || {};
                     const tabs = JSON.parse(localStorage.getItem('tabs')) || [];
                     const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
                     
                     return {
-                        tableData,
                         users,
                         appSettings,
-                        customButtons,
-                        customColumns,
-                        basicColumns,
-                        dateValidationColumns,
                         tabs,
                         pendingChanges
                     };
@@ -2540,12 +2517,26 @@
 
             // Данные по умолчанию
             getDefaultData() {
-                return {
+                const defaultTab = {
+                    id: 'tab1',
+                    name: 'Основное окно',
                     tableData: [
                         { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
                         { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
                         { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
                     ],
+                    customButtons: [],
+                    customColumns: [],
+                    basicColumns: [
+                        { id: 'id', name: '№ п/п', editable: false },
+                        { id: 'name', name: 'Название', editable: true },
+                        { id: 'date', name: 'Дата создания', editable: true },
+                        { id: 'status', name: 'Статус', editable: true }
+                    ],
+                    dateValidationColumns: {}
+                };
+
+                return {
                     users: [
                         { username: 'admin', password: 'admin', role: 'admin' },
                         { username: 'user', password: 'user', role: 'user' }
@@ -2556,18 +2547,7 @@
                         fixedColumnsCount: 3,
                         currentTheme: 'theme-orange'
                     },
-                    customButtons: [],
-                    customColumns: [],
-                    basicColumns: [
-                        { id: 'id', name: '№ п/п', editable: false },
-                        { id: 'name', name: 'Название', editable: true },
-                        { id: 'date', name: 'Дата создания', editable: true },
-                        { id: 'status', name: 'Статус', editable: true }
-                    ],
-                    dateValidationColumns: {},
-                    tabs: [
-                        { id: 'tab1', name: 'Основное окно', data: null, customButtons: [] }
-                    ],
+                    tabs: [defaultTab],
                     pendingChanges: []
                 };
             }
@@ -2802,7 +2782,6 @@
                 if (loadResult.success) {
                     const retryData = {
                         ...data,
-                        tableData: loadResult.data.tableData || data.tableData,
                         lastSync: new Date().toISOString()
                     };
                     
@@ -2820,34 +2799,6 @@
                     mergeOperation: true,
                     lastEditor: localData.lastEditor
                 };
-
-                // Слияние табличных данных
-                if (localData.tableData && remoteData.tableData) {
-                    console.log('📊 Слияние табличных данных...');
-                    
-                    const remoteRows = new Map(remoteData.tableData.map(row => [row.id, row]));
-                    const localRows = new Map(localData.tableData.map(row => [row.id, row]));
-                    
-                    const mergedTableData = [...remoteData.tableData];
-                    
-                    localData.tableData.forEach(localRow => {
-                        const existingIndex = mergedTableData.findIndex(row => row.id === localRow.id);
-                        if (existingIndex >= 0) {
-                            const existingAttachments = mergedTableData[existingIndex].attachments;
-                            mergedTableData[existingIndex] = {
-                                ...localRow,
-                                attachments: { ...existingAttachments, ...localRow.attachments }
-                            };
-                            console.log(`✏️ Обновлена строка ID: ${localRow.id}`);
-                        } else {
-                            mergedTableData.push(localRow);
-                            console.log(`➕ Добавлена новая строка ID: ${localRow.id}`);
-                        }
-                    });
-                    
-                    merged.tableData = mergedTableData;
-                    console.log(`✅ Табличные данные объединены: ${mergedTableData.length} строк`);
-                }
 
                 // Слияние пользователей
                 if (localData.users && remoteData.users) {
@@ -2869,14 +2820,6 @@
                         ...remoteData.appSettings,
                         ...localData.appSettings
                     };
-                }
-
-                // Сохранение пользовательских данных
-                if (localData.customButtons) {
-                    merged.customButtons = localData.customButtons;
-                }
-                if (localData.customColumns) {
-                    merged.customColumns = localData.customColumns;
                 }
 
                 // Слияние вкладок
@@ -2937,17 +2880,8 @@
 
         // Данные пользователей
         let users = [];
-        // Данные таблицы
-        let tableData = [];
         // Настройки приложения
         let appSettings = {};
-        // Данные кнопок и столбцов
-        let customButtons = [];
-        let customColumns = [];
-        // Базовые столбцы
-        let basicColumns = [];
-        // Настройки проверки дат
-        let dateValidationColumns = {};
         // Вкладки
         let tabs = [];
 
@@ -2977,6 +2911,49 @@
 
         // Глобальная переменная для управления файлами
         let currentFileManagementCell = null;
+
+        // Получение текущей вкладки
+        function getCurrentTab() {
+            return tabs.find(tab => tab.id === currentTabId);
+        }
+
+        // Получение данных текущей вкладки
+        function getCurrentTabData() {
+            const currentTab = getCurrentTab();
+            return currentTab ? currentTab.tableData : [];
+        }
+
+        // Получение кастомных кнопок текущей вкладки
+        function getCurrentTabCustomButtons() {
+            const currentTab = getCurrentTab();
+            return currentTab ? currentTab.customButtons : [];
+        }
+
+        // Получение кастомных столбцов текущей вкладки
+        function getCurrentTabCustomColumns() {
+            const currentTab = getCurrentTab();
+            return currentTab ? currentTab.customColumns : [];
+        }
+
+        // Получение базовых столбцов текущей вкладки
+        function getCurrentTabBasicColumns() {
+            const currentTab = getCurrentTab();
+            return currentTab ? currentTab.basicColumns : [];
+        }
+
+        // Получение настроек проверки дат текущей вкладки
+        function getCurrentTabDateValidationColumns() {
+            const currentTab = getCurrentTab();
+            return currentTab ? currentTab.dateValidationColumns : {};
+        }
+
+        // Обновление данных текущей вкладки
+        function updateCurrentTabData(newData) {
+            const currentTab = getCurrentTab();
+            if (currentTab) {
+                currentTab.tableData = newData;
+            }
+        }
 
         // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
         function updateStatusBar() {
@@ -3035,9 +3012,7 @@
         function autoSyncChanges() {
             if (currentUser && currentUser.role === 'admin') {
                 const appData = storageManager.getAllAppData(
-                    tableData, users, appSettings, customButtons, 
-                    customColumns, basicColumns, dateValidationColumns, 
-                    tabs, currentUser
+                    users, appSettings, tabs, currentUser
                 );
                 
                 storageManager.autoSyncChanges(appData, currentUser, updateSyncStatus);
@@ -3131,12 +3106,6 @@
         function findDataChanges(remoteData, localData) {
             const changes = [];
             
-            if (remoteData.tableData && localData.tableData) {
-                if (remoteData.tableData.length !== localData.tableData.length) {
-                    changes.push(`Количество строк: ${remoteData.tableData.length} → ${localData.tableData.length}`);
-                }
-            }
-            
             if (remoteData.users && localData.users) {
                 if (remoteData.users.length !== localData.users.length) {
                     changes.push(`Количество пользователей: ${remoteData.users.length} → ${localData.users.length}`);
@@ -3158,13 +3127,8 @@
         function updateLocalData(mergedData) {
             console.log('🔄 Обновление локальных данных после слияния...');
             
-            tableData = mergedData.tableData || tableData;
             users = mergedData.users || users;
             appSettings = mergedData.appSettings || appSettings;
-            customButtons = mergedData.customButtons || customButtons;
-            customColumns = mergedData.customColumns || customColumns;
-            basicColumns = mergedData.basicColumns || basicColumns;
-            dateValidationColumns = mergedData.dateValidationColumns || dateValidationColumns;
             tabs = mergedData.tabs || tabs;
             
             console.log('✅ Локальные данные обновлены');
@@ -3189,7 +3153,7 @@
                 console.log('✅ Данные успешно загружены');
                 
                 updateLocalData(result.data);
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 localStorage.setItem('lastSyncTime', new Date().toISOString());
 
                 updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
@@ -3206,18 +3170,10 @@
         function loadFromLocalStorageWithNotification() {
             const data = storageManager.loadFromLocalStorage();
             
-            tableData = data.tableData;
             users = data.users;
             appSettings = data.appSettings;
-            customButtons = data.customButtons;
-            customColumns = data.customColumns;
-            basicColumns = data.basicColumns;
-            dateValidationColumns = data.dateValidationColumns;
             tabs = data.tabs;
             storageManager.pendingChanges = data.pendingChanges;
-            
-            // ВОССТАНАВЛИВАЕМ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
-            restoreDateValidationColumns();
             
             renderTabs();
             renderTable();
@@ -3253,25 +3209,6 @@
             return false;
         }
 
-        function restoreDateValidationColumns() {
-            // Очищаем текущие настройки проверки дат
-            dateValidationColumns = {};
-            
-            // Восстанавливаем из customButtons
-            customButtons.forEach(button => {
-                if (button.dateColumns) {
-                    button.dateColumns.forEach(colName => {
-                        const column = customColumns.find(col => col.name === colName);
-                        if (column) {
-                            dateValidationColumns[column.id] = true;
-                        }
-                    });
-                }
-            });
-            
-            console.log('✅ Восстановлены настройки проверки дат:', dateValidationColumns);
-        }
-
         // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
         function initializeAppWithFallback() {
             setupEventListeners();
@@ -3288,15 +3225,12 @@
                 if (users.length === 0) {
                     loadUsersFromGitHub().then(() => {
                         loadFromLocalStorageWithNotification();
-                        restoreDateValidationColumns();
                     });
                 } else {
                     loadFromLocalStorageWithNotification();
-                    restoreDateValidationColumns();
                 }
             } else {
                 loadFromLocalStorageWithNotification();
-                restoreDateValidationColumns();
             }
             
             if (currentUser && currentUser.role === 'user') {
@@ -3406,7 +3340,7 @@
             headerTitle.contentEditable = 'true';
             headerTitle.addEventListener('blur', function() {
                 appSettings.headerTitle = this.textContent;
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
             });
             
@@ -3486,9 +3420,7 @@
             document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
             document.getElementById('sync-now-btn').addEventListener('click', () => {
                 const appData = storageManager.getAllAppData(
-                    tableData, users, appSettings, customButtons, 
-                    customColumns, basicColumns, dateValidationColumns, 
-                    tabs, currentUser
+                    users, appSettings, tabs, currentUser
                 );
                 
                 storageManager.saveToGitHub(appData, currentUser)
@@ -3581,6 +3513,10 @@
         }
 
         function addNewRow() {
+            const currentTab = getCurrentTab();
+            if (!currentTab) return;
+            
+            const tableData = getCurrentTabData();
             const newId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
             const newRow = {
                 id: newId,
@@ -3592,13 +3528,9 @@
             };
             
             tableData.push(newRow);
+            updateCurrentTabData(tableData);
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
-            
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             renderTable();
@@ -3685,7 +3617,7 @@
             };
             
             // Добавляем кнопку к текущей вкладке
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            const currentTab = getCurrentTab();
             if (currentTab) {
                 if (!currentTab.customButtons) {
                     currentTab.customButtons = [];
@@ -3693,24 +3625,7 @@
                 currentTab.customButtons.push(buttonData);
             }
             
-            customButtons.push(buttonData);
-                    
-            columns.forEach((colName, index) => {
-                const columnId = 'col_' + Date.now() + '_' + index;
-                if (!customColumns.find(col => col.name === colName)) {
-                    customColumns.push({
-                        id: columnId,
-                        name: colName
-                    });
-                }
-                
-                const dateCheckbox = dateCheckboxes[index];
-                if (dateCheckbox && dateCheckbox.checked) {
-                    dateValidationColumns[columnId] = true;
-                }
-            });
-            
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             createCustomButton(buttonData);
@@ -3801,13 +3716,16 @@
         }
 
         function editButton(buttonId) {
-            const button = customButtons.find(b => b.id === buttonId);
+            const currentTab = getCurrentTab();
+            if (!currentTab || !currentTab.customButtons) return;
+            
+            const button = currentTab.customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
             const newName = prompt('Введите новое название кнопки:', button.name);
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 loadCustomButtons();
             }
@@ -3816,23 +3734,23 @@
         function deleteButton(buttonId) {
             if (!confirm('Удалить эту кнопку и связанные с ней столбцы?')) return;
             
-            const button = customButtons.find(b => b.id === buttonId);
+            const currentTab = getCurrentTab();
+            if (!currentTab || !currentTab.customButtons) return;
+            
+            const button = currentTab.customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
-            customButtons = customButtons.filter(b => b.id !== buttonId);
+            currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
             
-            // Удаляем кнопку из текущей вкладки
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab && currentTab.customButtons) {
-                currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
-            }
-            
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
+            const customColumns = getCurrentTabCustomColumns();
             button.columns.forEach(colName => {
-                customColumns = customColumns.filter(col => col.name !== colName);
+                const filteredColumns = customColumns.filter(col => col.name !== colName);
+                currentTab.customColumns = filteredColumns;
                 
+                const tableData = getCurrentTabData();
                 tableData.forEach(row => {
                     if (row.customData && row.customData[colName]) {
                         delete row.customData[colName];
@@ -3843,7 +3761,7 @@
                 });
             });
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             loadCustomButtons();
@@ -3854,17 +3772,10 @@
             document.getElementById('custom-buttons').innerHTML = '';
             
             // Загружаем кнопки для текущей вкладки
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab && currentTab.customButtons) {
-                currentTab.customButtons.forEach(button => {
-                    createCustomButton(button);
-                });
-            } else {
-                // Загружаем общие кнопки для обратной совместимости
-                customButtons.forEach(button => {
-                    createCustomButton(button);
-                });
-            }
+            const customButtons = getCurrentTabCustomButtons();
+            customButtons.forEach(button => {
+                createCustomButton(button);
+            });
         }
 
         // ФУНКЦИИ ДЛЯ РАБОТЫ С ДАТАМИ
@@ -3995,7 +3906,10 @@
             const columnId = cell.dataset.columnId;
             const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
             
+            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
+            const customColumns = getCurrentTabCustomColumns();
+            
             if (customColumns.find(col => col.id === columnId)) {
                 if (!rowData.customData) rowData.customData = {};
                 rowData.customData[columnId] = dateStr;
@@ -4005,12 +3919,9 @@
                 }
             }
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
+            updateCurrentTabData(tableData);
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             closeDatePicker();
@@ -4068,7 +3979,10 @@
                 const columnId = cell.dataset.columnId;
                 const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
                 
+                const tableData = getCurrentTabData();
                 const rowData = tableData.find(row => row.id === rowId);
+                const customColumns = getCurrentTabCustomColumns();
+                
                 if (customColumns.find(col => col.id === columnId)) {
                     if (!rowData.customData) rowData.customData = {};
                     rowData.customData[columnId] = dateStr;
@@ -4078,12 +3992,9 @@
                     }
                 }
                 
-                const currentTab = tabs.find(tab => tab.id === currentTabId);
-                if (currentTab) {
-                    currentTab.data = JSON.parse(JSON.stringify(tableData));
-                }
+                updateCurrentTabData(tableData);
                 
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 
                 renderTable();
@@ -4115,6 +4026,11 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
+            const tableData = getCurrentTabData();
+            const basicColumns = getCurrentTabBasicColumns();
+            const customColumns = getCurrentTabCustomColumns();
+            const dateValidationColumns = getCurrentTabDateValidationColumns();
+            
             tableData.forEach(row => {
                 basicColumns.forEach(column => {
                     if (dateValidationColumns[column.id] && row[column.id]) {
@@ -4136,6 +4052,7 @@
         function checkDateCell(row, columnId, columnName, today, expiredDates, upcomingDates) {
             let dateValue;
             
+            const customColumns = getCurrentTabCustomColumns();
             if (customColumns.find(col => col.id === columnId)) {
                 dateValue = row.customData[columnId];
             } else {
@@ -4239,6 +4156,8 @@
             
             return [...data].sort((a, b) => {
                 let valueA, valueB;
+                
+                const customColumns = getCurrentTabCustomColumns();
                 
                 if (customColumns.find(col => col.id === currentSort.column)) {
                     valueA = a.customData && a.customData[currentSort.column] ? a.customData[currentSort.column] : '';
@@ -4425,6 +4344,8 @@
 
         function getUniqueValuesForColumn(columnId) {
             const values = new Set();
+            const tableData = getCurrentTabData();
+            const customColumns = getCurrentTabCustomColumns();
             
             tableData.forEach(row => {
                 let value;
@@ -4518,6 +4439,7 @@
             const columnId = cell.dataset.columnId;
             const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
             
+            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
                 rowData.attachments[columnId].forEach((file, index) => {
@@ -4542,6 +4464,7 @@
             const container = document.getElementById('attached-files');
             container.innerHTML = '';
             
+            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
                 rowData.attachments[columnId].forEach((file, index) => {
@@ -4571,13 +4494,16 @@
                 const columnType = currentEditingCell.dataset.columnType;
                 const columnIndex = parseInt(currentEditingCell.dataset.columnIndex);
                 
+                const currentTab = getCurrentTab();
+                if (!currentTab) return;
+                
                 if (columnType === 'basic') {
-                    basicColumns[columnIndex].name = newValue;
+                    currentTab.basicColumns[columnIndex].name = newValue;
                 } else if (columnType === 'custom') {
-                    customColumns[columnIndex].name = newValue;
+                    currentTab.customColumns[columnIndex].name = newValue;
                 }
                 
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 
                 currentEditingCell.textContent = newValue;
@@ -4585,7 +4511,10 @@
                 const columnId = currentEditingCell.dataset.columnId;
                 const rowId = parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent);
                 
+                const tableData = getCurrentTabData();
                 const rowData = tableData.find(row => row.id === rowId);
+                const customColumns = getCurrentTabCustomColumns();
+                
                 if (customColumns.find(col => col.id === columnId)) {
                     if (!rowData.customData) rowData.customData = {};
                     rowData.customData[columnId] = newValue;
@@ -4597,12 +4526,9 @@
                     }
                 }
                 
-                const currentTab = tabs.find(tab => tab.id === currentTabId);
-                if (currentTab) {
-                    currentTab.data = JSON.parse(JSON.stringify(tableData));
-                }
+                updateCurrentTabData(tableData);
                 
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
@@ -4619,17 +4545,15 @@
         }
 
         window.removeAttachment = function(rowId, columnId, fileIndex) {
+            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
                 const removedFile = rowData.attachments[columnId][fileIndex];
                 rowData.attachments[columnId].splice(fileIndex, 1);
                 
-                const currentTab = tabs.find(tab => tab.id === currentTabId);
-                if (currentTab) {
-                    currentTab.data = JSON.parse(JSON.stringify(tableData));
-                }
+                updateCurrentTabData(tableData);
                 
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 
                 if (currentEditingCell) {
@@ -4681,6 +4605,7 @@
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const tableData = getCurrentTabData();
                     const rowData = tableData.find(row => row.id === rowId);
                     if (!rowData.attachments) rowData.attachments = {};
                     if (!rowData.attachments[columnId]) rowData.attachments[columnId] = [];
@@ -4691,12 +4616,9 @@
                         data: e.target.result
                     });
                     
-                    const currentTab = tabs.find(tab => tab.id === currentTabId);
-                    if (currentTab) {
-                        currentTab.data = JSON.parse(JSON.stringify(tableData));
-                    }
+                    updateCurrentTabData(tableData);
                     
-                    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                    storageManager.saveToLocalStorage(users, appSettings, tabs);
                     autoSyncChanges();
                     
                     // Обновляем список файлов в модальном окне
@@ -4917,7 +4839,7 @@
             }
             
             users.push({ username, password, role });
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             renderUsersList();
             document.getElementById('add-user-form').reset();
@@ -4956,7 +4878,7 @@
             if (newPassword) user.password = newPassword;
             user.role = newRole;
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             renderUsersList();
         };
@@ -4964,7 +4886,7 @@
         window.deleteUser = function(index) {
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 renderUsersList();
             }
@@ -4993,7 +4915,7 @@
                     document.getElementById('header-logo').src = e.target.result;
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
-                    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                    storageManager.saveToLocalStorage(users, appSettings, tabs);
                     autoSyncChanges();
                 };
                 reader.readAsDataURL(file);
@@ -5023,7 +4945,7 @@
             const count = parseInt(document.getElementById('fixed-columns-count').value);
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
             }
         }
@@ -5033,18 +4955,23 @@
             const columnName = prompt('Введите название нового столбца:');
             if (!columnName) return;
 
+            const currentTab = getCurrentTab();
+            if (!currentTab) return;
+
             const columnId = 'col_' + Date.now();
-            customColumns.push({
+            currentTab.customColumns.push({
                 id: columnId,
                 name: columnName
             });
 
+            const tableData = getCurrentTabData();
             tableData.forEach(row => {
                 if (!row.customData) row.customData = {};
                 row.customData[columnId] = '';
             });
 
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            updateCurrentTabData(tableData);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             renderTable();
@@ -5058,6 +4985,7 @@
             const select = document.getElementById('column-to-remove');
             select.innerHTML = '';
 
+            const customColumns = getCurrentTabCustomColumns();
             customColumns.forEach(column => {
                 const option = document.createElement('option');
                 option.value = column.id;
@@ -5084,17 +5012,22 @@
 
             if (!columnId) return;
 
-            const column = customColumns.find(col => col.id === columnId);
+            const currentTab = getCurrentTab();
+            if (!currentTab) return;
+
+            const column = currentTab.customColumns.find(col => col.id === columnId);
             if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
 
+            const tableData = getCurrentTabData();
             tableData.forEach(row => {
                 if (row.customData && row.customData[columnId]) {
                     delete row.customData[columnId];
                 }
             });
 
-            customColumns = customColumns.filter(col => col.id !== columnId);
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            currentTab.customColumns = currentTab.customColumns.filter(col => col.id !== columnId);
+            updateCurrentTabData(tableData);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
 
             renderTable();
@@ -5109,7 +5042,10 @@
             
             select.innerHTML = '';
             
+            const basicColumns = getCurrentTabBasicColumns();
+            const customColumns = getCurrentTabCustomColumns();
             const allColumns = [...basicColumns, ...customColumns];
+            
             allColumns.forEach((column, index) => {
                 const option = document.createElement('option');
                 option.value = column.id;
@@ -5135,28 +5071,36 @@
             
             if (!columnId || !newPosition) return;
             
+            const currentTab = getCurrentTab();
+            if (!currentTab) return;
+            
+            const basicColumns = getCurrentTabBasicColumns();
+            const customColumns = getCurrentTabCustomColumns();
             const allColumns = [...basicColumns, ...customColumns];
+            
             const columnIndex = allColumns.findIndex(col => col.id === columnId);
             
             if (columnIndex === -1) return;
             
             const columnToMove = allColumns[columnIndex];
             
+            // Удаляем столбец из текущего массива
             if (columnIndex < basicColumns.length) {
-                basicColumns.splice(columnIndex, 1);
+                currentTab.basicColumns.splice(columnIndex, 1);
             } else {
-                customColumns.splice(columnIndex - basicColumns.length, 1);
+                currentTab.customColumns.splice(columnIndex - basicColumns.length, 1);
             }
             
             const targetPosition = newPosition - 2;
             
-            if (targetPosition < basicColumns.length) {
-                basicColumns.splice(targetPosition, 0, columnToMove);
+            // Вставляем столбец в новую позицию
+            if (targetPosition < currentTab.basicColumns.length) {
+                currentTab.basicColumns.splice(targetPosition, 0, columnToMove);
             } else {
-                customColumns.splice(targetPosition - basicColumns.length, 0, columnToMove);
+                currentTab.customColumns.splice(targetPosition - currentTab.basicColumns.length, 0, columnToMove);
             }
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             renderTable();
@@ -5260,6 +5204,11 @@
             const headers = currentImportData[0];
             const rows = currentImportData.slice(1);
             
+            const currentTab = getCurrentTab();
+            if (!currentTab) return;
+            
+            let tableData = getCurrentTabData();
+            
             if (importMode === 'replace') {
                 tableData = [];
             }
@@ -5282,8 +5231,8 @@
                             const columnName = headers[i];
                             const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
                             
-                            if (!customColumns.find(col => col.name === columnName)) {
-                                customColumns.push({
+                            if (!currentTab.customColumns.find(col => col.name === columnName)) {
+                                currentTab.customColumns.push({
                                     id: columnId,
                                     name: columnName
                                 });
@@ -5297,12 +5246,9 @@
                 }
             });
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
+            updateCurrentTabData(tableData);
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             renderTable();
@@ -5362,13 +5308,13 @@
                         const newName = this.textContent.trim();
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
-                            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                            storageManager.saveToLocalStorage(users, appSettings, tabs);
                             autoSyncChanges();
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
-                                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                                storageManager.saveToLocalStorage(users, appSettings, tabs);
                                 autoSyncChanges();
                             }
                         } else {
@@ -5387,15 +5333,7 @@
                 container.appendChild(tabElement);
             });
             
-            if (currentTabId && currentTabId !== 'tab1') {
-                const currentTab = tabs.find(tab => tab.id === currentTabId);
-                if (currentTab && currentTab.data) {
-                    tableData = currentTab.data;
-                    renderTable();
-                }
-            }
-
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            const currentTab = getCurrentTab();
             if (currentTab) {
                 document.getElementById('header-title').textContent = currentTab.name;
             }
@@ -5410,55 +5348,42 @@
             const tabId = 'tab_' + Date.now();
             const tabName = `Таблица ${tabs.length + 1}`;
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
-            
             const newTab = {
                 id: tabId,
                 name: tabName,
-                data: [
+                tableData: [
                     { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
                 ],
-                customButtons: [] // НОВОЕ: каждая вкладка имеет свои собственные кнопки
+                customButtons: [],
+                customColumns: [],
+                basicColumns: [
+                    { id: 'id', name: '№ п/п', editable: false },
+                    { id: 'name', name: 'Название', editable: true },
+                    { id: 'date', name: 'Дата создания', editable: true },
+                    { id: 'status', name: 'Статус', editable: true }
+                ],
+                dateValidationColumns: {}
             };
             
             tabs.push(newTab);
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             currentTabId = tabId;
-            tableData = JSON.parse(JSON.stringify(newTab.data));
             
             renderTabs();
             renderTable();
-            loadCustomButtons(); // НОВОЕ: загружаем кнопки для новой вкладки
+            loadCustomButtons();
             resetFiltersAndSearch();
         }
 
         function switchTab(tabId) {
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
-            
             currentTabId = tabId;
-            const newTab = tabs.find(tab => tab.id === tabId);
             
-            if (newTab && newTab.data) {
-                tableData = JSON.parse(JSON.stringify(newTab.data));
-            } else {
-                if (tabId === 'tab1') {
-                    const data = storageManager.loadFromLocalStorage();
-                    tableData = data.tableData;
-                }
-            }
-            
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             renderTabs();
             renderTable();
-            loadCustomButtons(); // НОВОЕ: загружаем кнопки при переключении вкладок
+            loadCustomButtons();
             resetFiltersAndSearch();
         }
 
@@ -5477,21 +5402,13 @@
             
             if (tabId === currentTabId) {
                 currentTabId = tabs[0].id;
-                const firstTab = tabs[0];
-                
-                if (firstTab.data) {
-                    tableData = JSON.parse(JSON.stringify(firstTab.data));
-                } else if (firstTab.id === 'tab1') {
-                    const data = storageManager.loadFromLocalStorage();
-                    tableData = data.tableData;
-                }
             }
             
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             renderTabs();
             renderTable();
-            loadCustomButtons(); // НОВОЕ: загружаем кнопки после закрытия вкладки
+            loadCustomButtons();
         }
 
         function resetFiltersAndSearch() {
@@ -5572,6 +5489,9 @@
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
         function exportToExcel() {
+            const tableData = getCurrentTabData();
+            const customColumns = getCurrentTabCustomColumns();
+            
             const exportData = [];
             const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
             
@@ -5614,7 +5534,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            const currentTab = getCurrentTab();
             const fileName = currentTab ? currentTab.name : 'таблица';
             
             link.setAttribute('href', url);
@@ -5649,11 +5569,13 @@
             selectAllTh.appendChild(selectAllCheckbox);
             thead.appendChild(selectAllTh);
             
+            const basicColumns = getCurrentTabBasicColumns();
             basicColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'basic');
                 thead.appendChild(th);
             });
             
+            const customColumns = getCurrentTabCustomColumns();
             customColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'custom');
                 thead.appendChild(th);
@@ -5680,6 +5602,7 @@
             
             tbody.innerHTML = '';
             
+            let tableData = getCurrentTabData();
             let filteredData = applyFilters(tableData);
             filteredData = applySearch(filteredData);
             let sortedData = applySorting(filteredData);
@@ -5728,11 +5651,7 @@
                 tbody.appendChild(row);
             });
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-            }
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
         }
 
         function createHeaderCell(column, index, type) {
@@ -5814,6 +5733,7 @@
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
             
+            const dateValidationColumns = getCurrentTabDateValidationColumns();
             const isDateColumn = dateValidationColumns[column.id];
             
             td.dataset.columnId = column.id;
@@ -5989,12 +5909,10 @@
                     rowData.customData[column.id] = newValue;
                 }
                 
-                const currentTab = tabs.find(tab => tab.id === currentTabId);
-                if (currentTab) {
-                    currentTab.data = JSON.parse(JSON.stringify(tableData));
-                }
+                const tableData = getCurrentTabData();
+                updateCurrentTabData(tableData);
                 
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
                 autoSyncChanges();
                 
                 // Восстанавливаем ячейку с новым значением
@@ -6060,20 +5978,18 @@
                 return;
             }
             
-            tableData = tableData.filter(row => row.id !== rowId);
+            const tableData = getCurrentTabData();
+            const updatedData = tableData.filter(row => row.id !== rowId);
             
-            tableData.forEach((row, index) => {
+            updatedData.forEach((row, index) => {
                 row.displayId = index + 1;
             });
             
+            updateCurrentTabData(updatedData);
+            
             selectedRows.delete(rowId);
             
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            if (currentTab) {
-                currentTab.data = JSON.parse(JSON.stringify(tableData));
-            }
-            
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
             renderTable();
@@ -6089,6 +6005,8 @@
                         return filterValue.includes(row.id);
                     } else {
                         let value;
+                        
+                        const customColumns = getCurrentTabCustomColumns();
                         
                         if (customColumns.find(col => col.id === filterType)) {
                             value = row.customData && row.customData[filterType] ? row.customData[filterType] : '';
