@@ -2062,7 +2062,12 @@
                     <label for="password">Пароль</label>
                     <input type="password" id="password" required>
                 </div>
-                <button type="submit">Войти</button>
+                <div class="form-group">
+                    <button type="submit">Войти</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="register-btn">Регистрация</button>
+                </div>
             </form>
         </div>
     </div>
@@ -3368,6 +3373,30 @@
             }
         }
 
+        // ФУНКЦИЯ РЕГИСТРАЦИИ
+        function handleRegister() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Проверяем, существует ли пользователь
+            if (users.find(u => u.username === username)) {
+                alert('Пользователь с таким именем уже существует');
+                return;
+            }
+
+            // Создаем нового пользователя с ролью user
+            const newUser = { username, password, role: 'user' };
+            users.push(newUser);
+            
+            // Сохраняем в localStorage
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            
+            // Автоматически входим под новым пользователем
+            completeLogin(newUser);
+            
+            alert('Регистрация прошла успешно!');
+        }
+
         function completeLogin(user) {
             currentUser = user;
             document.getElementById('login-screen').style.display = 'none';
@@ -3454,6 +3483,12 @@
             document.getElementById('login-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleLogin();
+            });
+            
+            // Регистрация
+            document.getElementById('register-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                handleRegister();
             });
             
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -3942,7 +3977,7 @@
         }
 
         function renderDatePicker(container, date, cell) {
-            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
             const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
             
             const currentMonth = date.getMonth();
