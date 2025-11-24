@@ -100,18 +100,6 @@
           },
           "attachments": {},
           "displayId": 3
-        },
-        {
-          "id": 4,
-          "name": "Новый проект",
-          "date": "24.11.2025",
-          "status": "Активен",
-          "customData": {
-            "col_1764003032137tswwjgzg5": "",
-            "col_1764003032137vox91ama8": ""
-          },
-          "attachments": {},
-          "displayId": 4
         }
       ],
       "customButtons": [],
@@ -205,7 +193,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T19:20:20.060Z",
+  "lastSync": "2025-11-24T19:21:44.617Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
