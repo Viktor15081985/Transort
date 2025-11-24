@@ -38,6 +38,15 @@
       },
       "attachments": {},
       "displayId": 3
+    },
+    {
+      "id": 4,
+      "name": "Новый проект",
+      "date": "24.11.2025",
+      "status": "Активен",
+      "customData": {},
+      "attachments": {},
+      "displayId": 4
     }
   ],
   "users": [
@@ -111,7 +120,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-24T05:01:28.852Z",
+  "lastSync": "2025-11-24T05:02:40.757Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
