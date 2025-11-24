@@ -14,7 +14,7 @@
   "appSettings": {
     "headerTitle": "Основное окно",
     "headerLogo": "",
-    "fixedColumnsCount": 3,
+    "fixedColumnsCount": 4,
     "currentTheme": "theme-orange"
   },
   "tabs": [
@@ -109,6 +109,6 @@
       }
     }
   ],
-  "lastSync": "2025-11-24T16:50:32.137Z",
+  "lastSync": "2025-11-24T17:52:29.956Z",
   "lastEditor": "admin"
 }
