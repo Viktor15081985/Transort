@@ -91,6 +91,15 @@
           "customData": {},
           "attachments": {},
           "displayId": 3
+        },
+        {
+          "id": 4,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 4
         }
       ],
       "customButtons": [
@@ -132,7 +141,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T19:59:04.710Z",
+  "lastSync": "2025-11-24T20:06:15.749Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
