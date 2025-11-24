@@ -6,7 +6,8 @@
       "date": "24.11.2025",
       "status": "Активен",
       "customData": {
-        "col_1763927601006_0": "05.11.2025"
+        "col_1763927601006_0": "05.11.2025",
+        "col_1763960675780_1": "6515"
       },
       "attachments": {},
       "displayId": 1
@@ -157,7 +158,7 @@
       "data": null
     }
   ],
-  "lastSync": "2025-11-24T05:24:55.152Z",
+  "lastSync": "2025-11-24T05:33:01.764Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
