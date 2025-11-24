@@ -10,7 +10,7 @@
     },
     {
       "id": 2,
-      "name": "Проект Б", 
+      "name": "Проект Б",
       "date": "05.10.2023",
       "status": "Завершен",
       "customData": {},
@@ -20,7 +20,7 @@
   "users": [
     {
       "username": "admin",
-      "password": "admin", 
+      "password": "admin",
       "role": "admin"
     },
     {
@@ -30,9 +30,9 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Основное окно",
+    "headerTitle": "Таблицппппппппппа 2",
     "headerLogo": "",
-    "fixedColumnsCount": 3,
+    "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
   },
   "customButtons": [],
@@ -44,7 +44,7 @@
       "editable": false
     },
     {
-      "id": "name", 
+      "id": "name",
       "name": "Название",
       "editable": true
     },
@@ -55,7 +55,7 @@
     },
     {
       "id": "status",
-      "name": "Статус", 
+      "name": "Статус",
       "editable": true
     }
   ],
@@ -64,9 +64,148 @@
     {
       "id": "tab1",
       "name": "Основное окно",
-      "data": null
+      "tableData": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1764003032137vox91ama8": "",
+            "col_1764003032137tswwjgzg5": ""
+          },
+          "attachments": {},
+          "displayId": 1
+        },
+        {
+          "id": 2,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1764003032137vox91ama8": "",
+            "col_1764003032137tswwjgzg5": ""
+          },
+          "attachments": {},
+          "displayId": 2
+        },
+        {
+          "id": 3,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1764003032137vox91ama8": "",
+            "col_1764003032137tswwjgzg5": ""
+          },
+          "attachments": {},
+          "displayId": 3
+        },
+        {
+          "id": 4,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1764003032137tswwjgzg5": "",
+            "col_1764003032137vox91ama8": ""
+          },
+          "attachments": {},
+          "displayId": 4
+        }
+      ],
+      "customButtons": [],
+      "customColumns": [
+        {
+          "id": "col_1764003032137vox91ama8",
+          "name": "1"
+        },
+        {
+          "id": "col_1764003032137tswwjgzg5",
+          "name": "2"
+        }
+      ],
+      "basicColumns": [
+        {
+          "id": "id",
+          "name": "№ п/п",
+          "editable": false
+        },
+        {
+          "id": "name",
+          "name": "Название",
+          "editable": true
+        },
+        {
+          "id": "date",
+          "name": "Дата создания",
+          "editable": true
+        },
+        {
+          "id": "status",
+          "name": "Статус",
+          "editable": true
+        }
+      ],
+      "dateValidationColumns": {
+        "col_1764003032137vox91ama8": true
+      }
+    },
+    {
+      "id": "tab_1764011768332",
+      "name": "Таблицппппппппппа 2",
+      "tableData": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 1
+        }
+      ],
+      "customButtons": [
+        {
+          "id": "btn_1764011828786",
+          "name": "111111111111",
+          "columns": [
+            "а",
+            "аа",
+            "ууу"
+          ],
+          "dateColumns": [
+            "а"
+          ]
+        }
+      ],
+      "customColumns": [],
+      "basicColumns": [
+        {
+          "id": "id",
+          "name": "№ п/п",
+          "editable": false
+        },
+        {
+          "id": "name",
+          "name": "Название",
+          "editable": true
+        },
+        {
+          "id": "date",
+          "name": "Дата создания",
+          "editable": true
+        },
+        {
+          "id": "status",
+          "name": "Статус",
+          "editable": true
+        }
+      ],
+      "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2024-01-01T00:00:00.000Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-24T19:20:20.060Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
