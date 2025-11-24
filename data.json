@@ -64,10 +64,75 @@
     {
       "id": "tab1",
       "name": "Основное окно",
-      "data": null
+      "tableData": [
+        {
+          "id": 1,
+          "name": "Проект А",
+          "date": "01.10.2023",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 1
+        },
+        {
+          "id": 2,
+          "name": "Проект Б",
+          "date": "05.10.2023",
+          "status": "Завершен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 2
+        },
+        {
+          "id": 3,
+          "name": "Проект В",
+          "date": "10.10.2023",
+          "status": "В процессе",
+          "customData": {},
+          "attachments": {},
+          "displayId": 3
+        }
+      ],
+      "customButtons": [
+        {
+          "id": "btn_1764014344696",
+          "name": "2020",
+          "columns": [
+            "00",
+            "115"
+          ],
+          "dateColumns": [
+            "00"
+          ]
+        }
+      ],
+      "customColumns": [],
+      "basicColumns": [
+        {
+          "id": "id",
+          "name": "№ п/п",
+          "editable": false
+        },
+        {
+          "id": "name",
+          "name": "Название",
+          "editable": true
+        },
+        {
+          "id": "date",
+          "name": "Дата создания",
+          "editable": true
+        },
+        {
+          "id": "status",
+          "name": "Статус",
+          "editable": true
+        }
+      ],
+      "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T19:27:43.473Z",
+  "lastSync": "2025-11-24T19:59:04.710Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
