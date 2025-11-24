@@ -5906,7 +5906,7 @@
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
                         const cellDate = parseDate(value);
-                        const timeDiff = cellDate.getTime() - today.getTime());
+                        const timeDiff = cellDate.getTime() - today.getTime();
                         const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
                         
                         if (daysDiff < 0) {
@@ -6174,3 +6174,4 @@
     </script>
 </body>
 </html>
+
