@@ -6051,22 +6051,22 @@
         }
 
         // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAppWithFallback();  // <-- ДОБАВЬТЕ ЭТУ СТРОКУ
-    
-    setInterval(updateStatusBar, 30000);
-    
-    window.addEventListener('online', function() {
-        updateSyncStatus('Восстановлено соединение', 'success');
-        if (storageManager.pendingChanges.length > 0) {
-            storageManager.trySyncChanges(updateSyncStatus);
-        }
-    });
-    
-    window.addEventListener('offline', function() {
-        updateSyncStatus('Отсутствует соединение', 'error');
-    });
-});
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAppWithFallback();
+            
+            setInterval(updateStatusBar, 30000);
+            
+            window.addEventListener('online', function() {
+                updateSyncStatus('Восстановлено соединение', 'success');
+                if (storageManager.pendingChanges.length > 0) {
+                    storageManager.trySyncChanges(updateSyncStatus);
+                }
+            });
+            
+            window.addEventListener('offline', function() {
+                updateSyncStatus('Отсутствует соединение', 'error');
+            });
+        });
     </script>
 </body>
 </html>
