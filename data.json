@@ -14,7 +14,7 @@
   "appSettings": {
     "headerTitle": "Основное окно",
     "headerLogo": "",
-    "fixedColumnsCount": 4,
+    "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
   },
   "tabs": [
@@ -24,8 +24,8 @@
       "tableData": [
         {
           "id": 1,
-          "name": "Проект А",
-          "date": "01.10.2023",
+          "name": "Новый проект",
+          "date": "24.11.2025",
           "status": "Активен",
           "customData": {
             "col_1764003032137vox91ama8": "",
@@ -36,9 +36,9 @@
         },
         {
           "id": 2,
-          "name": "Проект Б",
-          "date": "05.10.2023",
-          "status": "Завершен",
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
           "customData": {
             "col_1764003032137vox91ama8": "",
             "col_1764003032137tswwjgzg5": ""
@@ -48,15 +48,27 @@
         },
         {
           "id": 3,
-          "name": "Проект В",
-          "date": "10.10.2023",
-          "status": "В процессе",
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
           "customData": {
             "col_1764003032137vox91ama8": "",
             "col_1764003032137tswwjgzg5": ""
           },
           "attachments": {},
           "displayId": 3
+        },
+        {
+          "id": 4,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {
+            "col_1764003032137tswwjgzg5": "",
+            "col_1764003032137vox91ama8": ""
+          },
+          "attachments": {},
+          "displayId": 4
         }
       ],
       "customButtons": [
@@ -109,6 +121,7 @@
       }
     }
   ],
-  "lastSync": "2025-11-24T17:52:29.956Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-24T19:09:07.624Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
