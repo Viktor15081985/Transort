@@ -119,9 +119,49 @@
       "dateValidationColumns": {
         "col_1764003032137vox91ama8": true
       }
+    },
+    {
+      "id": "tab_1764011768332",
+      "name": "Таблица 2",
+      "tableData": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {},
+          "displayId": 1
+        }
+      ],
+      "customButtons": [],
+      "customColumns": [],
+      "basicColumns": [
+        {
+          "id": "id",
+          "name": "№ п/п",
+          "editable": false
+        },
+        {
+          "id": "name",
+          "name": "Название",
+          "editable": true
+        },
+        {
+          "id": "date",
+          "name": "Дата создания",
+          "editable": true
+        },
+        {
+          "id": "status",
+          "name": "Статус",
+          "editable": true
+        }
+      ],
+      "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T19:09:53.697Z",
+  "lastSync": "2025-11-24T19:16:09.300Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
