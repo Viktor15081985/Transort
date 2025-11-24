@@ -12,7 +12,7 @@
     }
   ],
   "appSettings": {
-    "headerTitle": "Основное окно",
+    "headerTitle": "Таблицппппппппппа 2",
     "headerLogo": "",
     "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
@@ -122,7 +122,7 @@
     },
     {
       "id": "tab_1764011768332",
-      "name": "Таблица 2",
+      "name": "Таблицппппппппппа 2",
       "tableData": [
         {
           "id": 1,
@@ -134,7 +134,20 @@
           "displayId": 1
         }
       ],
-      "customButtons": [],
+      "customButtons": [
+        {
+          "id": "btn_1764011828786",
+          "name": "111111111111",
+          "columns": [
+            "а",
+            "аа",
+            "ууу"
+          ],
+          "dateColumns": [
+            "а"
+          ]
+        }
+      ],
       "customColumns": [],
       "basicColumns": [
         {
@@ -161,7 +174,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T19:16:09.300Z",
+  "lastSync": "2025-11-24T19:17:09.207Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
