@@ -97,13 +97,7 @@
             box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
         }
 
-        .login-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .login-buttons button {
-            flex: 1;
+        button {
             padding: 0.9rem 1.5rem;
             background: var(--accent-color);
             color: white;
@@ -120,7 +114,7 @@
             text-align: center;
         }
 
-        .login-buttons button:hover {
+        button:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
             box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
@@ -2068,10 +2062,7 @@
                     <label for="password">Пароль</label>
                     <input type="password" id="password" required>
                 </div>
-                <div class="form-group login-buttons">
-                    <button type="submit">Войти</button>
-                    <button type="button" id="register-btn">Регистрация</button>
-                </div>
+                <button type="submit">Войти</button>
             </form>
         </div>
     </div>
@@ -2888,19 +2879,6 @@
                     merged.customColumns = localData.customColumns;
                 }
 
-                // Слияние вкладок
-                if (localData.tabs && remoteData.tabs) {
-                    console.log('📑 Слияние вкладок...');
-                    const tabMap = new Map(remoteData.tabs.map(tab => [tab.id, tab]));
-                    
-                    localData.tabs.forEach(localTab => {
-                        tabMap.set(localTab.id, localTab);
-                    });
-                    
-                    merged.tabs = Array.from(tabMap.values());
-                    console.log(`✅ Вкладки объединены: ${merged.tabs.length} вкладок`);
-                }
-
                 console.log('🎉 Слияние завершено успешно');
                 return merged;
             }
@@ -2979,12 +2957,7 @@
         let currentImportData = null;
 
         // Переменные для системы онлайн-пользователей и конфликтов
-        let onlineUsers = {};
-        try {
-            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-        } catch (e) {
-            onlineUsers = {};
-        }
+        let onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
         let lastDataHash = localStorage.getItem('lastDataHash') || '';
         let adminConflictData = null;
         let currentConflict = null;
@@ -2992,36 +2965,32 @@
         // Глобальная переменная для управления файлами
         let currentFileManagementCell = null;
 
-        // Интервал для обновления статус-бара
-        let statusBarInterval = null;
-
         // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
         function updateStatusBar() {
+            if (!currentUser) return;
+            
+            const adminCount = Object.values(onlineUsers).filter(user => user.role === 'admin').length;
+            const userCount = Object.values(onlineUsers).filter(user => user.role === 'user').length;
+            
             if (currentUser) {
                 onlineUsers[currentUser.username] = {
                     username: currentUser.username,
                     role: currentUser.role,
                     lastActive: Date.now()
                 };
+                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
             }
-
+            
             const now = Date.now();
             Object.keys(onlineUsers).forEach(username => {
-                const user = onlineUsers[username];
-                if (user && now - user.lastActive > 300000) {
+                if (now - onlineUsers[username].lastActive > 300000) {
                     delete onlineUsers[username];
                 }
             });
-
             localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-
-            const adminCount = Object.values(onlineUsers).filter(user => user && user.role === 'admin').length;
-            const userCount = Object.values(onlineUsers).filter(user => user && user.role === 'user').length;
-
+            
             const statusBar = document.getElementById('status-bar-header');
-            if (statusBar) {
-                statusBar.setAttribute('data-tooltip', `Администраторов: ${adminCount}, Пользователей: ${userCount}`);
-            }
+            statusBar.setAttribute('data-tooltip', `Администраторов: ${adminCount}, Пользователей: ${userCount}`);
         }
 
         // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ СТАТУСА СИНХРОНИЗАЦИИ В ХЕДЕРЕ
@@ -3029,25 +2998,23 @@
             const statusElement = document.getElementById('sync-status-text');
             const statusBar = document.getElementById('status-bar-header');
             
-            if (statusElement) statusElement.textContent = message;
+            statusElement.textContent = message;
             
-            if (statusBar) {
-                statusBar.classList.remove('syncing', 'success', 'error');
-                
-                if (type) {
-                    statusBar.classList.add(type);
-                }
-                
-                const syncIcon = statusBar.querySelector('.sync-icon');
-                if (type === 'syncing') {
-                    if (syncIcon) syncIcon.textContent = '🔄';
-                } else if (type === 'success') {
-                    if (syncIcon) syncIcon.textContent = '✅';
-                } else if (type === 'error') {
-                    if (syncIcon) syncIcon.textContent = '❌';
-                } else {
-                    if (syncIcon) syncIcon.textContent = '🔗';
-                }
+            statusBar.classList.remove('syncing', 'success', 'error');
+            
+            if (type) {
+                statusBar.classList.add(type);
+            }
+            
+            const syncIcon = statusBar.querySelector('.sync-icon');
+            if (type === 'syncing') {
+                syncIcon.textContent = '🔄';
+            } else if (type === 'success') {
+                syncIcon.textContent = '✅';
+            } else if (type === 'error') {
+                syncIcon.textContent = '❌';
+            } else {
+                syncIcon.textContent = '🔗';
             }
         }
 
@@ -3163,12 +3130,6 @@
                 }
             }
             
-            if (remoteData.tabs && localData.tabs) {
-                if (remoteData.tabs.length !== localData.tabs.length) {
-                    changes.push(`Количество вкладок: ${remoteData.tabs.length} → ${localData.tabs.length}`);
-                }
-            }
-            
             if (remoteData.lastEditor) {
                 changes.push(`Последний редактор: ${remoteData.lastEditor}`);
             }
@@ -3198,7 +3159,6 @@
             renderTabs();
             renderTable();
             loadCustomButtons();
-            checkAllDates();
         }
 
         // УЛУЧШЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ИЗ GITHUB
@@ -3249,9 +3209,6 @@
             renderTabs();
             renderTable();
             loadCustomButtons();
-            
-            // УБИРАЕМ АВТОМАТИЧЕСКУЮ ПРОВЕРКУ ДАТ ПРИ ЗАГРУЗКЕ
-            // checkAllDates();
             
             updateSyncStatus('Используются локальные данные', '');
             
@@ -3307,6 +3264,8 @@
             setupEventListeners();
             loadAppSettings();
             
+            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
+            
             // Загружаем пользователей при инициализации
             if (users.length === 0) {
                 const data = storageManager.loadFromLocalStorage();
@@ -3349,56 +3308,39 @@
             }
         }
 
-       // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
-function handleLogin() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    // Если пользователи не загружены, загружаем их
-    if (users.length === 0) {
-        const data = storageManager.loadFromLocalStorage();
-        users = data.users || [];
-        
-        // Если все еще нет пользователей, используем по умолчанию
-        if (users.length === 0) {
-            users = [
-                { username: 'admin', password: 'admin', role: 'admin' },
-                { username: 'user', password: 'user', role: 'user' }
-            ];
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-        }
-    }
-
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-        completeLogin(user);
-    } else {
-        alert('Неверное имя пользователя или пароль');
-    }
-}
-
-        // ФУНКЦИЯ РЕГИСТРАЦИИ
-        function handleRegister() {
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
+        function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Проверяем, существует ли пользователь
-            if (users.find(u => u.username === username)) {
-                alert('Пользователь с таким именем уже существует');
-                return;
+            // Попытка загрузить пользователей из GitHub для новых устройств
+            if (users.length === 0 || !users.find(u => u.username === 'admin')) {
+                loadUsersFromGitHub().then(() => {
+                    // После загрузки пользователей пробуем войти
+                    const user = users.find(u => u.username === username && u.password === password);
+                    if (user) {
+                        completeLogin(user);
+                    } else {
+                        alert('Неверное имя пользователя или пароль');
+                    }
+                }).catch(error => {
+                    console.log('Не удалось загрузить пользователей из GitHub:', error);
+                    // Пробуем найти пользователя в локальных данных
+                    const user = users.find(u => u.username === username && u.password === password);
+                    if (user) {
+                        completeLogin(user);
+                    } else {
+                        alert('Неверное имя пользователя или пароль');
+                    }
+                });
+            } else {
+                const user = users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    completeLogin(user);
+                } else {
+                    alert('Неверное имя пользователя или пароль');
+                }
             }
-
-            // Создаем нового пользователя с ролью user
-            const newUser = { username, password, role: 'user' };
-            users.push(newUser);
-            
-            // Сохраняем в localStorage
-            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-            
-            // Автоматически входим под новым пользователем
-            completeLogin(newUser);
-            
-            alert('Регистрация прошла успешно!');
         }
 
         function completeLogin(user) {
@@ -3423,8 +3365,9 @@ function handleLogin() {
             
             initializeAppWithFallback();
             
-            // Запускаем обновление статус-бара каждые 30 секунд
-            statusBarInterval = setInterval(updateStatusBar, 30000);
+            setTimeout(() => {
+                checkAllDates();
+            }, 1000);
         }
 
         // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
@@ -3432,11 +3375,7 @@ function handleLogin() {
             if (currentUser) {
                 delete onlineUsers[currentUser.username];
                 localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            }
-            
-            if (statusBarInterval) {
-                clearInterval(statusBarInterval);
-                statusBarInterval = null;
+                updateStatusBar();
             }
             
             currentUser = null;
@@ -3444,41 +3383,28 @@ function handleLogin() {
             document.getElementById('login-screen').style.display = 'flex';
             document.body.classList.remove('admin');
             
-            // Сброс фильтров и поиска
-            currentFilters = {};
-            searchTerm = '';
-            selectedRows.clear();
-            document.getElementById('table-search').value = '';
-            document.getElementById('select-all-checkbox').checked = false;
-            closeAllFilterDropdowns();
-            
             // Очищаем форму входа
             document.getElementById('login-form').reset();
         }
 
         function setupAdminFeatures() {
             const headerTitle = document.getElementById('header-title');
-            if (headerTitle) {
-                headerTitle.classList.add('editable');
-                headerTitle.contentEditable = 'true';
-                headerTitle.addEventListener('blur', function() {
-                    appSettings.headerTitle = this.textContent;
-                    storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-                    autoSyncChanges();
-                });
-                
-                headerTitle.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.blur();
-                    }
-                });
-            }
+            headerTitle.classList.add('editable');
+            headerTitle.contentEditable = 'true';
+            headerTitle.addEventListener('blur', function() {
+                appSettings.headerTitle = this.textContent;
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+                autoSyncChanges();
+            });
+            
+            headerTitle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+            });
 
-            const fixedColumnsInput = document.getElementById('fixed-columns-count');
-            if (fixedColumnsInput) {
-                fixedColumnsInput.value = appSettings.fixedColumnsCount || 3;
-            }
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
         // ОСТАВШИЕСЯ ФУНКЦИИ (исправленные)
@@ -3487,12 +3413,6 @@ function handleLogin() {
             document.getElementById('login-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleLogin();
-            });
-            
-            // Регистрация
-            document.getElementById('register-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                handleRegister();
             });
             
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -3594,25 +3514,18 @@ function handleLogin() {
             const fileUploadArea = document.getElementById('file-upload-area');
             const fileInput = document.getElementById('file-input');
             
-            if (fileUploadArea) {
-                fileUploadArea.addEventListener('click', function() {
-                    fileInput.click();
-                });
-            }
+            fileUploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
 
-            if (fileInput) {
-                fileInput.addEventListener('change', function(e) {
-                    handleFileUpload(e.target.files);
-                });
-            }
+            fileInput.addEventListener('change', function(e) {
+                handleFileUpload(e.target.files);
+            });
 
             setupFileDropZone();
 
             // Логотип
-            const headerLogo = document.getElementById('header-logo');
-            if (headerLogo) {
-                headerLogo.addEventListener('click', triggerLogoUpload);
-            }
+            document.getElementById('header-logo').addEventListener('click', triggerLogoUpload);
             document.getElementById('logo-upload').addEventListener('change', handleLogoUpload);
 
             // Закрытие фильтров при клике вне их
@@ -3686,10 +3599,7 @@ function handleLogin() {
         }
 
         function showModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'flex';
-            }
+            document.getElementById(modalId).style.display = 'flex';
             
             if (modalId === 'users-modal') {
                 renderUsersList();
@@ -3710,8 +3620,8 @@ function handleLogin() {
             const container = document.getElementById('columns-container');
             const dateContainer = document.getElementById('date-validation-columns');
             
-            if (container) container.innerHTML = '';
-            if (dateContainer) dateContainer.innerHTML = '';
+            container.innerHTML = '';
+            dateContainer.innerHTML = '';
             
             for (let i = 0; i < count; i++) {
                 const inputGroup = document.createElement('div');
@@ -3720,7 +3630,7 @@ function handleLogin() {
                     <input type="text" placeholder="Название столбца ${i + 1}" required 
                            style="width: 100%; padding: 0.5rem; border: 1px solid #4a4a4a; border-radius: 5px; background: #2f2f2f; color: #ecf0f1;">
                 `;
-                if (container) container.appendChild(inputGroup);
+                container.appendChild(inputGroup);
 
                 const dateCheckbox = document.createElement('div');
                 dateCheckbox.style.marginBottom = '5px';
@@ -3730,7 +3640,7 @@ function handleLogin() {
                         Проверять даты в столбце "${i + 1}"
                     </label>
                 `;
-                if (dateContainer) dateContainer.appendChild(dateCheckbox);
+                dateContainer.appendChild(dateCheckbox);
             }
         }
 
@@ -3912,13 +3822,10 @@ function handleLogin() {
         }
 
         function loadCustomButtons() {
-            const container = document.getElementById('custom-buttons');
-            if (container) {
-                container.innerHTML = '';
-                customButtons.forEach(button => {
-                    createCustomButton(button);
-                });
-            }
+            document.getElementById('custom-buttons').innerHTML = '';
+            customButtons.forEach(button => {
+                createCustomButton(button);
+            });
         }
 
         // ФУНКЦИИ ДЛЯ РАБОТЫ С ДАТАМИ
@@ -3981,7 +3888,7 @@ function handleLogin() {
         }
 
         function renderDatePicker(container, date, cell) {
-            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
             const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
             
             const currentMonth = date.getMonth();
@@ -4163,7 +4070,6 @@ function handleLogin() {
             }
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ ДАТ
         function checkAllDates() {
             const expiredDates = [];
             const upcomingDates = [];
@@ -4171,12 +4077,12 @@ function handleLogin() {
             today.setHours(0, 0, 0, 0);
             
             tableData.forEach(row => {
-                // Проверяем базовые столбцы с датами
-                if (dateValidationColumns['date'] && row.date) {
-                    checkDateCell(row, 'date', 'Дата создания', today, expiredDates, upcomingDates);
-                }
+                basicColumns.forEach(column => {
+                    if (dateValidationColumns[column.id] && row[column.id]) {
+                        checkDateCell(row, column.id, column.name, today, expiredDates, upcomingDates);
+                    }
+                });
                 
-                // Проверяем пользовательские столбцы с датами
                 customColumns.forEach(column => {
                     if (dateValidationColumns[column.id] && row.customData && row.customData[column.id]) {
                         checkDateCell(row, column.id, column.name, today, expiredDates, upcomingDates);
@@ -4698,7 +4604,6 @@ function handleLogin() {
         // ФУНКЦИИ РАБОТЫ С ФАЙЛАМИ
         function setupFileDropZone() {
             const dropZone = document.getElementById('file-upload-area');
-            if (!dropZone) return;
             
             dropZone.addEventListener('dragover', function(e) {
                 e.preventDefault();
@@ -5114,15 +5019,6 @@ function handleLogin() {
             const select = document.getElementById('column-to-remove');
             select.innerHTML = '';
 
-            // Добавляем базовые столбцы
-            basicColumns.forEach(column => {
-                const option = document.createElement('option');
-                option.value = column.id;
-                option.textContent = column.name;
-                select.appendChild(option);
-            });
-
-            // Добавляем пользовательские столбцы
             customColumns.forEach(column => {
                 const option = document.createElement('option');
                 option.value = column.id;
@@ -5130,9 +5026,9 @@ function handleLogin() {
                 select.appendChild(option);
             });
 
-            if (basicColumns.length === 0 && customColumns.length === 0) {
+            if (customColumns.length === 0) {
                 const option = document.createElement('option');
-                option.textContent = 'Нет столбцов для удаления';
+                option.textContent = 'Нет пользовательских столбцов для удаления';
                 option.disabled = true;
                 select.appendChild(option);
                 document.getElementById('confirm-remove-column').disabled = true;
@@ -5149,22 +5045,16 @@ function handleLogin() {
 
             if (!columnId) return;
 
-            const column = [...basicColumns, ...customColumns].find(col => col.id === columnId);
+            const column = customColumns.find(col => col.id === columnId);
             if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
 
-            // Удаляем из базовых столбцов
-            basicColumns = basicColumns.filter(col => col.id !== columnId);
-            
-            // Удаляем из пользовательских столбцов
-            customColumns = customColumns.filter(col => col.id !== columnId);
-            
-            // Удаляем данные из таблицы
             tableData.forEach(row => {
                 if (row.customData && row.customData[columnId]) {
                     delete row.customData[columnId];
                 }
             });
 
+            customColumns = customColumns.filter(col => col.id !== columnId);
             storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
             autoSyncChanges();
 
@@ -5940,7 +5830,6 @@ function handleLogin() {
                         }
                     });
                     
-                    // ПРОВЕРКА ДАТ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
                     if (value && isValidDate(value)) {
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
@@ -5995,45 +5884,14 @@ function handleLogin() {
                     // Добавляем визуальный курсор для указания возможности редактирования
                     td.style.cursor = 'text';
                 }
-            } else {
-                // ДЛЯ ПОЛЬЗОВАТЕЛЕЙ - ТОЛЬКО ПРОСМОТР
-                if (isDateColumn) {
-                    // Проверка дат для пользователей
-                    td.classList.add('date-cell');
-                    
-                    if (value && isValidDate(value)) {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const cellDate = parseDate(value);
-                        const timeDiff = cellDate.getTime() - today.getTime();
-                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                        
-                        if (daysDiff < 0) {
-                            td.classList.add('date-cell-danger');
-                        } else if (daysDiff <= 30) {
-                            td.classList.add('date-cell-warning');
-                        } else {
-                            td.classList.remove('date-cell-warning', 'date-cell-danger');
-                        }
-                    }
-                }
-                
-                // Пользователи могут только просматривать файлы
-                td.addEventListener('dblclick', (e) => {
-                    if (e.target.closest('.file-icons')) return;
-                    
-                    if (rowData.attachments && rowData.attachments[column.id] && rowData.attachments[column.id].length > 0) {
-                        openFilePreview(rowData.attachments[column.id][0], rowData.id, column.id, 0);
-                    }
-                });
             }
             
             return td;
         }
 
         // НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
-        function startTextEditing(td, rowData, column, type, currentValue) {
-            const originalContent = td.innerHTML;
+        function startTextEditing(cell, rowData, column, type, currentValue) {
+            const originalContent = cell.innerHTML;
             
             // Создаем input для редактирования
             const input = document.createElement('input');
@@ -6050,8 +5908,8 @@ function handleLogin() {
             input.className = 'cell-input';
             
             // Заменяем содержимое ячейки на input
-            td.innerHTML = '';
-            td.appendChild(input);
+            cell.innerHTML = '';
+            cell.appendChild(input);
             input.focus();
             input.select();
             
@@ -6091,7 +5949,7 @@ function handleLogin() {
                     saveChanges();
                 } else if (e.key === 'Escape') {
                     // Отмена редактирования - восстанавливаем оригинальное содержимое
-                    td.innerHTML = originalContent;
+                    cell.innerHTML = originalContent;
                 }
             });
             
@@ -6192,7 +6050,7 @@ function handleLogin() {
             });
         }
 
-       // Инициализация при загрузке страницы
+        // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     initializeAppWithFallback();  // <-- ДОБАВЬТЕ ЭТУ СТРОКУ
     
