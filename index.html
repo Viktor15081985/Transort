@@ -2954,6 +2954,7 @@
                 renderTabs();
                 renderTable();
                 loadCustomButtons();
+                checkAllDates(); // Добавляем проверку дат после загрузки
 
                 updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
 
@@ -2978,6 +2979,7 @@
             renderTabs();
             renderTable();
             loadCustomButtons();
+            checkAllDates(); // Добавляем проверку дат после загрузки
             
             updateSyncStatus('Используются локальные данные', '');
             
@@ -4041,6 +4043,7 @@
             renderTable();
             loadCustomButtons();
             resetFiltersAndSearch();
+            checkAllDates(); // Добавляем проверку дат при переключении вкладок
         }
 
         function closeTab(tabId) {
@@ -4125,14 +4128,11 @@
             const tableData = getCurrentTabData();
             const customColumns = getCurrentTabCustomColumns();
             
-            const exportData = [];
-            const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
+            const exportData = [['№ п/п', 'Название', 'Дата создания', 'Статус']];
             
             customColumns.forEach(col => {
-                headers.push(col.name);
+                exportData[0].push(col.name);
             });
-            
-            exportData.push(headers);
             
             tableData.forEach(row => {
                 const rowData = [
