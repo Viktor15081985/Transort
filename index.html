@@ -434,7 +434,7 @@
             gap: 8px;
             background: var(--bg-dark-controls);
             border: 1px solid var(--border-color);
-            borderRadius: 8px;
+            border-radius: 8px;
             padding: 6px 12px;
             min-width: 240px;
             height: 40px;
@@ -3345,33 +3345,26 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Попытка загрузить пользователей из GitHub для новых устройств
-            if (users.length === 0 || !users.find(u => u.username === 'admin')) {
-                loadUsersFromGitHub().then(() => {
-                    // После загрузки пользователей пробуем войти
-                    const user = users.find(u => u.username === username && u.password === password);
-                    if (user) {
-                        completeLogin(user);
-                    } else {
-                        alert('Неверное имя пользователя или пароль');
-                    }
-                }).catch(error => {
-                    console.log('Не удалось загрузить пользователей из GitHub:', error);
-                    // Пробуем найти пользователя в локальных данных
-                    const user = users.find(u => u.username === username && u.password === password);
-                    if (user) {
-                        completeLogin(user);
-                    } else {
-                        alert('Неверное имя пользователя или пароль');
-                    }
-                });
+            // Исправлено: сначала загружаем пользователей из localStorage
+            if (users.length === 0) {
+                const data = storageManager.loadFromLocalStorage();
+                users = data.users;
+            }
+
+            // Если пользователей все еще нет, используем по умолчанию
+            if (users.length === 0) {
+                users = [
+                    { username: 'admin', password: 'admin', role: 'admin' },
+                    { username: 'user', password: 'user', role: 'user' }
+                ];
+                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
+            }
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                completeLogin(user);
             } else {
-                const user = users.find(u => u.username === username && u.password === password);
-                if (user) {
-                    completeLogin(user);
-                } else {
-                    alert('Неверное имя пользователя или пароль');
-                }
+                alert('Неверное имя пользователя или пароль');
             }
         }
 
@@ -5913,7 +5906,7 @@
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
                         const cellDate = parseDate(value);
-                        const timeDiff = cellDate.getTime() - today.getTime();
+                        const timeDiff = cellDate.getTime() - today.getTime());
                         const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
                         
                         if (daysDiff < 0) {
@@ -6000,8 +5993,8 @@
         }
 
         // НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
-        function startTextEditing(cell, rowData, column, type, currentValue) {
-            const originalContent = cell.innerHTML;
+        function startTextEditing(td, rowData, column, type, currentValue) {
+            const originalContent = td.innerHTML;
             
             // Создаем input для редактирования
             const input = document.createElement('input');
@@ -6018,8 +6011,8 @@
             input.className = 'cell-input';
             
             // Заменяем содержимое ячейки на input
-            cell.innerHTML = '';
-            cell.appendChild(input);
+            td.innerHTML = '';
+            td.appendChild(input);
             input.focus();
             input.select();
             
@@ -6059,7 +6052,7 @@
                     saveChanges();
                 } else if (e.key === 'Escape') {
                     // Отмена редактирования - восстанавливаем оригинальное содержимое
-                    cell.innerHTML = originalContent;
+                    td.innerHTML = originalContent;
                 }
             });
             
