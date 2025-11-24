@@ -3349,33 +3349,33 @@
             }
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+       // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
+function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-            // Исправлено: сначала загружаем пользователей из localStorage
-            if (users.length === 0) {
-                const data = storageManager.loadFromLocalStorage();
-                users = data.users;
-            }
-
-            // Если пользователей все еще нет, используем по умолчанию
-            if (users.length === 0) {
-                users = [
-                    { username: 'admin', password: 'admin', role: 'admin' },
-                    { username: 'user', password: 'user', role: 'user' }
-                ];
-                storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
-            }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                completeLogin(user);
-            } else {
-                alert('Неверное имя пользователя или пароль');
-            }
+    // Если пользователи не загружены, загружаем их
+    if (users.length === 0) {
+        const data = storageManager.loadFromLocalStorage();
+        users = data.users || [];
+        
+        // Если все еще нет пользователей, используем по умолчанию
+        if (users.length === 0) {
+            users = [
+                { username: 'admin', password: 'admin', role: 'admin' },
+                { username: 'user', password: 'user', role: 'user' }
+            ];
+            storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
         }
+    }
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+        completeLogin(user);
+    } else {
+        alert('Неверное имя пользователя или пароль');
+    }
+}
 
         // ФУНКЦИЯ РЕГИСТРАЦИИ
         function handleRegister() {
@@ -6192,24 +6192,23 @@
             });
         }
 
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация происходит только после входа в систему
-            // initializeAppWithFallback();
-            
-            setInterval(updateStatusBar, 30000);
-            
-            window.addEventListener('online', function() {
-                updateSyncStatus('Восстановлено соединение', 'success');
-                if (storageManager.pendingChanges.length > 0) {
-                    storageManager.trySyncChanges(updateSyncStatus);
-                }
-            });
-            
-            window.addEventListener('offline', function() {
-                updateSyncStatus('Отсутствует соединение', 'error');
-            });
-        });
+       // Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAppWithFallback();  // <-- ДОБАВЬТЕ ЭТУ СТРОКУ
+    
+    setInterval(updateStatusBar, 30000);
+    
+    window.addEventListener('online', function() {
+        updateSyncStatus('Восстановлено соединение', 'success');
+        if (storageManager.pendingChanges.length > 0) {
+            storageManager.trySyncChanges(updateSyncStatus);
+        }
+    });
+    
+    window.addEventListener('offline', function() {
+        updateSyncStatus('Отсутствует соединение', 'error');
+    });
+});
     </script>
 </body>
 </html>
