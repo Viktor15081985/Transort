@@ -97,7 +97,13 @@
             box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
         }
 
-        button {
+        .login-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .login-buttons button {
+            flex: 1;
             padding: 0.9rem 1.5rem;
             background: var(--accent-color);
             color: white;
@@ -114,7 +120,7 @@
             text-align: center;
         }
 
-        button:hover {
+        .login-buttons button:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
             box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
@@ -2062,10 +2068,8 @@
                     <label for="password">Пароль</label>
                     <input type="password" id="password" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group login-buttons">
                     <button type="submit">Войти</button>
-                </div>
-                <div class="form-group">
                     <button type="button" id="register-btn">Регистрация</button>
                 </div>
             </form>
