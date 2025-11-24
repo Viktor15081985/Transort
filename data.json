@@ -38,7 +38,7 @@
   "appSettings": {
     "headerTitle": "asdf",
     "headerLogo": "",
-    "fixedColumnsCount": 4,
+    "fixedColumnsCount": 5,
     "currentTheme": "theme-orange"
   },
   "customButtons": [
@@ -190,7 +190,8 @@
           "status": "Активен",
           "customData": {
             "col_1763927601006_0": "15.11.2025",
-            "col_1763960675780_0": "03.11.2025"
+            "col_1763960675780_0": "03.11.2025",
+            "col_1763960675780_1": "515151"
           },
           "attachments": {},
           "displayId": 1
@@ -198,6 +199,7 @@
       ]
     }
   ],
-  "lastSync": "2025-11-24T12:25:59.134Z",
-  "lastEditor": "admin"
+  "lastSync": "2025-11-24T12:27:05.552Z",
+  "lastEditor": "admin",
+  "mergeOperation": true
 }
