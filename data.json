@@ -84,12 +84,17 @@
       "username": "1",
       "password": "1",
       "role": "user"
+    },
+    {
+      "username": "123",
+      "password": "123",
+      "role": "user"
     }
   ],
   "appSettings": {
     "headerTitle": "asdf",
     "headerLogo": "",
-    "fixedColumnsCount": 2,
+    "fixedColumnsCount": 4,
     "currentTheme": "theme-orange"
   },
   "customButtons": [
@@ -151,7 +156,10 @@
       "editable": true
     }
   ],
-  "dateValidationColumns": {},
+  "dateValidationColumns": {
+    "col_1763927601006_0": true,
+    "col_1763960675780_0": true
+  },
   "tabs": [
     {
       "id": "tab1",
@@ -226,9 +234,22 @@
           "displayId": 4
         }
       ]
+    },
+    {
+      "id": "tab_1763987150805",
+      "name": "Таблица 2",
+      "data": [
+        {
+          "id": 1,
+          "name": "Новый проект",
+          "date": "24.11.2025",
+          "status": "Активен",
+          "customData": {},
+          "attachments": {}
+        }
+      ]
     }
   ],
-  "lastSync": "2025-11-24T12:24:05.243Z",
-  "lastEditor": "admin",
-  "mergeOperation": true
+  "lastSync": "2025-11-24T12:25:50.829Z",
+  "lastEditor": "admin"
 }
