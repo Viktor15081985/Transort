@@ -2566,7 +2566,7 @@
                     ],
                     dateValidationColumns: {},
                     tabs: [
-                        { id: 'tab1', name: 'Основное окно', data: null }
+                        { id: 'tab1', name: 'Основное окно', data: null, customButtons: [] }
                     ],
                     pendingChanges: []
                 };
@@ -2877,6 +2877,19 @@
                 }
                 if (localData.customColumns) {
                     merged.customColumns = localData.customColumns;
+                }
+
+                // Слияние вкладок
+                if (localData.tabs) {
+                    console.log('📑 Слияние вкладок...');
+                    const tabMap = new Map(remoteData.tabs.map(tab => [tab.id, tab]));
+                    
+                    localData.tabs.forEach(localTab => {
+                        tabMap.set(localTab.id, localTab);
+                    });
+                    
+                    merged.tabs = Array.from(tabMap.values());
+                    console.log(`✅ Вкладки объединены: ${merged.tabs.length} вкладок`);
                 }
 
                 console.log('🎉 Слияние завершено успешно');
@@ -3671,6 +3684,15 @@
                 dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
             };
             
+            // Добавляем кнопку к текущей вкладке
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                if (!currentTab.customButtons) {
+                    currentTab.customButtons = [];
+                }
+                currentTab.customButtons.push(buttonData);
+            }
+            
             customButtons.push(buttonData);
                     
             columns.forEach((colName, index) => {
@@ -3798,6 +3820,13 @@
             if (!button) return;
             
             customButtons = customButtons.filter(b => b.id !== buttonId);
+            
+            // Удаляем кнопку из текущей вкладки
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab && currentTab.customButtons) {
+                currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
+            }
+            
             storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
             autoSyncChanges();
             
@@ -3823,9 +3852,19 @@
 
         function loadCustomButtons() {
             document.getElementById('custom-buttons').innerHTML = '';
-            customButtons.forEach(button => {
-                createCustomButton(button);
-            });
+            
+            // Загружаем кнопки для текущей вкладки
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab && currentTab.customButtons) {
+                currentTab.customButtons.forEach(button => {
+                    createCustomButton(button);
+                });
+            } else {
+                // Загружаем общие кнопки для обратной совместимости
+                customButtons.forEach(button => {
+                    createCustomButton(button);
+                });
+            }
         }
 
         // ФУНКЦИИ ДЛЯ РАБОТЫ С ДАТАМИ
@@ -5381,7 +5420,8 @@
                 name: tabName,
                 data: [
                     { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
-                ]
+                ],
+                customButtons: [] // НОВОЕ: каждая вкладка имеет свои собственные кнопки
             };
             
             tabs.push(newTab);
@@ -5393,6 +5433,7 @@
             
             renderTabs();
             renderTable();
+            loadCustomButtons(); // НОВОЕ: загружаем кнопки для новой вкладки
             resetFiltersAndSearch();
         }
 
@@ -5417,6 +5458,7 @@
             storageManager.saveToLocalStorage(tableData, users, appSettings, customButtons, customColumns, basicColumns, dateValidationColumns, tabs);
             renderTabs();
             renderTable();
+            loadCustomButtons(); // НОВОЕ: загружаем кнопки при переключении вкладок
             resetFiltersAndSearch();
         }
 
@@ -5449,6 +5491,7 @@
             autoSyncChanges();
             renderTabs();
             renderTable();
+            loadCustomButtons(); // НОВОЕ: загружаем кнопки после закрытия вкладки
         }
 
         function resetFiltersAndSearch() {
@@ -5883,6 +5926,21 @@
                     
                     // Добавляем визуальный курсор для указания возможности редактирования
                     td.style.cursor = 'text';
+                }
+            } else {
+                // ДЛЯ РЕЖИМА ПОЛЬЗОВАТЕЛЯ: проверяем и подсвечиваем даты
+                if (isDateColumn && value && isValidDate(value)) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const cellDate = parseDate(value);
+                    const timeDiff = cellDate.getTime() - today.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (daysDiff < 0) {
+                        td.classList.add('date-cell-danger');
+                    } else if (daysDiff <= 30) {
+                        td.classList.add('date-cell-warning');
+                    }
                 }
             }
             
