@@ -33,7 +33,8 @@
     "headerTitle": "Основное окно",
     "headerLogo": "",
     "fixedColumnsCount": 3,
-    "currentTheme": "theme-orange"
+    "currentTheme": "theme-orange",
+    "currentTabId": "tab1"
   },
   "customButtons": [],
   "customColumns": [],
@@ -70,7 +71,13 @@
           "name": "Проект А",
           "date": "01.10.2023",
           "status": "Активен",
-          "customData": {},
+          "customData": {
+            "col_1764054370590_0": "",
+            "col_1764054370590_1": "",
+            "col_1764054390597_0": "",
+            "col_1764054390597_1": "",
+            "col_1764054390597_2": ""
+          },
           "attachments": {},
           "displayId": 1
         },
@@ -79,7 +86,13 @@
           "name": "Проект Б",
           "date": "05.10.2023",
           "status": "Завершен",
-          "customData": {},
+          "customData": {
+            "col_1764054370590_0": "",
+            "col_1764054370590_1": "",
+            "col_1764054390597_0": "",
+            "col_1764054390597_1": "",
+            "col_1764054390597_2": ""
+          },
           "attachments": {},
           "displayId": 2
         },
@@ -88,33 +101,61 @@
           "name": "Проект В",
           "date": "10.10.2023",
           "status": "В процессе",
-          "customData": {},
+          "customData": {
+            "col_1764054370590_0": "",
+            "col_1764054370590_1": "",
+            "col_1764054390597_0": "",
+            "col_1764054390597_1": "",
+            "col_1764054390597_2": ""
+          },
           "attachments": {},
           "displayId": 3
+        }
+      ],
+      "customButtons": [],
+      "customColumns": [],
+      "basicColumns": [
+        {
+          "id": "id",
+          "name": "№ п/п",
+          "editable": false
         },
         {
-          "id": 4,
+          "id": "name",
+          "name": "Название",
+          "editable": true
+        },
+        {
+          "id": "date",
+          "name": "Дата создания",
+          "editable": true
+        },
+        {
+          "id": "status",
+          "name": "Статус",
+          "editable": true
+        }
+      ],
+      "dateValidationColumns": {
+        "col_1764054370590_0": true,
+        "col_1764054390597_0": true
+      }
+    },
+    {
+      "id": "tab_1764054415725",
+      "name": "Таблица 2",
+      "tableData": [
+        {
+          "id": 1,
           "name": "Новый проект",
           "date": "25.11.2025",
           "status": "Активен",
           "customData": {},
           "attachments": {},
-          "displayId": 4
+          "displayId": 1
         }
       ],
-      "customButtons": [
-        {
-          "id": "btn_1764045151322",
-          "name": "Время",
-          "columns": [
-            "5",
-            "e"
-          ],
-          "dateColumns": [
-            "5"
-          ]
-        }
-      ],
+      "customButtons": [],
       "customColumns": [],
       "basicColumns": [
         {
@@ -141,7 +182,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-25T04:35:11.897Z",
+  "lastSync": "2025-11-25T07:32:50.056Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
