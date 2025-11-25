@@ -2545,7 +2545,8 @@
                         headerTitle: 'Основное окно',
                         headerLogo: '',
                         fixedColumnsCount: 3,
-                        currentTheme: 'theme-orange'
+                        currentTheme: 'theme-orange',
+                        currentTabId: 'tab1'
                     },
                     tabs: [defaultTab],
                     pendingChanges: []
@@ -2912,6 +2913,27 @@
         // Глобальная переменная для управления файлами
         let currentFileManagementCell = null;
 
+        // Функция для получения столбца по имени
+        function getColumnByName(columnName) {
+            const basicColumns = getCurrentTabBasicColumns();
+            const customColumns = getCurrentTabCustomColumns();
+            const allColumns = [...basicColumns, ...customColumns];
+            
+            return allColumns.find(col => col.name === columnName);
+        }
+
+        // Функция для получения индекса столбца по имени
+        function getColumnIndexByName(columnName) {
+            const basicColumns = getCurrentTabBasicColumns();
+            const customColumns = getCurrentTabCustomColumns();
+            const allColumns = [...basicColumns, ...customColumns];
+            
+            const column = allColumns.find(col => col.name === columnName);
+            if (!column) return -1;
+            
+            return allColumns.indexOf(column);
+        }
+
         // Получение текущей вкладки
         function getCurrentTab() {
             if (!tabs || tabs.length === 0) {
@@ -3211,6 +3233,14 @@
             appSettings = data.appSettings;
             tabs = data.tabs;
             storageManager.pendingChanges = data.pendingChanges;
+            
+            // Устанавливаем currentTabId из appSettings, если он есть, иначе используем первую вкладку
+            if (appSettings.currentTabId && tabs.find(tab => tab.id === appSettings.currentTabId)) {
+                currentTabId = appSettings.currentTabId;
+            } else if (tabs.length > 0) {
+                currentTabId = tabs[0].id;
+                appSettings.currentTabId = currentTabId;
+            }
             
             renderTabs();
             renderTable();
@@ -3628,146 +3658,193 @@
                 .map(input => input.value.trim())
                 .filter(name => name !== '');
             
+            if (columns.length === 0) {
+                alert('Введите названия столбцов!');
+                return;
+            }
+            
             const buttonId = 'btn_' + Date.now();
             
-            // СОХРАНИТЕ ИНФОРМАЦИЮ О ПРОВЕРКЕ ДАТ В САМОЙ КНОПКЕ
-            const dateColumns = [];
-            dateCheckboxes.forEach((checkbox, index) => {
-                if (checkbox.checked && columns[index]) {
-                    dateColumns.push(columns[index]);
+            // Получаем текущую вкладку
+            const currentTab = getCurrentTab();
+            if (!currentTab) {
+                alert('Ошибка: не найдена текущая вкладка');
+                return;
+            }
+            
+            // Инициализируем массивы
+            if (!currentTab.customButtons) currentTab.customButtons = [];
+            if (!currentTab.customColumns) currentTab.customColumns = [];
+            if (!currentTab.dateValidationColumns) currentTab.dateValidationColumns = {};
+            
+            // Проверяем, есть ли уже кнопка с таким именем
+            if (currentTab.customButtons.find(btn => btn.name === buttonName)) {
+                alert('Кнопка с таким именем уже существует!');
+                return;
+            }
+            
+            // СОЗДАЕМ СТОЛБЦЫ, ЕСЛИ ИХ НЕТ
+            columns.forEach((colName, index) => {
+                const existingColumn = currentTab.customColumns.find(col => col.name === colName);
+                if (!existingColumn) {
+                    const columnId = 'col_' + Date.now() + '_' + index;
+                    const newColumn = {
+                        id: columnId,
+                        name: colName
+                    };
+                    currentTab.customColumns.push(newColumn);
+                    
+                    // Добавляем столбец во все строки
+                    const tableData = getCurrentTabData();
+                    tableData.forEach(row => {
+                        if (!row.customData) row.customData = {};
+                        row.customData[columnId] = '';
+                    });
+                    
+                    // Настройки проверки дат
+                    if (dateCheckboxes[index] && dateCheckboxes[index].checked) {
+                        currentTab.dateValidationColumns[columnId] = true;
+                    }
                 }
             });
             
             const buttonData = {
                 id: buttonId,
                 name: buttonName,
-                columns: columns,
-                dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
+                columns: columns // Сохраняем названия столбцов
             };
             
-            // Добавляем кнопку к текущей вкладке
-            const currentTab = getCurrentTab();
-            if (currentTab) {
-                if (!currentTab.customButtons) {
-                    currentTab.customButtons = [];
-                }
-                currentTab.customButtons.push(buttonData);
-            }
+            // Добавляем кнопку
+            currentTab.customButtons.push(buttonData);
             
+            // Сохраняем изменения
+            updateCurrentTabData(getCurrentTabData());
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
+            // Обновляем интерфейс
             createCustomButton(buttonData);
             renderTable();
+            
             document.getElementById('add-button-modal').style.display = 'none';
             document.getElementById('add-button-form').reset();
+            
+            alert(`Кнопка "${buttonName}" создана! Будут показаны столбцы: ${columns.join(', ')}`);
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ
-function createCustomButton(buttonData) {
-    const buttonWrapper = document.createElement('div');
-    buttonWrapper.className = 'custom-button-wrapper';
-    
-    const button = document.createElement('button');
-    button.className = 'custom-button';
-    button.dataset.buttonId = buttonData.id;
-    button.dataset.columns = JSON.stringify(buttonData.columns);
-    button.title = `Показать столбцы: ${buttonData.columns.join(', ')}`;
-    
-    const buttonText = document.createElement('span');
-    buttonText.className = 'button-text';
-    buttonText.textContent = buttonData.name;
-    
-    button.appendChild(buttonText);
-    
-    if (currentUser && currentUser.role === 'admin') {
-        const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'button-actions';
-        
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn-edit-small';
-        editBtn.innerHTML = '✎';
-        editBtn.title = 'Редактировать кнопку';
-        editBtn.onclick = (e) => {
-            e.stopPropagation();
-            editButton(buttonData.id);
-        };
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn-danger-small';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.title = 'Удалить кнопку';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteButton(buttonData.id);
-        };
-        
-        actionsContainer.appendChild(editBtn);
-        actionsContainer.appendChild(deleteBtn);
-        
-        buttonWrapper.appendChild(button);
-        buttonWrapper.appendChild(actionsContainer);
-    } else {
-        buttonWrapper.appendChild(button);
-    }
-    
-    button.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
-            const columns = JSON.parse(this.dataset.columns);
+        function createCustomButton(buttonData) {
+            const buttonWrapper = document.createElement('div');
+            buttonWrapper.className = 'custom-button-wrapper';
             
-            // Сначала скрываем все столбцы
-            const allCells = document.querySelectorAll('#data-table th, #data-table td');
-            allCells.forEach(cell => cell.style.display = 'none');
+            const button = document.createElement('button');
+            button.className = 'custom-button';
+            button.dataset.buttonId = buttonData.id;
+            button.dataset.columns = JSON.stringify(buttonData.columns);
+            button.title = `Показать столбцы: ${buttonData.columns.join(', ')}`;
             
-            // Показываем фиксированные столбцы (чекбокс и № п/п)
-            for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
-                const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
-                const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+            const buttonText = document.createElement('span');
+            buttonText.className = 'button-text';
+            buttonText.textContent = buttonData.name;
+            
+            button.appendChild(buttonText);
+            
+            if (currentUser && currentUser.role === 'admin') {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'button-actions';
                 
-                headerCells.forEach(cell => cell.style.display = '');
-                dataCells.forEach(cell => cell.style.display = '');
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn-edit-small';
+                editBtn.innerHTML = '✎';
+                editBtn.title = 'Редактировать кнопку';
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    editButton(buttonData.id);
+                };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-danger-small';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.title = 'Удалить кнопку';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteButton(buttonData.id);
+                };
+                
+                actionsContainer.appendChild(editBtn);
+                actionsContainer.appendChild(deleteBtn);
+                
+                buttonWrapper.appendChild(button);
+                buttonWrapper.appendChild(actionsContainer);
+            } else {
+                buttonWrapper.appendChild(button);
             }
             
-            // Показываем столбцы, указанные в кнопке - ИСПРАВЛЕННЫЙ ПОИСК
-            columns.forEach(colName => {
-                // Ищем ВСЕ заголовки и ячейки по текстовому содержимому
-                const allHeaders = document.querySelectorAll('#data-table th');
-                const allDataCells = document.querySelectorAll('#data-table td');
-                
-                allHeaders.forEach(header => {
-                    const headerText = header.querySelector('.th-title');
-                    if (headerText && headerText.textContent.trim() === colName) {
-                        header.style.display = '';
+            button.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
+                    const columnsToShow = JSON.parse(this.dataset.columns);
+                    
+                    console.log('Нажата кнопка:', buttonData.name, 'Показываем столбцы:', columnsToShow);
+                    
+                    // НОВАЯ ЛОГИКА ОТОБРАЖЕНИЯ СТОЛБЦОВ
+                    const fixedColumnsCount = appSettings.fixedColumnsCount || 3;
+                    
+                    // Скрываем все столбцы, начиная с fixedColumnsCount
+                    const allHeaders = document.querySelectorAll('#data-table th');
+                    const allDataCells = document.querySelectorAll('#data-table td');
+                    
+                    // Скрываем заголовки, начиная с fixedColumnsCount
+                    for (let i = fixedColumnsCount; i < allHeaders.length; i++) {
+                        allHeaders[i].style.display = 'none';
                     }
-                });
-                
-                allDataCells.forEach(cell => {
-                    const columnIndex = cell.cellIndex;
-                    const header = document.querySelector(`#data-table th:nth-child(${columnIndex + 1}) .th-title`);
-                    if (header && header.textContent.trim() === colName) {
-                        cell.style.display = '';
+                    
+                    // Скрываем ячейки, у которых cellIndex >= fixedColumnsCount
+                    allDataCells.forEach(cell => {
+                        if (cell.cellIndex >= fixedColumnsCount) {
+                            cell.style.display = 'none';
+                        }
+                    });
+                    
+                    // Показываем столбцы из columnsToShow, которые не входят в фиксированные
+                    columnsToShow.forEach(colName => {
+                        const columnIndex = getColumnIndexByName(colName);
+                        if (columnIndex !== -1) {
+                            // +2 потому что: 0-чекбокс, 1-№п/п, дальше столбцы
+                            const displayIndex = columnIndex + 2;
+                            
+                            // Показываем заголовок
+                            const header = document.querySelector(`#data-table th:nth-child(${displayIndex})`);
+                            if (header) header.style.display = '';
+                            
+                            // Показываем ячейки
+                            const dataCells = document.querySelectorAll(`#data-table td:nth-child(${displayIndex})`);
+                            dataCells.forEach(cell => cell.style.display = '');
+                        }
+                    });
+                    
+                    // Показываем столбец действий для администратора
+                    if (currentUser && currentUser.role === 'admin') {
+                        const actionHeader = document.querySelector('th.actions-header');
+                        const actionCells = document.querySelectorAll('td.admin-only');
+                        if (actionHeader) {
+                            actionHeader.style.display = '';
+                        }
+                        actionCells.forEach(cell => {
+                            cell.style.display = '';
+                        });
                     }
-                });
+                    
+                    console.log('Отображение столбцов завершено');
+                    
+                    // ПЕРЕПРОВЕРЯЕМ ДАТЫ
+                    setTimeout(() => {
+                        checkAllDates();
+                    }, 100);
+                }
             });
             
-            // Показываем столбец действий для администратора
-            if (currentUser && currentUser.role === 'admin') {
-                const actionHeaders = document.querySelectorAll('th.actions-header');
-                const actionCells = document.querySelectorAll('td.admin-only');
-                
-                actionHeaders.forEach(cell => cell.style.display = '');
-                actionCells.forEach(cell => cell.style.display = '');
-            }
-            
-            // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
-            setTimeout(() => {
-                checkAllDates();
-            }, 100);
+            document.getElementById('custom-buttons').appendChild(buttonWrapper);
         }
-    });
-    
-    document.getElementById('custom-buttons').appendChild(buttonWrapper);
-}
 
         function editButton(buttonId) {
             const currentTab = getCurrentTab();
@@ -3786,7 +3863,7 @@ function createCustomButton(buttonData) {
         }
 
         function deleteButton(buttonId) {
-            if (!confirm('Удалить эту кнопку и связанные с ней столбцы?')) return;
+            if (!confirm('Удалить эту кнопку?')) return;
             
             const currentTab = getCurrentTab();
             if (!currentTab || !currentTab.customButtons) return;
@@ -3794,38 +3871,23 @@ function createCustomButton(buttonData) {
             const button = currentTab.customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
+            // УДАЛЯЕМ ТОЛЬКО КНОПКУ, НЕ СТОЛБЦЫ
             currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
-            const customColumns = getCurrentTabCustomColumns();
-            button.columns.forEach(colName => {
-                const filteredColumns = customColumns.filter(col => col.name !== colName);
-                currentTab.customColumns = filteredColumns;
-                
-                const tableData = getCurrentTabData();
-                tableData.forEach(row => {
-                    if (row.customData && row.customData[colName]) {
-                        delete row.customData[colName];
-                    }
-                    if (row.attachments && row.attachments[colName]) {
-                        delete row.attachments[colName];
-                    }
-                });
-            });
-            
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
-            
+            // ПЕРЕЗАГРУЖАЕМ ИНТЕРФЕЙС
             loadCustomButtons();
             renderTable();
+            
+            alert(`Кнопка "${button.name}" удалена!`);
         }
 
         function loadCustomButtons() {
-            document.getElementById('custom-buttons').innerHTML = '';
+            const container = document.getElementById('custom-buttons');
+            container.innerHTML = '';
             
-            // Загружаем кнопки для текущей вкладки
             const customButtons = getCurrentTabCustomButtons();
             customButtons.forEach(button => {
                 createCustomButton(button);
@@ -5424,6 +5486,7 @@ function createCustomButton(buttonData) {
             autoSyncChanges();
             
             currentTabId = tabId;
+            appSettings.currentTabId = tabId;
             
             renderTabs();
             renderTable();
@@ -5433,6 +5496,7 @@ function createCustomButton(buttonData) {
 
         function switchTab(tabId) {
             currentTabId = tabId;
+            appSettings.currentTabId = tabId;
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             renderTabs();
@@ -5456,6 +5520,7 @@ function createCustomButton(buttonData) {
             
             if (tabId === currentTabId) {
                 currentTabId = tabs[0].id;
+                appSettings.currentTabId = currentTabId;
             }
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
