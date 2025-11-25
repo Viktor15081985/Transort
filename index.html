@@ -2545,8 +2545,7 @@
                         headerTitle: 'Основное окно',
                         headerLogo: '',
                         fixedColumnsCount: 3,
-                        currentTheme: 'theme-orange',
-                        currentTabId: 'tab1'
+                        currentTheme: 'theme-orange'
                     },
                     tabs: [defaultTab],
                     pendingChanges: []
@@ -2913,50 +2912,15 @@
         // Глобальная переменная для управления файлами
         let currentFileManagementCell = null;
 
-        // Функция для получения столбца по имени
-        function getColumnByName(columnName) {
-            const basicColumns = getCurrentTabBasicColumns();
-            const customColumns = getCurrentTabCustomColumns();
-            const allColumns = [...basicColumns, ...customColumns];
-            
-            return allColumns.find(col => col.name === columnName);
-        }
-
-        // Функция для получения индекса столбца по имени
-        function getColumnIndexByName(columnName) {
-            const basicColumns = getCurrentTabBasicColumns();
-            const customColumns = getCurrentTabCustomColumns();
-            const allColumns = [...basicColumns, ...customColumns];
-            
-            const column = allColumns.find(col => col.name === columnName);
-            if (!column) return -1;
-            
-            return allColumns.indexOf(column);
-        }
-
         // Получение текущей вкладки
         function getCurrentTab() {
-            if (!tabs || tabs.length === 0) {
-                console.warn('⚠️ Нет доступных вкладок, создаем базовую');
-                const defaultData = storageManager.getDefaultData();
-                tabs = defaultData.tabs;
-                currentTabId = tabs[0].id;
-            }
-            
-            const currentTab = tabs.find(tab => tab.id === currentTabId);
-            
-            if (!currentTab && tabs.length > 0) {
-                currentTabId = tabs[0].id;
-                return tabs[0];
-            }
-            
-            return currentTab;
+            return tabs.find(tab => tab.id === currentTabId);
         }
 
         // Получение данных текущей вкладки
         function getCurrentTabData() {
             const currentTab = getCurrentTab();
-            return currentTab && currentTab.tableData ? currentTab.tableData : [];
+            return currentTab ? currentTab.tableData : [];
         }
 
         // Получение кастомных кнопок текущей вкладки
@@ -3163,33 +3127,15 @@
         function updateLocalData(mergedData) {
             console.log('🔄 Обновление локальных данных после слияния...');
             
-            // Безопасное обновление данных с проверками
-            users = mergedData && mergedData.users ? mergedData.users : users;
-            appSettings = mergedData && mergedData.appSettings ? mergedData.appSettings : appSettings;
-            tabs = mergedData && mergedData.tabs ? mergedData.tabs : tabs;
+            users = mergedData.users || users;
+            appSettings = mergedData.appSettings || appSettings;
+            tabs = mergedData.tabs || tabs;
             
             console.log('✅ Локальные данные обновлены');
-            console.log('👥 Пользователей:', users.length);
-            console.log('⚙️ Настроек:', Object.keys(appSettings).length);
-            console.log('📑 Вкладок:', tabs.length);
             
-            // Рендерим интерфейс с обработкой ошибок
-            try {
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
-            } catch (error) {
-                console.error('❌ Ошибка при рендеринге интерфейса:', error);
-                // Восстанавливаем данные по умолчанию в случае ошибки
-                const defaultData = storageManager.getDefaultData();
-                users = defaultData.users;
-                appSettings = defaultData.appSettings;
-                tabs = defaultData.tabs;
-                
-                renderTabs();
-                renderTable();
-                loadCustomButtons();
-            }
+            renderTabs();
+            renderTable();
+            loadCustomButtons();
         }
 
         // УЛУЧШЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ИЗ GITHUB
@@ -3204,23 +3150,18 @@
                     return;
                 }
 
-                console.log('✅ Данные успешно загружены из GitHub');
+                console.log('✅ Данные успешно загружены');
                 
-                // Проверяем структуру данных перед обновлением
-                if (result.success && result.data) {
-                    updateLocalData(result.data);
-                    storageManager.saveToLocalStorage(users, appSettings, tabs);
-                    localStorage.setItem('lastSyncTime', new Date().toISOString());
-                    updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
-                } else {
-                    throw new Error('Неверная структура данных из GitHub');
-                }
+                updateLocalData(result.data);
+                storageManager.saveToLocalStorage(users, appSettings, tabs);
+                localStorage.setItem('lastSyncTime', new Date().toISOString());
+
+                updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
 
             } catch (error) {
-                console.error('❌ Ошибка загрузки из GitHub:', error);
+                console.error('❌ Ошибка загрузки:', error);
                 updateSyncStatus('Ошибка загрузки: ' + error.message, 'error');
                 
-                // Загружаем локальные данные как резервный вариант
                 loadFromLocalStorageWithNotification();
             }
         }
@@ -3233,14 +3174,6 @@
             appSettings = data.appSettings;
             tabs = data.tabs;
             storageManager.pendingChanges = data.pendingChanges;
-            
-            // Устанавливаем currentTabId из appSettings, если он есть, иначе используем первую вкладку
-            if (appSettings.currentTabId && tabs.find(tab => tab.id === appSettings.currentTabId)) {
-                currentTabId = appSettings.currentTabId;
-            } else if (tabs.length > 0) {
-                currentTabId = tabs[0].id;
-                appSettings.currentTabId = currentTabId;
-            }
             
             renderTabs();
             renderTable();
@@ -3276,41 +3209,48 @@
             return false;
         }
 
-        // ФУНКЦИЯ БЕЗОПАСНОЙ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
-        function safeInitializeApp() {
-            try {
-                setupEventListeners();
-                loadAppSettings();
+        // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
+        function initializeAppWithFallback() {
+            setupEventListeners();
+            loadAppSettings();
+            
+            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
+            
+            // Загружаем пользователей при инициализации
+            if (users.length === 0) {
+                const data = storageManager.loadFromLocalStorage();
+                users = data.users;
                 
-                onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-                
-                // Загружаем пользователей при инициализации
-                if (!users || users.length === 0) {
-                    const data = storageManager.loadFromLocalStorage();
-                    users = data.users || [];
-                    
-                    // Если все еще нет пользователей, пробуем загрузить из GitHub
-                    if (users.length === 0) {
-                        loadUsersFromGitHub().then(() => {
-                            loadFromLocalStorageWithNotification();
-                        }).catch(() => {
-                            loadFromLocalStorageWithNotification();
-                        });
-                    } else {
+                // Если все еще нет пользователей, пробуем загрузить из GitHub
+                if (users.length === 0) {
+                    loadUsersFromGitHub().then(() => {
                         loadFromLocalStorageWithNotification();
-                    }
+                    });
                 } else {
                     loadFromLocalStorageWithNotification();
                 }
-                
-            } catch (error) {
-                console.error('❌ Критическая ошибка инициализации:', error);
-                // Используем данные по умолчанию
-                const defaultData = storageManager.getDefaultData();
-                users = defaultData.users;
-                appSettings = defaultData.appSettings;
-                tabs = defaultData.tabs;
-                
+            } else {
+                loadFromLocalStorageWithNotification();
+            }
+            
+            if (currentUser && currentUser.role === 'user') {
+                const config = storageManager.getConfig();
+                if (config.repo && config.branch) {
+                    console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
+                    loadFromGitHub().then(() => {
+                        console.log('✅ Загрузка из GitHub завершена');
+                        
+                        if (storageManager.pendingChanges.length > 0) {
+                            storageManager.trySyncChanges(updateSyncStatus);
+                        }
+                    }).catch(error => {
+                        console.log('❌ Ошибка загрузки из GitHub:', error);
+                        loadFromLocalStorageWithNotification();
+                    });
+                } else {
+                    loadFromLocalStorageWithNotification();
+                }
+            } else {
                 loadFromLocalStorageWithNotification();
             }
         }
@@ -3370,7 +3310,7 @@
             localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
             updateStatusBar();
             
-            safeInitializeApp();
+            initializeAppWithFallback();
             
             setTimeout(() => {
                 checkAllDates();
@@ -3411,9 +3351,10 @@
                 }
             });
 
-            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount || 3;
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
+        // ОСТАВШИЕСЯ ФУНКЦИИ (исправленные)
         function setupEventListeners() {
             // Логин
             document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -3658,78 +3599,39 @@
                 .map(input => input.value.trim())
                 .filter(name => name !== '');
             
-            if (columns.length === 0) {
-                alert('Введите названия столбцов!');
-                return;
-            }
-            
             const buttonId = 'btn_' + Date.now();
             
-            // Получаем текущую вкладку
-            const currentTab = getCurrentTab();
-            if (!currentTab) {
-                alert('Ошибка: не найдена текущая вкладка');
-                return;
-            }
-            
-            // Инициализируем массивы
-            if (!currentTab.customButtons) currentTab.customButtons = [];
-            if (!currentTab.customColumns) currentTab.customColumns = [];
-            if (!currentTab.dateValidationColumns) currentTab.dateValidationColumns = {};
-            
-            // Проверяем, есть ли уже кнопка с таким именем
-            if (currentTab.customButtons.find(btn => btn.name === buttonName)) {
-                alert('Кнопка с таким именем уже существует!');
-                return;
-            }
-            
-            // СОЗДАЕМ СТОЛБЦЫ, ЕСЛИ ИХ НЕТ
-            columns.forEach((colName, index) => {
-                const existingColumn = currentTab.customColumns.find(col => col.name === colName);
-                if (!existingColumn) {
-                    const columnId = 'col_' + Date.now() + '_' + index;
-                    const newColumn = {
-                        id: columnId,
-                        name: colName
-                    };
-                    currentTab.customColumns.push(newColumn);
-                    
-                    // Добавляем столбец во все строки
-                    const tableData = getCurrentTabData();
-                    tableData.forEach(row => {
-                        if (!row.customData) row.customData = {};
-                        row.customData[columnId] = '';
-                    });
-                    
-                    // Настройки проверки дат
-                    if (dateCheckboxes[index] && dateCheckboxes[index].checked) {
-                        currentTab.dateValidationColumns[columnId] = true;
-                    }
+            // СОХРАНИТЕ ИНФОРМАЦИЮ О ПРОВЕРКЕ ДАТ В САМОЙ КНОПКЕ
+            const dateColumns = [];
+            dateCheckboxes.forEach((checkbox, index) => {
+                if (checkbox.checked && columns[index]) {
+                    dateColumns.push(columns[index]);
                 }
             });
             
             const buttonData = {
                 id: buttonId,
                 name: buttonName,
-                columns: columns // Сохраняем названия столбцов
+                columns: columns,
+                dateColumns: dateColumns // ДОБАВЛЕНО: сохраняем какие столбцы проверять на даты
             };
             
-            // Добавляем кнопку
-            currentTab.customButtons.push(buttonData);
+            // Добавляем кнопку к текущей вкладке
+            const currentTab = getCurrentTab();
+            if (currentTab) {
+                if (!currentTab.customButtons) {
+                    currentTab.customButtons = [];
+                }
+                currentTab.customButtons.push(buttonData);
+            }
             
-            // Сохраняем изменения
-            updateCurrentTabData(getCurrentTabData());
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
-            // Обновляем интерфейс
             createCustomButton(buttonData);
             renderTable();
-            
             document.getElementById('add-button-modal').style.display = 'none';
             document.getElementById('add-button-form').reset();
-            
-            alert(`Кнопка "${buttonName}" создана! Будут показаны столбцы: ${columns.join(', ')}`);
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ
@@ -3782,61 +3684,28 @@
             
             button.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
-                    const columnsToShow = JSON.parse(this.dataset.columns);
+                    const columns = JSON.parse(this.dataset.columns);
                     
-                    console.log('Нажата кнопка:', buttonData.name, 'Показываем столбцы:', columnsToShow);
+                    const allCells = document.querySelectorAll('#data-table th, #data-table td');
+                    allCells.forEach(cell => cell.style.display = 'none');
                     
-                    // НОВАЯ ЛОГИКА ОТОБРАЖЕНИЯ СТОЛБЦОВ
-                    const fixedColumnsCount = appSettings.fixedColumnsCount || 3;
-                    
-                    // Скрываем все столбцы, начиная с fixedColumnsCount
-                    const allHeaders = document.querySelectorAll('#data-table th');
-                    const allDataCells = document.querySelectorAll('#data-table td');
-                    
-                    // Скрываем заголовки, начиная с fixedColumnsCount
-                    for (let i = fixedColumnsCount; i < allHeaders.length; i++) {
-                        allHeaders[i].style.display = 'none';
+                    for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
+                        const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
+                        const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
+                        
+                        headerCells.forEach(cell => cell.style.display = '');
+                        dataCells.forEach(cell => cell.style.display = '');
                     }
                     
-                    // Скрываем ячейки, у которых cellIndex >= fixedColumnsCount
-                    allDataCells.forEach(cell => {
-                        if (cell.cellIndex >= fixedColumnsCount) {
-                            cell.style.display = 'none';
-                        }
+                    columns.forEach(colName => {
+                        const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
+                        const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
+                        
+                        customHeaders.forEach(cell => cell.style.display = '');
+                        customCells.forEach(cell => cell.style.display = '');
                     });
                     
-                    // Показываем столбцы из columnsToShow, которые не входят в фиксированные
-                    columnsToShow.forEach(colName => {
-                        const columnIndex = getColumnIndexByName(colName);
-                        if (columnIndex !== -1) {
-                            // +2 потому что: 0-чекбокс, 1-№п/п, дальше столбцы
-                            const displayIndex = columnIndex + 2;
-                            
-                            // Показываем заголовок
-                            const header = document.querySelector(`#data-table th:nth-child(${displayIndex})`);
-                            if (header) header.style.display = '';
-                            
-                            // Показываем ячейки
-                            const dataCells = document.querySelectorAll(`#data-table td:nth-child(${displayIndex})`);
-                            dataCells.forEach(cell => cell.style.display = '');
-                        }
-                    });
-                    
-                    // Показываем столбец действий для администратора
-                    if (currentUser && currentUser.role === 'admin') {
-                        const actionHeader = document.querySelector('th.actions-header');
-                        const actionCells = document.querySelectorAll('td.admin-only');
-                        if (actionHeader) {
-                            actionHeader.style.display = '';
-                        }
-                        actionCells.forEach(cell => {
-                            cell.style.display = '';
-                        });
-                    }
-                    
-                    console.log('Отображение столбцов завершено');
-                    
-                    // ПЕРЕПРОВЕРЯЕМ ДАТЫ
+                    // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
                     setTimeout(() => {
                         checkAllDates();
                     }, 100);
@@ -3863,7 +3732,7 @@
         }
 
         function deleteButton(buttonId) {
-            if (!confirm('Удалить эту кнопку?')) return;
+            if (!confirm('Удалить эту кнопку и связанные с ней столбцы?')) return;
             
             const currentTab = getCurrentTab();
             if (!currentTab || !currentTab.customButtons) return;
@@ -3871,23 +3740,38 @@
             const button = currentTab.customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
-            // УДАЛЯЕМ ТОЛЬКО КНОПКУ, НЕ СТОЛБЦЫ
             currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             autoSyncChanges();
             
-            // ПЕРЕЗАГРУЖАЕМ ИНТЕРФЕЙС
+            const customColumns = getCurrentTabCustomColumns();
+            button.columns.forEach(colName => {
+                const filteredColumns = customColumns.filter(col => col.name !== colName);
+                currentTab.customColumns = filteredColumns;
+                
+                const tableData = getCurrentTabData();
+                tableData.forEach(row => {
+                    if (row.customData && row.customData[colName]) {
+                        delete row.customData[colName];
+                    }
+                    if (row.attachments && row.attachments[colName]) {
+                        delete row.attachments[colName];
+                    }
+                });
+            });
+            
+            storageManager.saveToLocalStorage(users, appSettings, tabs);
+            autoSyncChanges();
+            
             loadCustomButtons();
             renderTable();
-            
-            alert(`Кнопка "${button.name}" удалена!`);
         }
 
         function loadCustomButtons() {
-            const container = document.getElementById('custom-buttons');
-            container.innerHTML = '';
+            document.getElementById('custom-buttons').innerHTML = '';
             
+            // Загружаем кнопки для текущей вкладки
             const customButtons = getCurrentTabCustomButtons();
             customButtons.forEach(button => {
                 createCustomButton(button);
@@ -5009,12 +4893,12 @@
         };
 
         function loadAppSettings() {
-            document.getElementById('header-title').textContent = appSettings.headerTitle || 'Основное окно';
+            document.getElementById('header-title').textContent = appSettings.headerTitle;
             if (appSettings.headerLogo) {
                 document.getElementById('header-logo').src = appSettings.headerLogo;
                 document.getElementById('header-logo').style.display = 'block';
             }
-            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount || 3;
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
         }
 
         function triggerLogoUpload() {
@@ -5486,7 +5370,6 @@
             autoSyncChanges();
             
             currentTabId = tabId;
-            appSettings.currentTabId = tabId;
             
             renderTabs();
             renderTable();
@@ -5496,7 +5379,6 @@
 
         function switchTab(tabId) {
             currentTabId = tabId;
-            appSettings.currentTabId = tabId;
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
             renderTabs();
@@ -5520,7 +5402,6 @@
             
             if (tabId === currentTabId) {
                 currentTabId = tabs[0].id;
-                appSettings.currentTabId = currentTabId;
             }
             
             storageManager.saveToLocalStorage(users, appSettings, tabs);
@@ -5672,12 +5553,6 @@
             const thead = document.querySelector('#data-table thead tr');
             const tbody = document.querySelector('#data-table tbody');
             
-            // Проверяем наличие элементов DOM
-            if (!thead || !tbody) {
-                console.error('❌ Не найдены элементы таблицы для рендеринга');
-                return;
-            }
-            
             thead.innerHTML = '';
             
             const selectAllTh = document.createElement('th');
@@ -5694,23 +5569,18 @@
             selectAllTh.appendChild(selectAllCheckbox);
             thead.appendChild(selectAllTh);
             
-            // Получаем данные с проверкой на существование
-            const basicColumns = getCurrentTabBasicColumns() || [];
-            const customColumns = getCurrentTabCustomColumns() || [];
-            
-            // Рендерим базовые столбцы
+            const basicColumns = getCurrentTabBasicColumns();
             basicColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'basic');
                 thead.appendChild(th);
             });
             
-            // Рендерим кастомные столбцы
+            const customColumns = getCurrentTabCustomColumns();
             customColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'custom');
                 thead.appendChild(th);
             });
             
-            // Добавляем столбец действий для администратора
             if (currentUser && currentUser.role === 'admin') {
                 const actionsTh = document.createElement('th');
                 actionsTh.className = 'admin-only actions-header';
@@ -5732,24 +5602,18 @@
             
             tbody.innerHTML = '';
             
-            // Получаем данные таблицы с проверкой
-            let tableData = getCurrentTabData() || [];
-            
-            // Применяем фильтры и поиск
+            let tableData = getCurrentTabData();
             let filteredData = applyFilters(tableData);
             filteredData = applySearch(filteredData);
             let sortedData = applySorting(filteredData);
             
-            // Устанавлием displayId для отображения
             sortedData.forEach((rowData, index) => {
                 rowData.displayId = index + 1;
             });
             
-            // Рендерим строки данных
             sortedData.forEach(rowData => {
                 const row = document.createElement('tr');
                 
-                // Чекбокс строки
                 const checkboxTd = document.createElement('td');
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
@@ -5762,19 +5626,16 @@
                 checkboxTd.appendChild(checkbox);
                 row.appendChild(checkboxTd);
                 
-                // Базовые столбцы
                 basicColumns.forEach(column => {
                     const td = createDataCell(rowData, column, 'basic');
                     row.appendChild(td);
                 });
                 
-                // Кастомные столбцы
                 customColumns.forEach(column => {
                     const td = createDataCell(rowData, column, 'custom');
                     row.appendChild(td);
                 });
                 
-                // Кнопка удаления для администратора
                 if (currentUser && currentUser.role === 'admin') {
                     const actionsTd = document.createElement('td');
                     actionsTd.className = 'admin-only';
@@ -5790,7 +5651,6 @@
                 tbody.appendChild(row);
             });
             
-            // Сохраняем изменения
             storageManager.saveToLocalStorage(users, appSettings, tabs);
         }
 
@@ -6168,7 +6028,7 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            safeInitializeApp();
+            initializeAppWithFallback();
             
             setInterval(updateStatusBar, 30000);
             
