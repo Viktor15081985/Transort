@@ -3715,9 +3715,11 @@
                 if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
                     const columns = JSON.parse(this.dataset.columns);
                     
+                    // Сначала скрываем все столбцы
                     const allCells = document.querySelectorAll('#data-table th, #data-table td');
                     allCells.forEach(cell => cell.style.display = 'none');
                     
+                    // Показываем фиксированные столбцы (чекбокс и № п/п)
                     for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
                         const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
                         const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
@@ -3726,13 +3728,24 @@
                         dataCells.forEach(cell => cell.style.display = '');
                     }
                     
+                    // Показываем столбцы, указанные в кнопке
                     columns.forEach(colName => {
+                        // Ищем заголовки и ячейки по data-column-name
                         const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
                         const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
                         
                         customHeaders.forEach(cell => cell.style.display = '');
                         customCells.forEach(cell => cell.style.display = '');
                     });
+                    
+                    // Показываем столбец действий для администратора
+                    if (currentUser && currentUser.role === 'admin') {
+                        const actionHeaders = document.querySelectorAll('th.actions-header');
+                        const actionCells = document.querySelectorAll('td.admin-only');
+                        
+                        actionHeaders.forEach(cell => cell.style.display = '');
+                        actionCells.forEach(cell => cell.style.display = '');
+                    }
                     
                     // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
                     setTimeout(() => {
