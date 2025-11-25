@@ -95,7 +95,7 @@
         {
           "id": 4,
           "name": "Новый проект",
-          "date": "24.11.2025",
+          "date": "25.11.2025",
           "status": "Активен",
           "customData": {},
           "attachments": {},
@@ -104,14 +104,14 @@
       ],
       "customButtons": [
         {
-          "id": "btn_1764014344696",
-          "name": "2020",
+          "id": "btn_1764045151322",
+          "name": "Время",
           "columns": [
-            "00",
-            "115"
+            "5",
+            "e"
           ],
           "dateColumns": [
-            "00"
+            "5"
           ]
         }
       ],
@@ -141,7 +141,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-24T20:06:15.749Z",
+  "lastSync": "2025-11-25T04:35:11.897Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
