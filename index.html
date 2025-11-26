@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Управление данными</title>
     <style>
-        /* СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ */
         * {
             margin: 0;
             padding: 0;
@@ -30,8 +29,1863 @@
             --table-hover: #5a5a5a;
         }
 
-        /* ... ВСЕ ОСТАЛЬНЫЕ СТИЛИ БЕЗ ИЗМЕНЕНИЙ ... */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
 
+#login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(47, 47, 47, 0.8) 0%, rgba(37, 37, 37, 0.8) 100%), url('fon.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+@media (max-width: 1920px) {
+    #login-screen {
+        background-attachment: scroll;
+    }
+}
+        .login-container {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border-color);
+        }
+
+        .login-container h2 {
+            margin-bottom: 1.8rem;
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        button {
+            padding: 0.9rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        #main-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 0.8rem 1.5rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            height: 40px;
+            opacity: 0.9;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .user-role-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        #logout-btn.user-role-btn {
+            cursor: pointer;
+            background: var(--accent-color);
+        }
+
+        #logout-btn.user-role-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .top-controls-panel {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: nowrap;
+            height: 65px;
+            min-height: 65px;
+        }
+
+        .tabs-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 0 1 auto;
+            position: relative;
+            height: 40px;
+            max-width: 60%;
+            min-width: 200px;
+        }
+
+        .tabs-scroll-btn {
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-primary);
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            z-index: 2;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .tabs-scroll-btn:hover {
+            background: var(--table-hover);
+        }
+
+        .tabs-scroll-btn.left {
+            margin-right: 5px;
+        }
+
+        .tabs-scroll-btn.right {
+            margin-left: 5px;
+        }
+
+        .tabs-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 40px;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+            flex: 1;
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            background: var(--bg-tertiary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid var(--table-hover);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            height: 40px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .tab.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .tab.editable {
+            cursor: text;
+            border: 1px dashed transparent;
+        }
+
+        .tab.editable:hover {
+            border-color: var(--accent-color);
+            background: var(--bg-secondary);
+        }
+
+        .tab.editable:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        .tab-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .tab-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            min-width: 40%;
+            justify-content: flex-end;
+        }
+
+        .new-tab-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .new-tab-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-dark-controls);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            min-width: 240px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 6px;
+            font-size: 0.9rem;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-clear {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 6px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .search-clear:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .filter-selected-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .filter-selected-btn:hover {
+            background: var(--table-hover);
+        }
+
+        .export-excel-btn {
+            background: var(--bg-dark-controls);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .export-excel-btn:hover {
+            background: var(--table-hover);
+        }
+
+        .import-excel-btn {
+            background: var(--bg-dark-controls);
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .import-excel-btn:hover {
+            background: var(--table-hover);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 135px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            color: white;
+            padding: 1.2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-buttons {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .sidebar-buttons::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-buttons::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 3px;
+        }
+
+        .sidebar-buttons::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .sidebar-buttons::-webkit-scrollbar-thumb:hover {
+            background: var(--table-hover);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.2rem;
+        }
+
+        .sidebar button {
+            margin-bottom: 4px;
+            background: var(--bg-tertiary);
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        .sidebar button:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .custom-button-wrapper {
+            margin-bottom: 4px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .custom-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            flex: 1;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .custom-button:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .button-text {
+            flex: 1;
+            text-align: center;
+            padding: 0 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .button-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .btn-edit-small {
+            background: var(--bg-tertiary);
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            border-radius: 5px;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            height: 40px;
+            width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit-small:hover {
+            background: var(--table-hover);
+        }
+
+        .btn-danger-small {
+            background: var(--bg-tertiary);
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            border-radius: 5px;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            height: 40px;
+            width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-small:hover {
+            background: var(--table-hover);
+        }
+
+        .content {
+            flex: 1;
+            padding: 1.2rem;
+            overflow: auto;
+            position: relative;
+            background: var(--bg-secondary);
+        }
+
+        .table-container {
+            position: relative;
+            overflow: auto;
+            height: 100%;
+            background: var(--table-bg);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid var(--table-border);
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 5px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--table-hover);
+        }
+
+        .table-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--bg-tertiary) var(--bg-primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--table-bg);
+        }
+
+        th, td {
+            border: 1px solid var(--table-border);
+            padding: 0.4rem;
+            text-align: center;
+            position: relative;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: var(--table-header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+            padding: 8px 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border: 1px solid #333 !important;
+        }
+
+        th:first-child {
+            min-width: 50px;
+            max-width: 60px;
+            width: 50px;
+        }
+
+        th:nth-child(2) {
+            min-width: 70px;
+            max-width: 80px;
+            width: 70px;
+        }
+
+        th:last-child {
+            min-width: 40px;
+            max-width: 50px;
+            width: 40px;
+        }
+
+        th.actions-header {
+            background: var(--table-header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 8px 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border: 1px solid #333 !important;
+        }
+
+        th.actions-header .th-title {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        th.editable-header:hover {
+            background: var(--table-hover);
+        }
+
+        tr:hover {
+            background: var(--table-hover);
+        }
+
+        .editable {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .editable:hover {
+            background-color: var(--table-hover);
+        }
+
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .delete-row-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 5px;
+            padding: 4px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            text-align: center;
+        }
+
+        .delete-row-btn:hover {
+            background: var(--table-hover);
+            color: var(--text-primary);
+        }
+
+        .date-cell-warning {
+            background-color: rgba(230, 126, 34, 0.2) !important;
+            border: 1px solid var(--accent-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .date-cell-danger {
+            background-color: rgba(230, 126, 34, 0.4) !important;
+            border: 1px solid var(--accent-hover) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .date-cell-normal {
+            background-color: var(--bg-tertiary) !important;
+            border: 1px solid var(--table-border) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .date-picker {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 10000;
+            min-width: 280px;
+            color: var(--text-primary);
+        }
+
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 6px;
+        }
+
+        .month-nav-btn {
+            background: var(--bg-tertiary);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 5px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .month-nav-btn:hover {
+            background: var(--accent-color) !important;
+            color: white;
+        }
+
+        .date-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .date-picker-day {
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .date-picker-day:hover {
+            background: var(--accent-color) !important;
+            color: white;
+        }
+
+        .date-picker-day.selected {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .date-picker-day.today {
+            background: var(--bg-tertiary);
+            font-weight: bold;
+        }
+
+        .notification-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 420px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 10000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .notification-header {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 14px 18px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-content {
+            padding: 18px;
+        }
+
+        .notification-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--bg-tertiary);
+            background: var(--bg-primary);
+        }
+
+        .notification-item.warning {
+            border-left-color: var(--accent-color);
+            background: rgba(230, 126, 34, 0.2);
+        }
+
+        .notification-item.danger {
+            border-left-color: var(--accent-hover);
+            background: rgba(211, 84, 0, 0.3);
+        }
+
+        .close-notifications {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .close-notifications:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .cell-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 20px;
+        }
+
+        .cell-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+
+        .file-icons {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .file-icon-small {
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--table-border);
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .file-icon-small:hover {
+            background: var(--table-hover);
+            color: var(--text-primary);
+        }
+
+        .th-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .th-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 20px;
+        }
+
+        .th-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 2px 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .sort-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .sort-btn:hover {
+            background: var(--table-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--table-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--table-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.filtered {
+            color: var(--accent-color);
+        }
+
+        .filter-dropdown {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 10000;
+            min-width: 240px;
+            max-width: 320px;
+            max-height: 420px;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .filter-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .filter-search {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .filter-search:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+        }
+
+        .filter-search::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .filter-options {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: var(--bg-primary);
+        }
+
+        .filter-options::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .filter-options::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .filter-options::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .filter-options::-webkit-scrollbar-thumb:hover {
+            background: var(--table-hover);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            border-bottom: 1px solid var(--bg-secondary);
+        }
+
+        .filter-option:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .filter-option input[type="checkbox"] {
+            margin: 0;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .filter-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 36px;
+            text-align: center;
+        }
+
+        .filter-actions button:hover {
+            background: var(--table-hover);
+            border-color: var(--table-hover);
+        }
+
+        .filter-actions .btn-primary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .filter-actions .btn-primary:hover {
+            background: var(--table-hover);
+            border-color: var(--table-hover);
+        }
+
+        .filter-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .sort-indicator {
+            margin-left: 4px;
+            font-size: 11px;
+        }
+
+        .sort-asc .sort-indicator::after {
+            content: "↑";
+        }
+
+        .sort-desc .sort-indicator::after {
+            content: "↓";
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close {
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin .admin-only {
+            display: block;
+        }
+
+        .user-only {
+            display: block;
+        }
+
+        .admin .user-only {
+            display: none;
+        }
+
+        .user-list {
+            margin-top: 1.2rem;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            background: var(--bg-primary);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-danger {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-danger:hover {
+            background: var(--table-hover);
+        }
+
+        .btn-edit {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-edit:hover {
+            background: var(--table-hover);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            background: var(--bg-primary);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--accent-color);
+            background: var(--bg-secondary);
+        }
+
+        .attached-files {
+            margin-top: 1.2rem;
+        }
+
+        .attached-file {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            margin-bottom: 0.6rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-cell-content {
+            min-height: 120px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.9rem;
+            margin-bottom: 1.2rem;
+            width: 100%;
+            resize: vertical;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .preview-content {
+            text-align: center;
+            margin: 1.2rem 0;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 450px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .preview-document {
+            width: 100%;
+            height: 550px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 1.2rem;
+        }
+
+        .preview-actions button {
+            padding: 0.8rem 1.5rem;
+        }
+
+        .btn-success {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-success:hover {
+            background: var(--table-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--table-hover);
+        }
+
+        .file-info {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            padding: 1.2rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        #add-row-btn {
+            position: fixed;
+            left: 5px;
+            bottom: 5px;
+            width: 1px !important;
+            height: 1px !important;
+            min-width: 1px !important;
+            min-height: 1px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 0 !important;
+            opacity: 0.1;
+            z-index: 9999;
+            overflow: hidden;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .admin #add-row-btn {
+            position: static;
+            width: 100% !important;
+            height: 40px !important;
+            min-width: auto !important;
+            min-height: auto !important;
+            padding: 0.9rem 1.5rem !important;
+            margin-bottom: 4px !important;
+            font-size: 1rem !important;
+            opacity: 1;
+            background: var(--accent-color) !important;
+        }
+
+        .admin #add-row-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
+        .add-row-btn {
+            background: var(--accent-color) !important;
+        }
+
+        .add-row-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
+        .check-dates-btn {
+            background: var(--accent-color) !important;
+        }
+
+        .check-dates-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
+        .manage-users-btn {
+            background: var(--accent-color) !important;
+        }
+
+        .manage-users-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
+        .add-custom-button-btn {
+            background: var(--accent-color) !important;
+        }
+
+        .add-custom-button-btn:hover {
+            background: var(--accent-hover) !important;
+        }
+
+        .date-input-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 100;
+            border-radius: 4px;
+        }
+
+        .date-input {
+            width: 100%;
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+            padding: 6px 8px;
+            font-size: 14px;
+            outline: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .header-title {
+            cursor: default;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-title.editable {
+            cursor: text;
+            border: 1px dashed transparent;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .header-title.editable:hover {
+            border-color: var(--accent-color);
+            background: var(--bg-secondary);
+        }
+
+        .header-title.editable:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        .icon {
+            font-size: 1.1em;
+            color: var(--text-primary);
+        }
+
+        .column-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 4px;
+            z-index: 1000;
+        }
+
+        .column-control-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            font-size: 12px;
+            opacity: 0.3;
+        }
+
+        .column-control-btn:hover {
+            background: var(--bg-tertiary);
+            opacity: 0.7;
+        }
+
+        body:not(.admin) .column-controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        body:not(.admin) .column-control-btn {
+            width: 1px;
+            height: 1px;
+            opacity: 0.01;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        body:not(.admin) .column-control-btn:hover {
+            background: transparent;
+            opacity: 0.01;
+        }
+
+        .fixed-columns-setting {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            z-index: 1000;
+            color: var(--text-primary);
+            font-size: 12px;
+        }
+
+        .fixed-columns-setting input {
+            width: 50px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 4px;
+            border-radius: 3px;
+            margin-left: 8px;
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            z-index: 1000;
+        }
+
+        .sync-status.syncing {
+            color: var(--accent-color);
+        }
+
+        .sync-status.error {
+            color: #e74c3c;
+        }
+
+        .sync-status.success {
+            color: #2ecc71;
+        }
+
+        @media (max-width: 1200px) {
+            .top-controls-panel {
+                height: auto;
+                padding: 15px;
+            }
+            
+            .controls-group {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            
+            .search-container {
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 300px;
+                order: 2;
+            }
+            
+            .content {
+                order: 1;
+                flex: none;
+                height: 60vh;
+            }
+            
+            .top-controls-panel {
+                flex-direction: column;
+                height: auto;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .tabs-wrapper {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .controls-group {
+                width: 100%;
+                justify-content: space-between;
+                margin-left: 0;
+            }
+            
+            .search-container {
+                min-width: 150px;
+                flex: 1;
+            }
+            
+            .header {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .header-content {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .user-info {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                max-height: 250px;
+            }
+            
+            .content {
+                height: 50vh;
+            }
+            
+            .controls-group {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .search-container {
+                order: -1;
+                width: 100%;
+            }
+            
+            .tabs-container {
+                max-width: 100%;
+            }
+            
+            .tab {
+                min-width: 120px;
+                padding: 6px 12px;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                width: 95%;
+            }
+            
+            .notification-panel {
+                width: 95%;
+                right: 2.5%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 1.5rem;
+                margin: 10px;
+            }
+            
+            .sidebar {
+                padding: 1rem;
+            }
+            
+            .content {
+                padding: 0.8rem;
+            }
+            
+            .top-controls-panel {
+                padding: 8px;
+            }
+            
+            .controls-group {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .controls-group button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .tabs-wrapper {
+                flex-direction: column;
+                height: auto;
+                gap: 5px;
+            }
+            
+            .tabs-container {
+                order: 2;
+                height: 35px;
+            }
+            
+            .tabs-scroll-btn.left {
+                margin-right: 0;
+            }
+            
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .user-role-btn {
+                min-width: 100px;
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 0.3rem;
+                font-size: 0.8rem;
+            }
+            
+            th {
+                padding: 6px 4px;
+                font-size: 0.8rem;
+            }
+            
+            .column-controls {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .fixed-columns-setting {
+                bottom: 50px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .sidebar button {
+                font-size: 0.8rem;
+                padding: 0 10px;
+            }
+            
+            .button-text {
+                font-size: 0.8rem;
+            }
+            
+            .custom-button-wrapper {
+                flex-direction: column;
+                gap: 2px;
+            }
+            
+            .button-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        #show-all {
+            margin-bottom: 10px !important;
+        }
     </style>
 </head>
 <body class="theme-orange">
@@ -62,14 +1916,6 @@
             </div>
             <div class="user-info">
                 <span class="user-name" id="user-name-display"></span>
-                <div class="status-bar-header" id="status-bar-header" data-tooltip="">
-                    <div class="status-info-header">
-                        <div class="status-sync-header">
-                            <span class="sync-icon">🔄</span>
-                            <span class="sync-text" id="sync-status-text">Готов к синхронизации</span>
-                        </div>
-                    </div>
-                </div>
                 <button class="user-role-btn" id="user-role">Пользователь</button>
                 <button id="logout-btn" class="user-role-btn">Выйти</button>
             </div>
@@ -99,6 +1945,7 @@
                     <span class="icon">⌕</span> Фильтр выделенного
                 </button>
                 
+                <!-- Кнопка импорта Excel теперь только для администратора -->
                 <button class="import-excel-btn admin-only" id="import-excel-btn" title="Импорт данных из Excel файла">
                     <span class="icon">↓</span> Импорт Excel
                 </button>
@@ -121,9 +1968,7 @@
                             <span class="icon">+</span> Добавить кнопку
                         </button>
                     </div>
-                    <button id="refresh-data-btn" class="refresh-data-btn user-only" title="Загрузить обновленные данные с GitHub">
-                        <span class="icon">↻</span> Обновить данные
-                    </button>
+                    <!-- Кнопка "Добавить строку" теперь видна для пользователей, но очень маленькая -->
                     <button id="add-row-btn" class="add-row-btn" title="Добавить новую строку в таблицу">
                         <span class="icon">+</span> Добавить строку
                     </button>
@@ -136,9 +1981,6 @@
                         </button>
                         <button id="github-sync-btn" class="manage-users-btn" title="Настройки синхронизации с GitHub">
                             <span class="icon">🔗</span> GitHub Синхронизация
-                        </button>
-                        <button id="save-changes-btn" class="manage-users-btn" title="Сохранить изменения на GitHub">
-                            <span class="icon">💾</span> Сохранить изменения
                         </button>
                     </div>
                 </div>
@@ -166,25 +2008,55 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Данные будут загружаться динамически -->
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="1" title="Выделить строку"></td>
+                                <td>1</td>
+                                <td class="editable" title="Клик для редактирования">Проект А</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">01.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">Активен</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="2" title="Выделить строку"></td>
+                                <td>2</td>
+                                <td class="editable" title="Клик для редактирования">Проект Б</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">05.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">Завершен</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-checkbox" data-row-id="3" title="Выделить строку"></td>
+                                <td>3</td>
+                                <td class="editable" title="Клик для редактирования">Проект В</td>
+                                <td class="editable date-cell" title="Клик - открыть календарь. Двойной клик - ввести дату вручную">10.10.2023</td>
+                                <td class="editable" title="Клик для редактирования">В процессе</td>
+                                <td class="admin-only">
+                                    <button class="delete-row-btn" title="Удалить строку">×</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Кнопки управления столбцами -->
+        <!-- Кнопки управления столбцами - теперь отображаются и у пользователей, но в уменьшенном виде -->
         <div class="column-controls">
             <button class="column-control-btn" id="add-column-btn" title="Добавить столбец">+</button>
             <button class="column-control-btn" id="remove-column-btn" title="Удалить столбец">-</button>
-            <button class="column-control-btn" id="move-column-left-btn" title="Переместить столбец влево">←</button>
-            <button class="column-control-btn" id="move-column-right-btn" title="Переместить столбец вправо">→</button>
         </div>
 
-        <!-- Настройки фиксированных столбцов -->
+        <!-- Настройки фиксированных столбцов - только для администратора -->
         <div class="fixed-columns-setting admin-only">
             <label>Фикс. столбцов: <input type="number" id="fixed-columns-count" min="1" max="10" value="3" title="Количество фиксированных столбцов слева"></label>
         </div>
+
+        <!-- Статус синхронизации -->
+        <div class="sync-status" id="sync-status">Готов к синхронизации</div>
     </div>
 
     <!-- Модальное окно для добавления кнопки -->
@@ -271,10 +2143,7 @@
                     <!-- Прикрепленные файлы будут здесь -->
                 </div>
             </div>
-            <div class="preview-actions">
-                <button id="save-cell-btn" title="Сохранить изменения в ячейке">Сохранить</button>
-                <button id="close-file-modal" title="Закрыть окно">Закрыть</button>
-            </div>
+            <button id="save-cell-btn" title="Сохранить изменения в ячейке">Сохранить</button>
         </div>
     </div>
 
@@ -365,27 +2234,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно перемещения столбца -->
-    <div id="move-column-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Перемещение столбца</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="form-group">
-                <label for="column-to-move">Выберите столбец для перемещения:</label>
-                <select id="column-to-move" style="width: 100%; padding: 0.5rem; border: 1px solid #4a4a4a; border-radius: 5px; background: #2f2f2f; color: #ecf0f1;">
-                    <!-- Столбцы будут добавлены динамически -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="column-position">Новая позиция (от 1 до <span id="max-position">0</span>):</label>
-                <input type="number" id="column-position" min="1" value="1" style="width: 100%; padding: 0.5rem; border: 1px solid #4a4a4a; border-radius: 5px; background: #2f2f2f; color: #ecf0f1;">
-            </div>
-            <button id="confirm-move-column">Переместить столбец</button>
-        </div>
-    </div>
-
     <!-- Модальное окно настроек GitHub -->
     <div id="github-sync-modal" class="modal">
         <div class="modal-content">
@@ -415,461 +2263,52 @@
         </div>
     </div>
 
-    <!-- Модальное окно для разрешения конфликтов -->
-    <div id="conflict-resolution-modal" class="modal conflict-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Обнаружен конфликт данных</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="form-group">
-                <p>Данные были изменены другим администратором. Выберите действие:</p>
-                <div class="conflict-details" id="conflict-details">
-                    <!-- Детали конфликта будут здесь -->
-                </div>
-            </div>
-            <div class="preview-actions">
-                <button id="overwrite-conflict-btn" class="btn-success">Перезаписать данные</button>
-                <button id="keep-changes-btn" class="btn-secondary">Сохранить мои изменения</button>
-                <button id="cancel-conflict-btn" class="btn-secondary">Отмена</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Скрытый input для загрузки логотипа -->
     <input type="file" id="logo-upload" accept=".png" style="display: none;">
 
     <script>
-        // ========== StorageManager Class ==========
-        class StorageManager {
-            constructor() {
-                this.GITHUB_CONFIG = {
-                    token: localStorage.getItem('githubToken') || '',
-                    repo: localStorage.getItem('githubRepo') || 'viktor15081985/Transort',
-                    branch: localStorage.getItem('githubBranch') || 'main'
-                };
-                
-                this.pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
-                this.isSyncing = false;
-                this.syncRetryCount = 0;
-                this.MAX_SYNC_RETRIES = 3;
-                this.syncRetryTimeout = null;
-            }
-
-            // Получение всех данных приложения
-            getAllAppData(users, appSettings, tabs, currentUser) {
-                return {
-                    users,
-                    appSettings,
-                    tabs,
-                    lastSync: new Date().toISOString(),
-                    lastEditor: currentUser.username
-                };
-            }
-
-            // Сохранение всех данных в localStorage
-            saveToLocalStorage(users, appSettings, tabs) {
-                try {
-                    localStorage.setItem('users', JSON.stringify(users));
-                    localStorage.setItem('appSettings', JSON.stringify(appSettings));
-                    localStorage.setItem('tabs', JSON.stringify(tabs));
-                    
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка сохранения в localStorage:', error);
-                    return false;
-                }
-            }
-
-            // Загрузка всех данных из localStorage
-            loadFromLocalStorage() {
-                try {
-                    const users = JSON.parse(localStorage.getItem('users')) || [];
-                    const appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
-                    const tabs = JSON.parse(localStorage.getItem('tabs')) || [];
-                    const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
-                    
-                    return {
-                        users,
-                        appSettings,
-                        tabs,
-                        pendingChanges
-                    };
-                } catch (error) {
-                    console.error('Ошибка загрузки из localStorage:', error);
-                    return this.getDefaultData();
-                }
-            }
-
-            // Данные по умолчанию
-            getDefaultData() {
-                const defaultTab = {
-                    id: 'tab1',
-                    name: 'Основное окно',
-                    tableData: [
-                        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
-                        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
-                        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
-                    ],
-                    customButtons: [],
-                    customColumns: [],
-                    basicColumns: [
-                        { id: 'id', name: '№ п/п', editable: false },
-                        { id: 'name', name: 'Название', editable: true },
-                        { id: 'date', name: 'Дата создания', editable: true },
-                        { id: 'status', name: 'Статус', editable: true }
-                    ],
-                    dateValidationColumns: {}
-                };
-
-                return {
-                    users: [
-                        { username: 'admin', password: 'admin', role: 'admin' },
-                        { username: 'user', password: 'user', role: 'user' }
-                    ],
-                    appSettings: {
-                        headerTitle: 'Основное окно',
-                        headerLogo: '',
-                        fixedColumnsCount: 3,
-                        currentTheme: 'theme-orange'
-                    },
-                    tabs: [defaultTab],
-                    pendingChanges: []
-                };
-            }
-
-            // Сохранение в GitHub
-            async saveToGitHub(data, currentUser) {
-                if (!this.GITHUB_CONFIG.token) {
-                    throw new Error('GitHub токен не настроен');
-                }
-
-                console.log('🔄 Начинаем процесс синхронизации...');
-
-                let content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-                
-                let sha = null;
-                let remoteData = null;
-                
-                try {
-                    console.log('📡 Получаем актуальную информацию о файле...');
-                    const fileInfoResponse = await fetch(`https://api.github.com/repos/${this.GITHUB_CONFIG.repo}/contents/data.json?ref=${this.GITHUB_CONFIG.branch}`, {
-                        headers: {
-                            'Authorization': `token ${this.GITHUB_CONFIG.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    
-                    if (fileInfoResponse.ok) {
-                        const fileInfo = await fileInfoResponse.json();
-                        sha = fileInfo.sha;
-                        
-                        const remoteContent = decodeURIComponent(escape(atob(fileInfo.content)));
-                        remoteData = JSON.parse(remoteContent);
-                        
-                        console.log('✅ Текущий SHA:', sha);
-
-                        if (currentUser.role === 'admin' && remoteData.lastEditor && 
-                            remoteData.lastEditor !== currentUser.username && 
-                            remoteData.lastSync > localStorage.getItem('lastSyncTime')) {
-                            
-                            console.log('⚠️ Обнаружен потенциальный конфликт: данные были изменены другим администратором');
-                            
-                            return {
-                                conflict: true,
-                                remoteData: remoteData,
-                                sha: sha
-                            };
-                        }
-                        
-                        console.log('🔄 Выполняем автоматическое слияние данных...');
-                        const mergedData = this.mergeData(remoteData, data);
-                        content = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
-                        
-                    } else if (fileInfoResponse.status === 404) {
-                        console.log('📝 Файл не существует, создаем новый');
-                        sha = null;
-                    } else {
-                        const error = await fileInfoResponse.json();
-                        throw new Error(`Ошибка получения информации о файле: ${error.message}`);
-                    }
-                } catch (e) {
-                    console.log('⚠️ Ошибка при получении информации о файле:', e.message);
-                }
-
-                console.log('💾 Отправляем данные на GitHub...');
-                const saveResponse = await fetch(`https://api.github.com/repos/${this.GITHUB_CONFIG.repo}/contents/data.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${this.GITHUB_CONFIG.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: `Авто-синхронизация ${new Date().toLocaleString()} (${currentUser.username})`,
-                        content: content,
-                        branch: this.GITHUB_CONFIG.branch,
-                        sha: sha
-                    })
-                });
-
-                if (!saveResponse.ok) {
-                    const error = await saveResponse.json();
-                    
-                    if (error.message && error.message.includes('does not match')) {
-                        console.log('⚡ Обнаружен конфликт SHA, обновляем данные...');
-                        return {
-                            shaConflict: true,
-                            error: error
-                        };
-                    }
-                    
-                    throw new Error(error.message || 'Ошибка сохранения в GitHub');
-                }
-
-                console.log('✅ Успешно сохранено в GitHub');
-                localStorage.setItem('lastSyncTime', new Date().toISOString());
-                return { success: true };
-            }
-
-            // Загрузка из GitHub
-            async loadFromGitHub() {
-                try {
-                    console.log('📥 Начинаем загрузку данных из GitHub...');
-                    
-                    if (!this.GITHUB_CONFIG.token && !this.GITHUB_CONFIG.repo) {
-                        throw new Error('Настройки GitHub не настроены');
-                    }
-
-                    const headers = {
-                        'Accept': 'application/vnd.github.v3+json'
-                    };
-                    if (this.GITHUB_CONFIG.token) {
-                        headers['Authorization'] = `token ${this.GITHUB_CONFIG.token}`;
-                    }
-
-                    const response = await fetch(`https://api.github.com/repos/${this.GITHUB_CONFIG.repo}/contents/data.json?ref=${this.GITHUB_CONFIG.branch}`, {
-                        headers: headers
-                    });
-
-                    console.log('📡 Статус загрузки:', response.status);
-
-                    if (!response.ok) {
-                        if (response.status === 404) {
-                            console.log('📝 Файл данных не найден, будет создан при первой синхронизации');
-                            return { notFound: true };
-                        }
-                        const error = await response.json();
-                        throw new Error(error.message || `Ошибка загрузки: ${response.status}`);
-                    }
-
-                    const fileInfo = await response.json();
-                    console.log('✅ Файл найден, размер:', fileInfo.size, 'байт');
-
-                    if (!fileInfo.content || fileInfo.size === 0) {
-                        throw new Error('Файл данных пуст');
-                    }
-
-                    const content = decodeURIComponent(escape(atob(fileInfo.content)));
-                    
-                    if (!content || content.trim() === '') {
-                        throw new Error('Файл данных пуст');
-                    }
-
-                    console.log('🔍 Парсим данные...');
-                    let data;
-                    try {
-                        data = JSON.parse(content);
-                    } catch (parseError) {
-                        console.error('❌ Ошибка парсинга JSON:', parseError);
-                        throw new Error('Файл данных поврежден');
-                    }
-
-                    console.log('✅ Данные успешно загружены');
-                    return { success: true, data: data };
-
-                } catch (error) {
-                    console.error('❌ Ошибка загрузки:', error);
-                    throw error;
-                }
-            }
-
-            // Автоматическая синхронизация изменений
-            async autoSyncChanges(data, currentUser, updateSyncStatus) {
-                if (currentUser && currentUser.role === 'admin') {
-                    const change = {
-                        timestamp: Date.now(),
-                        data: data,
-                        user: currentUser.username
-                    };
-                    
-                    this.pendingChanges.push(change);
-                    localStorage.setItem('pendingChanges', JSON.stringify(this.pendingChanges));
-                    
-                    await this.trySyncChanges(updateSyncStatus);
-                }
-            }
-
-            // Попытка синхронизации изменений
-            async trySyncChanges(updateSyncStatus) {
-                if (this.isSyncing || this.pendingChanges.length === 0) return;
-                
-                this.isSyncing = true;
-                updateSyncStatus('Синхронизация...', 'syncing');
-                
-                const change = this.pendingChanges[0];
-                
-                try {
-                    const result = await this.saveToGitHub(change.data, change.user);
-                    
-                    if (result.conflict) {
-                        updateSyncStatus('Обнаружен конфликт данных', 'error');
-                        return { conflict: true, remoteData: result.remoteData };
-                    }
-                    
-                    if (result.shaConflict) {
-                        // Повторная попытка после конфликта SHA
-                        await this.handleShaConflict(change.data, change.user);
-                    }
-                    
-                    this.pendingChanges.shift();
-                    localStorage.setItem('pendingChanges', JSON.stringify(this.pendingChanges));
-                    this.syncRetryCount = 0;
-                    
-                    updateSyncStatus('Синхронизировано: ' + new Date().toLocaleTimeString(), 'success');
-                    
-                    if (this.pendingChanges.length > 0) {
-                        setTimeout(() => this.trySyncChanges(updateSyncStatus), 1000);
-                    }
-                    
-                    return { success: true };
-                    
-                } catch (error) {
-                    console.error('Ошибка синхронизации:', error);
-                    this.syncRetryCount++;
-                    
-                    if (this.syncRetryCount <= this.MAX_SYNC_RETRIES) {
-                        updateSyncStatus(`Ошибка, повтор через ${this.syncRetryCount * 2} сек...`, 'error');
-                        this.syncRetryTimeout = setTimeout(() => this.trySyncChanges(updateSyncStatus), this.syncRetryCount * 2000);
-                    } else {
-                        updateSyncStatus('Ошибка синхронизации', 'error');
-                    }
-                    
-                    return { error: error.message };
-                } finally {
-                    this.isSyncing = false;
-                }
-            }
-
-            // Обработка конфликта SHA
-            async handleShaConflict(data, user) {
-                // Загружаем актуальные данные и повторяем сохранение
-                const loadResult = await this.loadFromGitHub();
-                if (loadResult.success) {
-                    const retryData = {
-                        ...data,
-                        lastSync: new Date().toISOString()
-                    };
-                    
-                    await this.saveToGitHub(retryData, user);
-                }
-            }
-
-            // Слияние данных
-            mergeData(remoteData, localData) {
-                console.log('🔄 Запуск слияния данных...');
-                
-                const merged = {
-                    ...remoteData,
-                    lastSync: new Date().toISOString(),
-                    mergeOperation: true,
-                    lastEditor: localData.lastEditor
-                };
-
-                // Слияние пользователей
-                if (localData.users && remoteData.users) {
-                    console.log('👥 Слияние пользователей...');
-                    const userMap = new Map(remoteData.users.map(user => [user.username, user]));
-                    
-                    localData.users.forEach(localUser => {
-                        userMap.set(localUser.username, localUser);
-                    });
-                    
-                    merged.users = Array.from(userMap.values());
-                    console.log(`✅ Пользователи объединены: ${merged.users.length} пользователей`);
-                }
-
-                // Слияние настроек
-                if (localData.appSettings) {
-                    console.log('⚙️ Слияние настроек приложения...');
-                    merged.appSettings = {
-                        ...remoteData.appSettings,
-                        ...localData.appSettings
-                    };
-                }
-
-                // Слияние вкладок
-                if (localData.tabs) {
-                    console.log('📑 Слияние вкладок...');
-                    const tabMap = new Map(remoteData.tabs.map(tab => [tab.id, tab]));
-                    
-                    localData.tabs.forEach(localTab => {
-                        tabMap.set(localTab.id, localTab);
-                    });
-                    
-                    merged.tabs = Array.from(tabMap.values());
-                    console.log(`✅ Вкладки объединены: ${merged.tabs.length} вкладок`);
-                }
-
-                console.log('🎉 Слияние завершено успешно');
-                return merged;
-            }
-
-            // Обновление конфигурации GitHub
-            updateGitHubConfig(token, repo, branch) {
-                this.GITHUB_CONFIG.token = token;
-                this.GITHUB_CONFIG.repo = repo;
-                this.GITHUB_CONFIG.branch = branch;
-                
-                localStorage.setItem('githubToken', token);
-                localStorage.setItem('githubRepo', repo);
-                localStorage.setItem('githubBranch', branch);
-                
-                return true;
-            }
-
-            // Получение текущей конфигурации
-            getConfig() {
-                return { ...this.GITHUB_CONFIG };
-            }
-
-            // Очистка отложенных изменений
-            clearPendingChanges() {
-                this.pendingChanges = [];
-                localStorage.setItem('pendingChanges', JSON.stringify(this.pendingChanges));
-            }
-
-            // Получение статуса синхронизации
-            getSyncStatus() {
-                return {
-                    isSyncing: this.isSyncing,
-                    pendingChanges: this.pendingChanges.length,
-                    syncRetryCount: this.syncRetryCount
-                };
-            }
-        }
-
-        // ========== Основной код приложения ==========
-        
-        // Создаем экземпляр StorageManager
-        const storageManager = new StorageManager();
+        // Конфигурация GitHub
+        const GITHUB_CONFIG = {
+            token: localStorage.getItem('githubToken') || '',
+            repo: localStorage.getItem('githubRepo') || 'viktor15081985/Transort',
+            branch: localStorage.getItem('githubBranch') || 'main'
+        };
 
         // Данные пользователей
-        let users = [];
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { username: 'admin', password: 'admin', role: 'admin' },
+            { username: 'user', password: 'user', role: 'user' }
+        ];
+
+        // Данные таблицы
+        let tableData = JSON.parse(localStorage.getItem('tableData')) || [
+            { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+            { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+            { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+        ];
+
         // Настройки приложения
-        let appSettings = {};
-        // Вкладки
-        let tabs = [];
+        let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
+            headerTitle: 'Основное окно',
+            headerLogo: '',
+            fixedColumnsCount: 3,
+            currentTheme: 'theme-orange'
+        };
+
+        // Данные кнопок и столбцов
+        let customButtons = JSON.parse(localStorage.getItem('customButtons')) || [];
+        let customColumns = JSON.parse(localStorage.getItem('customColumns')) || [];
+
+        // Базовые столбцы
+        let basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || [
+            { id: 'id', name: '№ п/п', editable: false },
+            { id: 'name', name: 'Название', editable: true },
+            { id: 'date', name: 'Дата создания', editable: true },
+            { id: 'status', name: 'Статус', editable: true }
+        ];
+
+        // Настройки проверки дат
+        let dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || {};
 
         // Текущий пользователь и состояние
         let currentUser = null;
@@ -882,6 +2321,9 @@
         let currentDateInput = null;
 
         // Новые переменные для вкладок и поиска
+        let tabs = JSON.parse(localStorage.getItem('tabs')) || [
+            { id: 'tab1', name: 'Основное окно', data: null }
+        ];
         let currentTabId = 'tab1';
         let selectedRows = new Set();
         let searchTerm = '';
@@ -889,458 +2331,449 @@
         // Данные для импорта
         let currentImportData = null;
 
-        // Переменные для системы онлайн-пользователей и конфликтов
-        let onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-        let lastDataHash = localStorage.getItem('lastDataHash') || '';
-        let adminConflictData = null;
-        let currentConflict = null;
+        // НОВАЯ ФУНКЦИЯ saveToGitHub с автоматическим слиянием
+        async function saveToGitHub() {
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Синхронизация...';
+            statusElement.className = 'sync-status syncing';
 
-        // Глобальная переменная для управления файлами
-        let currentFileManagementCell = null;
-
-        // Получение текущей вкладки
-        function getCurrentTab() {
-            return tabs.find(tab => tab.id === currentTabId);
-        }
-
-        // Получение данных текущей вкладки
-        function getCurrentTabData() {
-            const currentTab = getCurrentTab();
-            return currentTab ? currentTab.tableData : [];
-        }
-
-        // Получение кастомных кнопок текущей вкладки
-        function getCurrentTabCustomButtons() {
-            const currentTab = getCurrentTab();
-            return currentTab ? currentTab.customButtons : [];
-        }
-
-        // Получение кастомных столбцов текущей вкладки
-        function getCurrentTabCustomColumns() {
-            const currentTab = getCurrentTab();
-            return currentTab ? currentTab.customColumns : [];
-        }
-
-        // Получение базовых столбцов текущей вкладки
-        function getCurrentTabBasicColumns() {
-            const currentTab = getCurrentTab();
-            return currentTab ? currentTab.basicColumns : [];
-        }
-
-        // Получение настроек проверки дат текущей вкладки
-        function getCurrentTabDateValidationColumns() {
-            const currentTab = getCurrentTab();
-            return currentTab ? currentTab.dateValidationColumns : {};
-        }
-
-        // Обновление данных текущей вкладки
-        function updateCurrentTabData(newData) {
-            const currentTab = getCurrentTab();
-            if (currentTab) {
-                currentTab.tableData = newData;
-            }
-        }
-
-        // ФУНКЦИЯ ОБНОВЛЕНИЯ СТРОКИ СОСТОЯНИЯ В ХЕДЕРЕ
-        function updateStatusBar() {
-            if (!currentUser) return;
-            
-            const adminCount = Object.values(onlineUsers).filter(user => user.role === 'admin').length;
-            const userCount = Object.values(onlineUsers).filter(user => user.role === 'user').length;
-            
-            if (currentUser) {
-                onlineUsers[currentUser.username] = {
-                    username: currentUser.username,
-                    role: currentUser.role,
-                    lastActive: Date.now()
-                };
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            }
-            
-            const now = Date.now();
-            Object.keys(onlineUsers).forEach(username => {
-                if (now - onlineUsers[username].lastActive > 300000) {
-                    delete onlineUsers[username];
-                }
-            });
-            localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            
-            const statusBar = document.getElementById('status-bar-header');
-            statusBar.setAttribute('data-tooltip', `Администраторов: ${adminCount}, Пользователей: ${userCount}`);
-        }
-
-        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ СТАТУСА СИНХРОНИЗАЦИИ В ХЕДЕРЕ
-        function updateSyncStatus(message, type = '') {
-            const statusElement = document.getElementById('sync-status-text');
-            const statusBar = document.getElementById('status-bar-header');
-            
-            statusElement.textContent = message;
-            
-            statusBar.classList.remove('syncing', 'success', 'error');
-            
-            if (type) {
-                statusBar.classList.add(type);
-            }
-            
-            const syncIcon = statusBar.querySelector('.sync-icon');
-            if (type === 'syncing') {
-                syncIcon.textContent = '🔄';
-            } else if (type === 'success') {
-                syncIcon.textContent = '✅';
-            } else if (type === 'error') {
-                syncIcon.textContent = '❌';
-            } else {
-                syncIcon.textContent = '🔗';
-            }
-        }
-
-        // ФУНКЦИЯ ДЛЯ АВТОМАТИЧЕСКОЙ СИНХРОНИЗАЦИИ ПРИ ИЗМЕНЕНИЯХ
-        function autoSyncChanges() {
-            if (currentUser && currentUser.role === 'admin') {
-                const appData = storageManager.getAllAppData(
-                    users, appSettings, tabs, currentUser
-                );
-                
-                storageManager.autoSyncChanges(appData, currentUser, updateSyncStatus);
-            }
-        }
-
-        // ФУНКЦИЯ ДЛЯ ПРИНУДИТЕЛЬНОГО СОХРАНЕНИЯ ИЗМЕНЕНИЙ
-        function forceSaveChanges() {
-            if (storageManager.pendingChanges.length === 0) {
-                alert('Нет изменений для сохранения');
-                return;
-            }
-            
-            storageManager.syncRetryCount = 0;
-            if (storageManager.syncRetryTimeout) {
-                clearTimeout(storageManager.syncRetryTimeout);
-                storageManager.syncRetryTimeout = null;
-            }
-            
-            storageManager.trySyncChanges(updateSyncStatus);
-        }
-
-        // ФУНКЦИЯ ДЛЯ ПОКАЗА КОНФЛИКТА И РАЗРЕШЕНИЯ
-        function showConflictResolution(remoteData, localData) {
-            const modal = document.getElementById('conflict-resolution-modal');
-            const detailsContainer = document.getElementById('conflict-details');
-            
-            const changes = findDataChanges(remoteData, localData);
-            
-            let detailsHTML = '<div><strong>Изменения другого администратора (' + remoteData.lastEditor + '):</strong></div>';
-            
-            changes.forEach(change => {
-                detailsHTML += `<div class="conflict-item">${change}</div>`;
-            });
-            
-            detailsHTML += '<div style="margin-top: 10px;"><strong>Ваши изменения:</strong></div>';
-            detailsHTML += '<div class="conflict-item">Локальные правки данных</div>';
-            
-            detailsContainer.innerHTML = detailsHTML;
-            
-            document.getElementById('overwrite-conflict-btn').onclick = function() {
-                continueSaveAfterConflict('overwrite');
-                modal.style.display = 'none';
-            };
-            
-            document.getElementById('keep-changes-btn').onclick = function() {
-                continueSaveAfterConflict('merge');
-                modal.style.display = 'none';
-            };
-            
-            document.getElementById('cancel-conflict-btn').onclick = function() {
-                modal.style.display = 'none';
-                updateSyncStatus('Сохранение отменено из-за конфликта', 'error');
-            };
-            
-            modal.style.display = 'flex';
-        }
-
-        // ФУНКЦИЯ ДЛЯ ПРОДОЛЖЕНИЯ СОХРАНЕНИЯ ПОСЛЕ РАЗРЕШЕНИЯ КОНФЛИКТА
-        async function continueSaveAfterConflict(resolution) {
-            if (!adminConflictData) return;
-            
-            const { remoteData, localData, sha } = adminConflictData;
-            let finalData = localData;
-            
-            if (resolution === 'merge') {
-                finalData = storageManager.mergeData(remoteData, localData);
-            }
-            
             try {
-                await storageManager.saveToGitHub(finalData, currentUser);
-                console.log('✅ Успешно сохранено после разрешения конфликта');
-                updateSyncStatus('Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString(), 'success');
-                
-                if (resolution === 'merge') {
-                    updateLocalData(finalData);
+                // Проверка конфигурации
+                if (!GITHUB_CONFIG.token) {
+                    throw new Error('GitHub токен не настроен');
                 }
+
+                console.log('🔄 Начинаем процесс синхронизации...');
+
+                // 1. ПОДГОТОВКА ДАННЫХ
+                const dataToSave = {
+                    tableData,
+                    users,
+                    appSettings,
+                    customButtons,
+                    customColumns,
+                    basicColumns,
+                    dateValidationColumns,
+                    tabs,
+                    lastSync: new Date().toISOString(),
+                    syncSource: 'device_' + Math.random().toString(36).substr(2, 9) // Идентификатор устройства
+                };
+
+                console.log('📊 Данные для сохранения:', {
+                    строки: tableData.length,
+                    пользователи: users.length,
+                    вкладки: tabs.length
+                });
+
+                let content = btoa(unescape(encodeURIComponent(JSON.stringify(dataToSave, null, 2))));
                 
-                if (storageManager.pendingChanges.length > 0) {
-                    storageManager.pendingChanges.shift();
-                    localStorage.setItem('pendingChanges', JSON.stringify(storageManager.pendingChanges));
+                // 2. ПОЛУЧЕНИЕ ТЕКУЩЕГО СОСТОЯНИЯ ФАЙЛА
+                let sha = null;
+                let remoteData = null;
+                
+                try {
+                    console.log('📡 Получаем актуальную информацию о файле...');
+                    const fileInfoResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                        headers: {
+                            'Authorization': `token ${GITHUB_CONFIG.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (fileInfoResponse.ok) {
+                        const fileInfo = await fileInfoResponse.json();
+                        sha = fileInfo.sha;
+                        
+                        // Декодируем и парсим текущие данные с GitHub
+                        const remoteContent = decodeURIComponent(escape(atob(fileInfo.content)));
+                        remoteData = JSON.parse(remoteContent);
+                        
+                        console.log('✅ Текущий SHA:', sha);
+                        console.log('📋 Данные с GitHub:', {
+                            строки: remoteData.tableData?.length || 0,
+                            последняяСинхронизация: remoteData.lastSync
+                        });
+                    } else if (fileInfoResponse.status === 404) {
+                        console.log('📝 Файл не существует, создаем новый');
+                        sha = null;
+                        remoteData = null;
+                    } else {
+                        const error = await fileInfoResponse.json();
+                        throw new Error(`Ошибка получения информации о файле: ${error.message}`);
+                    }
+                } catch (e) {
+                    console.log('⚠️ Ошибка при получении информации о файле:', e.message);
+                    // Продолжаем без информации о удаленном файле
                 }
+
+                // 3. АВТОМАТИЧЕСКОЕ СЛИЯНИЕ ДАННЫХ (если есть удаленные данные)
+                let finalData = dataToSave;
+                
+                if (remoteData && remoteData.tableData) {
+                    console.log('🔄 Выполняем автоматическое слияние данных...');
+                    finalData = mergeData(remoteData, dataToSave);
+                    console.log('✅ Слияние завершено:', {
+                        было_строк: remoteData.tableData.length,
+                        стало_строк: finalData.tableData.length
+                    });
+                    
+                    // Обновляем контент после слияния
+                    content = btoa(unescape(encodeURIComponent(JSON.stringify(finalData, null, 2))));
+                }
+
+                // 4. СОХРАНЕНИЕ ДАННЫХ
+                console.log('💾 Отправляем данные с SHA:', sha);
+                const saveResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Авто-синхронизация ${new Date().toLocaleString()}`,
+                        content: content,
+                        branch: GITHUB_CONFIG.branch,
+                        sha: sha // Используем актуальный SHA
+                    })
+                });
+
+                // 5. ОБРАБОТКА ОТВЕТА
+                if (!saveResponse.ok) {
+                    const error = await saveResponse.json();
+                    
+                    // Если SHA не совпадает (конфликт версий)
+                    if (error.message && error.message.includes('does not match')) {
+                        console.log('⚡ Обнаружен конфликт версий, выполняем разрешение...');
+                        
+                        // Получаем самый актуальный SHA
+                        const retryResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                            headers: {
+                                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        });
+                        
+                        if (retryResponse.ok) {
+                            const latestFileInfo = await retryResponse.json();
+                            const newSha = latestFileInfo.sha;
+                            
+                            console.log('🔄 Получен новый SHA для повторной попытки:', newSha);
+                            
+                            // СЛИЯНИЕ С САМЫМИ АКТУАЛЬНЫМИ ДАННЫМИ
+                            const latestContent = decodeURIComponent(escape(atob(latestFileInfo.content)));
+                            const latestData = JSON.parse(latestContent);
+                            
+                            console.log('🔄 Повторное слияние с актуальными данными...');
+                            const mergedData = mergeData(latestData, dataToSave);
+                            const mergedContent = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
+                            
+                            // Повторяем запрос с новым SHA и объединенными данными
+                            const retrySave = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/vnd.github.v3+json'
+                                },
+                                body: JSON.stringify({
+                                    message: `Авто-синхронизация с разрешением конфликта ${new Date().toLocaleString()}`,
+                                    content: mergedContent,
+                                    branch: GITHUB_CONFIG.branch,
+                                    sha: newSha
+                                })
+                            });
+                            
+                            if (!retrySave.ok) {
+                                const retryError = await retrySave.json();
+                                throw new Error(`Ошибка при повторной попытке: ${retryError.message}`);
+                            }
+                            
+                            // УСПЕХ ПОВТОРНОЙ ПОПЫТКИ
+                            console.log('✅ Успешно сохранено после разрешения конфликта');
+                            statusElement.textContent = 'Синхронизировано (разрешён конфликт): ' + new Date().toLocaleTimeString();
+                            statusElement.className = 'sync-status success';
+                            
+                            // Обновляем локальные данные объединенной версией
+                            updateLocalData(mergedData);
+                            saveToLocalStorage();
+                            return;
+                        }
+                    }
+                    
+                    // Другие ошибки
+                    throw new Error(error.message || 'Ошибка сохранения в GitHub');
+                }
+
+                // УСПЕШНОЕ СОХРАНЕНИЕ
+                console.log('✅ Успешно сохранено в GitHub');
+                statusElement.textContent = 'Синхронизировано: ' + new Date().toLocaleTimeString();
+                statusElement.className = 'sync-status success';
+                saveToLocalStorage();
+                
             } catch (error) {
-                updateSyncStatus('Ошибка сохранения: ' + error.message, 'error');
+                console.error('❌ Ошибка синхронизации:', error);
+                statusElement.textContent = 'Ошибка синхронизации: ' + error.message;
+                statusElement.className = 'sync-status error';
+                saveToLocalStorage();
             }
-            
-            adminConflictData = null;
         }
 
-        // ФУНКЦИЯ ДЛЯ ПОИСКА ИЗМЕНЕНИЙ В ДАННЫХ
-        function findDataChanges(remoteData, localData) {
-            const changes = [];
+        // ФУНКЦИЯ АВТОМАТИЧЕСКОГО СЛИЯНИЯ ДАННЫХ
+        function mergeData(remoteData, localData) {
+            console.log('🔄 Запуск слияния данных...');
             
-            if (remoteData.users && localData.users) {
-                if (remoteData.users.length !== localData.users.length) {
-                    changes.push(`Количество пользователей: ${remoteData.users.length} → ${localData.users.length}`);
-                }
+            const merged = {
+                ...remoteData,
+                lastSync: new Date().toISOString(),
+                mergeOperation: true
+            };
+
+            // СЛИЯНИЕ ТАБЛИЧНЫХ ДАННЫХ
+            if (localData.tableData && remoteData.tableData) {
+                console.log('📊 Слияние табличных данных...');
+                
+                const remoteRows = new Map(remoteData.tableData.map(row => [row.id, row]));
+                const localRows = new Map(localData.tableData.map(row => [row.id, row]));
+                
+                // Объединяем строки - локальные изменения имеют приоритет
+                const mergedTableData = [...remoteData.tableData];
+                
+                localData.tableData.forEach(localRow => {
+                    const existingIndex = mergedTableData.findIndex(row => row.id === localRow.id);
+                    if (existingIndex >= 0) {
+                        // Обновляем существующую строку, сохраняя attachments
+                        const existingAttachments = mergedTableData[existingIndex].attachments;
+                        mergedTableData[existingIndex] = {
+                            ...localRow,
+                            attachments: { ...existingAttachments, ...localRow.attachments }
+                        };
+                        console.log(`✏️ Обновлена строка ID: ${localRow.id}`);
+                    } else {
+                        // Добавляем новую строку
+                        mergedTableData.push(localRow);
+                        console.log(`➕ Добавлена новая строка ID: ${localRow.id}`);
+                    }
+                });
+                
+                merged.tableData = mergedTableData;
+                console.log(`✅ Табличные данные объединены: ${mergedTableData.length} строк`);
             }
-            
-            if (remoteData.lastEditor) {
-                changes.push(`Последний редактор: ${remoteData.lastEditor}`);
+
+            // СЛИЯНИЕ ПОЛЬЗОВАТЕЛЕЙ (административные данные)
+            if (localData.users && remoteData.users) {
+                console.log('👥 Слияние пользователей...');
+                const userMap = new Map(remoteData.users.map(user => [user.username, user]));
+                
+                localData.users.forEach(localUser => {
+                    userMap.set(localUser.username, localUser);
+                });
+                
+                merged.users = Array.from(userMap.values());
+                console.log(`✅ Пользователи объединены: ${merged.users.length} пользователей`);
             }
-            
-            if (changes.length === 0) {
-                changes.push('Незначительные изменения в данных');
+
+            // СЛИЯНИЕ НАСТРОЕК (локальные настройки имеют приоритет)
+            if (localData.appSettings) {
+                console.log('⚙️ Слияние настроек приложения...');
+                merged.appSettings = {
+                    ...remoteData.appSettings,
+                    ...localData.appSettings
+                };
             }
-            
-            return changes;
+
+            // СЛИЯНИЕ КОЛОНОК И КНОПОК
+            if (localData.customButtons) {
+                merged.customButtons = localData.customButtons;
+            }
+            if (localData.customColumns) {
+                merged.customColumns = localData.customColumns;
+            }
+
+            console.log('🎉 Слияние завершено успешно');
+            return merged;
         }
 
         // ФУНКЦИЯ ОБНОВЛЕНИЯ ЛОКАЛЬНЫХ ДАННЫХ
         function updateLocalData(mergedData) {
             console.log('🔄 Обновление локальных данных после слияния...');
             
+            tableData = mergedData.tableData || tableData;
             users = mergedData.users || users;
             appSettings = mergedData.appSettings || appSettings;
+            customButtons = mergedData.customButtons || customButtons;
+            customColumns = mergedData.customColumns || customColumns;
+            basicColumns = mergedData.basicColumns || basicColumns;
+            dateValidationColumns = mergedData.dateValidationColumns || dateValidationColumns;
             tabs = mergedData.tabs || tabs;
             
             console.log('✅ Локальные данные обновлены');
             
+            // Перерисовываем интерфейс
             renderTabs();
             renderTable();
             loadCustomButtons();
         }
 
-        // УЛУЧШЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ИЗ GITHUB
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ loadFromGitHub
         async function loadFromGitHub() {
-            updateSyncStatus('Загрузка из GitHub...', 'syncing');
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Загрузка из GitHub...';
+            statusElement.className = 'sync-status syncing';
 
             try {
-                const result = await storageManager.loadFromGitHub();
+                console.log('📥 Начинаем загрузку данных из GitHub...');
                 
-                if (result.notFound) {
-                    updateSyncStatus('Файл данных не найден', '');
-                    return;
+                if (!GITHUB_CONFIG.token) {
+                    // Если токена нет, пытаемся загрузить из публичного репозитория
+                    console.log('⚠️ Токен GitHub не настроен, пробуем загрузить из публичного репозитория...');
+                    statusElement.textContent = 'Попытка загрузки из публичного репозитория...';
                 }
 
-                console.log('✅ Данные успешно загружены');
-                
-                updateLocalData(result.data);
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                localStorage.setItem('lastSyncTime', new Date().toISOString());
+                const headers = {
+                    'Accept': 'application/vnd.github.v3+json'
+                };
+                if (GITHUB_CONFIG.token) {
+                    headers['Authorization'] = `token ${GITHUB_CONFIG.token}`;
+                }
 
-                updateSyncStatus('Загружено из GitHub: ' + new Date().toLocaleTimeString(), 'success');
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/data.json?ref=${GITHUB_CONFIG.branch}`, {
+                    headers: headers
+                });
+
+                console.log('📡 Статус загрузки:', response.status);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.log('📝 Файл данных не найден, будет создан при первой синхронизации');
+                        statusElement.textContent = 'Файл данных не найден (создастся при синхронизации)';
+                        statusElement.className = 'sync-status';
+                        return;
+                    }
+                    const error = await response.json();
+                    throw new Error(error.message || `Ошибка загрузки: ${response.status}`);
+                }
+
+                const fileInfo = await response.json();
+                console.log('✅ Файл найден, размер:', fileInfo.size, 'байт');
+
+                // Проверяем, что файл не пустой
+                if (!fileInfo.content || fileInfo.size === 0) {
+                    throw new Error('Файл данных пуст');
+                }
+
+                const content = decodeURIComponent(escape(atob(fileInfo.content)));
+                
+                if (!content || content.trim() === '') {
+                    throw new Error('Файл данных пуст');
+                }
+
+                console.log('🔍 Парсим данные...');
+                let data;
+                try {
+                    data = JSON.parse(content);
+                } catch (parseError) {
+                    console.error('❌ Ошибка парсинга JSON:', parseError);
+                    throw new Error('Файл данных поврежден');
+                }
+
+                console.log('✅ Данные успешно загружены:', {
+                    строки: data.tableData?.length || 0,
+                    пользователи: data.users?.length || 0,
+                    вкладки: data.tabs?.length || 0
+                });
+
+                // ОБНОВЛЯЕМ ЛОКАЛЬНЫЕ ДАННЫЕ
+                updateLocalData(data);
+                saveToLocalStorage();
+
+                statusElement.textContent = 'Загружено из GitHub: ' + new Date().toLocaleTimeString();
+                statusElement.className = 'sync-status success';
+
+                console.log('🎉 Загрузка завершена успешно');
 
             } catch (error) {
                 console.error('❌ Ошибка загрузки:', error);
-                updateSyncStatus('Ошибка загрузки: ' + error.message, 'error');
+                statusElement.textContent = 'Ошибка загрузки: ' + error.message;
+                statusElement.className = 'sync-status error';
                 
-                loadFromLocalStorageWithNotification();
+                // При ошибке загружаем данные из localStorage
+                loadFromLocalStorage();
+                renderTabs();
+                renderTable();
+                loadCustomButtons();
+                
+                console.log('📁 Загружены резервные данные из localStorage');
             }
         }
 
-        // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
-        function loadFromLocalStorageWithNotification() {
-            const data = storageManager.loadFromLocalStorage();
-            
-            users = data.users;
-            appSettings = data.appSettings;
-            tabs = data.tabs;
-            storageManager.pendingChanges = data.pendingChanges;
-            
-            renderTabs();
-            renderTable();
-            loadCustomButtons();
-            
-            updateSyncStatus('Используются локальные данные', '');
-            
-            console.log('📁 Загружены локальные данные из localStorage');
+        function saveToLocalStorage() {
+            localStorage.setItem('tableData', JSON.stringify(tableData));
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            localStorage.setItem('customButtons', JSON.stringify(customButtons));
+            localStorage.setItem('customColumns', JSON.stringify(customColumns));
+            localStorage.setItem('basicColumns', JSON.stringify(basicColumns));
+            localStorage.setItem('dateValidationColumns', JSON.stringify(dateValidationColumns));
+            localStorage.setItem('tabs', JSON.stringify(tabs));
         }
 
-        // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ПОЛЬЗОВАТЕЛЕЙ ИЗ GITHUB
-        async function loadUsersFromGitHub() {
-            try {
-                const result = await storageManager.loadFromGitHub();
-                if (result.success && result.data && result.data.users) {
-                    users = result.data.users;
-                    // Сохраняем пользователей в localStorage для будущих использований
-                    localStorage.setItem('users', JSON.stringify(users));
-                    console.log('✅ Пользователи успешно загружены из GitHub');
-                    return true;
-                }
-            } catch (error) {
-                console.error('❌ Ошибка загрузки пользователей:', error);
-                // Используем пользователей по умолчанию если загрузка не удалась
-                if (users.length === 0) {
-                    users = [
-                        { username: 'admin', password: 'admin', role: 'admin' },
-                        { username: 'user', password: 'user', role: 'user' }
-                    ];
-                    localStorage.setItem('users', JSON.stringify(users));
-                }
-            }
-            return false;
+        function loadFromLocalStorage() {
+            tableData = JSON.parse(localStorage.getItem('tableData')) || tableData;
+            users = JSON.parse(localStorage.getItem('users')) || users;
+            appSettings = JSON.parse(localStorage.getItem('appSettings')) || appSettings;
+            customButtons = JSON.parse(localStorage.getItem('customButtons')) || customButtons;
+            customColumns = JSON.parse(localStorage.getItem('customColumns')) || customColumns;
+            basicColumns = JSON.parse(localStorage.getItem('basicColumns')) || basicColumns;
+            dateValidationColumns = JSON.parse(localStorage.getItem('dateValidationColumns')) || dateValidationColumns;
+            tabs = JSON.parse(localStorage.getItem('tabs')) || tabs;
         }
 
-        // ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ПРИЛОЖЕНИЯ
         function initializeAppWithFallback() {
             setupEventListeners();
             loadAppSettings();
             
-            onlineUsers = JSON.parse(localStorage.getItem('onlineUsers')) || {};
-            
-            // Загружаем пользователей при инициализации
-            if (users.length === 0) {
-                const data = storageManager.loadFromLocalStorage();
-                users = data.users;
-                
-                // Если все еще нет пользователей, пробуем загрузить из GitHub
-                if (users.length === 0) {
-                    loadUsersFromGitHub().then(() => {
-                        loadFromLocalStorageWithNotification();
-                    });
-                } else {
-                    loadFromLocalStorageWithNotification();
-                }
-            } else {
-                loadFromLocalStorageWithNotification();
-            }
-            
-            if (currentUser && currentUser.role === 'user') {
-                const config = storageManager.getConfig();
-                if (config.repo && config.branch) {
-                    console.log('🔄 Попытка загрузки данных из GitHub для пользователя...');
+            // Всегда сначала пытаемся загрузить из GitHub, даже без токена
+            // (на случай, если репозиторий публичный)
+            try {
+                if (GITHUB_CONFIG.repo && GITHUB_CONFIG.branch) {
+                    console.log('🔄 Попытка загрузки данных из GitHub...');
                     loadFromGitHub().then(() => {
                         console.log('✅ Загрузка из GitHub завершена');
-                        
-                        if (storageManager.pendingChanges.length > 0) {
-                            storageManager.trySyncChanges(updateSyncStatus);
-                        }
                     }).catch(error => {
                         console.log('❌ Ошибка загрузки из GitHub:', error);
+                        // При ошибке загружаем из localStorage
                         loadFromLocalStorageWithNotification();
                     });
                 } else {
                     loadFromLocalStorageWithNotification();
                 }
-            } else {
+            } catch (error) {
+                console.error('❌ Критическая ошибка инициализации:', error);
                 loadFromLocalStorageWithNotification();
             }
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Попытка загрузить пользователей из GitHub для новых устройств
-            if (users.length === 0 || !users.find(u => u.username === 'admin')) {
-                loadUsersFromGitHub().then(() => {
-                    // После загрузки пользователей пробуем войти
-                    const user = users.find(u => u.username === username && u.password === password);
-                    if (user) {
-                        completeLogin(user);
-                    } else {
-                        alert('Неверное имя пользователя или пароль');
-                    }
-                }).catch(error => {
-                    console.log('Не удалось загрузить пользователей из GitHub:', error);
-                    // Пробуем найти пользователя в локальных данных
-                    const user = users.find(u => u.username === username && u.password === password);
-                    if (user) {
-                        completeLogin(user);
-                    } else {
-                        alert('Неверное имя пользователя или пароль');
-                    }
-                });
-            } else {
-                const user = users.find(u => u.username === username && u.password === password);
-                if (user) {
-                    completeLogin(user);
-                } else {
-                    alert('Неверное имя пользователя или пароль');
-                }
-            }
+        // НОВАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ИЗ LOCALSTORAGE С УВЕДОМЛЕНИЕМ
+        function loadFromLocalStorageWithNotification() {
+            loadFromLocalStorage();
+            renderTabs();
+            renderTable();
+            loadCustomButtons();
+            
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = 'Используются локальные данные';
+            statusElement.className = 'sync-status';
+            
+            console.log('📁 Загружены локальные данные из localStorage');
         }
 
-        function completeLogin(user) {
-            currentUser = user;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-screen').style.display = 'flex';
-            document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
-            document.getElementById('user-name-display').textContent = user.username;
-            
-            if (user.role === 'admin') {
-                document.body.classList.add('admin');
-                setupAdminFeatures();
-            }
-            
-            onlineUsers[user.username] = {
-                username: user.username,
-                role: user.role,
-                lastActive: Date.now()
-            };
-            localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            updateStatusBar();
-            
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
             initializeAppWithFallback();
-            
-            setTimeout(() => {
-                checkAllDates();
-            }, 1000);
-        }
+        });
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫХОДА
-        function handleLogout() {
-            if (currentUser) {
-                delete onlineUsers[currentUser.username];
-                localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-                updateStatusBar();
-            }
-            
-            currentUser = null;
-            document.getElementById('main-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-            document.body.classList.remove('admin');
-            
-            // Очищаем форму входа
-            document.getElementById('login-form').reset();
-        }
-
-        function setupAdminFeatures() {
-            const headerTitle = document.getElementById('header-title');
-            headerTitle.classList.add('editable');
-            headerTitle.contentEditable = 'true';
-            headerTitle.addEventListener('blur', function() {
-                appSettings.headerTitle = this.textContent;
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
-            });
-            
-            headerTitle.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.blur();
-                }
-            });
-
-            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
-        }
-
-        // ОСТАВШИЕСЯ ФУНКЦИИ (исправленные)
         function setupEventListeners() {
             // Логин
             document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -1357,14 +2790,6 @@
             document.getElementById('check-dates-btn').addEventListener('click', checkAllDates);
             document.getElementById('add-row-btn').addEventListener('click', addNewRow);
             document.getElementById('github-sync-btn').addEventListener('click', () => showModal('github-sync-modal'));
-            document.getElementById('save-changes-btn').addEventListener('click', forceSaveChanges);
-
-            // КНОПКА ОБНОВЛЕНИЯ ДАННЫХ
-            document.getElementById('refresh-data-btn').addEventListener('click', function() {
-                if (currentUser && currentUser.role === 'user') {
-                    loadFromGitHub();
-                }
-            });
 
             // Новые кнопки управления
             document.getElementById('new-tab-btn').addEventListener('click', createNewTab);
@@ -1382,15 +2807,10 @@
             // Кнопки управления столбцами
             document.getElementById('add-column-btn').addEventListener('click', addNewColumn);
             document.getElementById('remove-column-btn').addEventListener('click', showRemoveColumnModal);
-            document.getElementById('move-column-left-btn').addEventListener('click', () => moveColumn(-1));
-            document.getElementById('move-column-right-btn').addEventListener('click', () => moveColumn(1));
             document.getElementById('fixed-columns-count').addEventListener('change', updateFixedColumnsCount);
 
             // Удаление столбца
             document.getElementById('confirm-remove-column').addEventListener('click', removeSelectedColumn);
-
-            // Перемещение столбца
-            document.getElementById('confirm-move-column').addEventListener('click', moveSelectedColumn);
 
             // Импорт Excel
             document.getElementById('excel-upload-area').addEventListener('click', function() {
@@ -1404,19 +2824,7 @@
 
             // GitHub синхронизация
             document.getElementById('github-sync-form').addEventListener('submit', handleGitHubSettingsSave);
-            document.getElementById('sync-now-btn').addEventListener('click', () => {
-                const appData = storageManager.getAllAppData(
-                    users, appSettings, tabs, currentUser
-                );
-                
-                storageManager.saveToGitHub(appData, currentUser)
-                    .then(() => {
-                        updateSyncStatus('Синхронизировано вручную: ' + new Date().toLocaleTimeString(), 'success');
-                    })
-                    .catch(error => {
-                        updateSyncStatus('Ошибка синхронизации: ' + error.message, 'error');
-                    });
-            });
+            document.getElementById('sync-now-btn').addEventListener('click', () => saveToGitHub());
             document.getElementById('load-from-github-btn').addEventListener('click', () => loadFromGitHub());
 
             // Модальные окна
@@ -1431,10 +2839,6 @@
             document.getElementById('add-user-form').addEventListener('submit', handleAddUser);
             document.getElementById('column-count').addEventListener('change', generateColumnInputs);
             document.getElementById('save-cell-btn').addEventListener('click', saveCellChanges);
-            document.getElementById('close-file-modal').addEventListener('click', function() {
-                document.getElementById('edit-cell-modal').style.display = 'none';
-                currentFileManagementCell = null;
-            });
 
             // Кнопки предпросмотра
             document.getElementById('download-preview-btn').addEventListener('click', downloadPreviewFile);
@@ -1483,14 +2887,80 @@
         function handleGitHubSettingsSave(e) {
             e.preventDefault();
             
-            const token = document.getElementById('github-token').value;
-            const repo = document.getElementById('github-repo').value;
-            const branch = document.getElementById('github-branch').value;
+            GITHUB_CONFIG.token = document.getElementById('github-token').value;
+            GITHUB_CONFIG.repo = document.getElementById('github-repo').value;
+            GITHUB_CONFIG.branch = document.getElementById('github-branch').value;
             
-            storageManager.updateGitHubConfig(token, repo, branch);
+            // Сохраняем настройки в localStorage
+            localStorage.setItem('githubToken', GITHUB_CONFIG.token);
+            localStorage.setItem('githubRepo', GITHUB_CONFIG.repo);
+            localStorage.setItem('githubBranch', GITHUB_CONFIG.branch);
             
             document.getElementById('github-sync-modal').style.display = 'none';
             alert('Настройки GitHub сохранены!');
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВХОДА
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-screen').style.display = 'flex';
+                document.getElementById('user-role').textContent = user.role === 'admin' ? 'Администратор' : 'Пользователь';
+                document.getElementById('user-name-display').textContent = user.username;
+                
+                if (user.role === 'admin') {
+                    document.body.classList.add('admin');
+                    setupAdminFeatures();
+                }
+                
+                // ПЕРЕЗАГРУЖАЕМ ДАННЫЕ ПОСЛЕ ВХОДА
+                if (GITHUB_CONFIG.token) {
+                    loadFromGitHub();
+                } else {
+                    loadFromLocalStorage();
+                    renderTabs();
+                    renderTable();
+                    loadCustomButtons();
+                }
+                
+                setTimeout(() => {
+                    checkAllDates();
+                }, 1000);
+            } else {
+                alert('Неверное имя пользователя или пароль');
+            }
+        }
+
+        function setupAdminFeatures() {
+            const headerTitle = document.getElementById('header-title');
+            headerTitle.classList.add('editable');
+            headerTitle.contentEditable = 'true';
+            headerTitle.addEventListener('blur', function() {
+                appSettings.headerTitle = this.textContent;
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
+            });
+            
+            headerTitle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+            });
+
+            document.getElementById('fixed-columns-count').value = appSettings.fixedColumnsCount;
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.body.classList.remove('admin');
         }
 
         function showAllColumns() {
@@ -1499,10 +2969,6 @@
         }
 
         function addNewRow() {
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-            
-            const tableData = getCurrentTabData();
             const newId = tableData.length > 0 ? Math.max(...tableData.map(row => row.id)) + 1 : 1;
             const newRow = {
                 id: newId,
@@ -1514,10 +2980,14 @@
             };
             
             tableData.push(newRow);
-            updateCurrentTabData(tableData);
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             
@@ -1537,12 +3007,9 @@
             } else if (modalId === 'add-button-modal') {
                 generateColumnInputs();
             } else if (modalId === 'github-sync-modal') {
-                const config = storageManager.getConfig();
-                document.getElementById('github-token').value = config.token;
-                document.getElementById('github-repo').value = config.repo;
-                document.getElementById('github-branch').value = config.branch;
-            } else if (modalId === 'move-column-modal') {
-                showMoveColumnModal();
+                document.getElementById('github-token').value = GITHUB_CONFIG.token;
+                document.getElementById('github-repo').value = GITHUB_CONFIG.repo;
+                document.getElementById('github-branch').value = GITHUB_CONFIG.branch;
             }
         }
 
@@ -1575,7 +3042,6 @@
             }
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ КНОПКИ - ТЕПЕРЬ СОЗДАЕТ СТОЛБЦЫ
         function handleAddButton(e) {
             e.preventDefault();
             const buttonName = document.getElementById('button-name').value;
@@ -1586,85 +3052,42 @@
                 .map(input => input.value.trim())
                 .filter(name => name !== '');
             
-            if (columns.length === 0) {
-                alert('Введите названия столбцов!');
-                return;
-            }
-
             const buttonId = 'btn_' + Date.now();
-            
-            // СОЗДАЕМ СТОЛБЦЫ ДЛЯ ЭТОЙ КНОПКИ
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-
-            const dateColumns = [];
-            const columnIds = [];
-
-            // Создаем кастомные столбцы для каждой колонки в кнопке
-            columns.forEach((columnName, index) => {
-                const columnId = 'col_' + Date.now() + '_' + index;
-                columnIds.push(columnId);
-                
-                // Проверяем, существует ли уже столбец с таким именем
-                const existingColumn = currentTab.customColumns.find(col => col.name === columnName);
-                if (!existingColumn) {
-                    // Создаем новый столбец
-                    currentTab.customColumns.push({
-                        id: columnId,
-                        name: columnName,
-                        editable: true
-                    });
-                    
-                    // Добавляем данные для этого столбца во все строки
-                    const tableData = getCurrentTabData();
-                    tableData.forEach(row => {
-                        if (!row.customData) row.customData = {};
-                        row.customData[columnId] = '';
-                    });
-                    updateCurrentTabData(tableData);
-                } else {
-                    // Используем существующий столбец
-                    columnIds[index] = existingColumn.id;
-                }
-
-                // Проверяем, нужно ли проверять даты для этого столбца
-                const checkbox = dateCheckboxes[index];
-                if (checkbox && checkbox.checked) {
-                    dateColumns.push(columnName);
-                    // Добавляем в настройки проверки дат
-                    if (!currentTab.dateValidationColumns) {
-                        currentTab.dateValidationColumns = {};
-                    }
-                    currentTab.dateValidationColumns[columnId] = true;
-                }
-            });
-            
             const buttonData = {
                 id: buttonId,
                 name: buttonName,
-                columns: columns,
-                columnIds: columnIds, // Сохраняем ID столбцов
-                dateColumns: dateColumns
+                columns: columns
             };
             
-            // Добавляем кнопку к текущей вкладке
-            if (!currentTab.customButtons) {
-                currentTab.customButtons = [];
-            }
-            currentTab.customButtons.push(buttonData);
+            customButtons.push(buttonData);
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            columns.forEach((colName, index) => {
+                const columnId = 'col_' + Date.now() + '_' + index;
+                if (!customColumns.find(col => col.name === colName)) {
+                    customColumns.push({
+                        id: columnId,
+                        name: colName
+                    });
+                }
+                
+                const dateCheckbox = dateCheckboxes[index];
+                if (dateCheckbox && dateCheckbox.checked) {
+                    dateValidationColumns[columnId] = true;
+                }
+            });
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             createCustomButton(buttonData);
-            renderTable(); // Перерисовываем таблицу чтобы показать новые столбцы
+            renderTable();
             document.getElementById('add-button-modal').style.display = 'none';
             document.getElementById('add-button-form').reset();
-            
-            alert(`Кнопка "${buttonName}" создана! Добавлено ${columns.length} столбцов.`);
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КАСТОМНОЙ КНОПКИ - КНОПКИ РЯДОМ
         function createCustomButton(buttonData) {
             const buttonWrapper = document.createElement('div');
             buttonWrapper.className = 'custom-button-wrapper';
@@ -1673,7 +3096,6 @@
             button.className = 'custom-button';
             button.dataset.buttonId = buttonData.id;
             button.dataset.columns = JSON.stringify(buttonData.columns);
-            button.dataset.columnIds = JSON.stringify(buttonData.columnIds); // Сохраняем ID столбцов
             button.title = `Показать столбцы: ${buttonData.columns.join(', ')}`;
             
             const buttonText = document.createElement('span');
@@ -1713,17 +3135,13 @@
                 buttonWrapper.appendChild(button);
             }
             
-            // ИСПРАВЛЕННЫЙ ОБРАБОТЧИК КЛИКА - ТЕПЕРЬ РАБОТАЕТ С ID СТОЛБЦОВ
             button.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('btn-edit-small') && !e.target.classList.contains('btn-danger-small')) {
                     const columns = JSON.parse(this.dataset.columns);
-                    const columnIds = JSON.parse(this.dataset.columnIds);
                     
-                    // Скрываем все ячейки
                     const allCells = document.querySelectorAll('#data-table th, #data-table td');
                     allCells.forEach(cell => cell.style.display = 'none');
                     
-                    // Показываем фиксированные столбцы
                     for (let i = 0; i < appSettings.fixedColumnsCount; i++) {
                         const headerCells = document.querySelectorAll(`#data-table th:nth-child(${i + 1})`);
                         const dataCells = document.querySelectorAll(`#data-table td:nth-child(${i + 1})`);
@@ -1732,19 +3150,13 @@
                         dataCells.forEach(cell => cell.style.display = '');
                     }
                     
-                    // Показываем столбцы, связанные с кнопкой (по ID)
-                    columnIds.forEach(columnId => {
-                        const customHeaders = document.querySelectorAll(`th[data-column-id="${columnId}"]`);
-                        const customCells = document.querySelectorAll(`td[data-column-id="${columnId}"]`);
+                    columns.forEach(colName => {
+                        const customHeaders = document.querySelectorAll(`th[data-column-name="${colName}"]`);
+                        const customCells = document.querySelectorAll(`td[data-column-name="${colName}"]`);
                         
                         customHeaders.forEach(cell => cell.style.display = '');
                         customCells.forEach(cell => cell.style.display = '');
                     });
-                    
-                    // ПЕРЕПРОВЕРЯЕМ ДАТЫ ПОСЛЕ ОТОБРАЖЕНИЯ СТОЛБЦОВ
-                    setTimeout(() => {
-                        checkAllDates();
-                    }, 100);
                 }
             });
             
@@ -1752,46 +3164,50 @@
         }
 
         function editButton(buttonId) {
-            const currentTab = getCurrentTab();
-            if (!currentTab || !currentTab.customButtons) return;
-            
-            const button = currentTab.customButtons.find(b => b.id === buttonId);
+            const button = customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
             const newName = prompt('Введите новое название кнопки:', button.name);
             if (newName && newName.trim() !== '') {
                 button.name = newName.trim();
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 loadCustomButtons();
             }
         }
 
         function deleteButton(buttonId) {
-            if (!confirm('Удалить эту кнопку?')) return;
+            if (!confirm('Удалить эту кнопку и связанные с ней столбцы?')) return;
             
-            const currentTab = getCurrentTab();
-            if (!currentTab || !currentTab.customButtons) return;
-            
-            const button = currentTab.customButtons.find(b => b.id === buttonId);
+            const button = customButtons.find(b => b.id === buttonId);
             if (!button) return;
             
-            currentTab.customButtons = currentTab.customButtons.filter(b => b.id !== buttonId);
+            customButtons = customButtons.filter(b => b.id !== buttonId);
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            button.columns.forEach(colName => {
+                customColumns = customColumns.filter(col => col.name !== colName);
+                
+                tableData.forEach(row => {
+                    if (row.customData && row.customData[colName]) {
+                        delete row.customData[colName];
+                    }
+                    if (row.attachments && row.attachments[colName]) {
+                        delete row.attachments[colName];
+                    }
+                });
+            });
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             loadCustomButtons();
             renderTable();
-            
-            alert(`Кнопка "${button.name}" удалена!`);
         }
 
         function loadCustomButtons() {
             document.getElementById('custom-buttons').innerHTML = '';
-            
-            // Загружаем кнопки для текущей вкладки
-            const customButtons = getCurrentTabCustomButtons();
             customButtons.forEach(button => {
                 createCustomButton(button);
             });
@@ -1925,10 +3341,7 @@
             const columnId = cell.dataset.columnId;
             const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
             
-            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
-            const customColumns = getCurrentTabCustomColumns();
-            
             if (customColumns.find(col => col.id === columnId)) {
                 if (!rowData.customData) rowData.customData = {};
                 rowData.customData[columnId] = dateStr;
@@ -1938,10 +3351,13 @@
                 }
             }
             
-            updateCurrentTabData(tableData);
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             closeDatePicker();
             renderTable();
@@ -1998,10 +3414,7 @@
                 const columnId = cell.dataset.columnId;
                 const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
                 
-                const tableData = getCurrentTabData();
                 const rowData = tableData.find(row => row.id === rowId);
-                const customColumns = getCurrentTabCustomColumns();
-                
                 if (customColumns.find(col => col.id === columnId)) {
                     if (!rowData.customData) rowData.customData = {};
                     rowData.customData[columnId] = dateStr;
@@ -2011,10 +3424,13 @@
                     }
                 }
                 
-                updateCurrentTabData(tableData);
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab) {
+                    currentTab.data = JSON.parse(JSON.stringify(tableData));
+                }
                 
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 renderTable();
                 checkAllDates();
@@ -2045,11 +3461,6 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            const tableData = getCurrentTabData();
-            const basicColumns = getCurrentTabBasicColumns();
-            const customColumns = getCurrentTabCustomColumns();
-            const dateValidationColumns = getCurrentTabDateValidationColumns();
-            
             tableData.forEach(row => {
                 basicColumns.forEach(column => {
                     if (dateValidationColumns[column.id] && row[column.id]) {
@@ -2071,7 +3482,6 @@
         function checkDateCell(row, columnId, columnName, today, expiredDates, upcomingDates) {
             let dateValue;
             
-            const customColumns = getCurrentTabCustomColumns();
             if (customColumns.find(col => col.id === columnId)) {
                 dateValue = row.customData[columnId];
             } else {
@@ -2176,8 +3586,6 @@
             return [...data].sort((a, b) => {
                 let valueA, valueB;
                 
-                const customColumns = getCurrentTabCustomColumns();
-                
                 if (customColumns.find(col => col.id === currentSort.column)) {
                     valueA = a.customData && a.customData[currentSort.column] ? a.customData[currentSort.column] : '';
                     valueB = b.customData && b.customData[currentSort.column] ? b.customData[currentSort.column] : '';
@@ -2219,12 +3627,6 @@
             filterDropdown.style.left = thRect.left + 'px';
             filterDropdown.style.top = thRect.bottom + 'px';
             filterDropdown.style.zIndex = '10000';
-            
-            const viewportWidth = window.innerWidth;
-            const filterWidth = 320;
-            if (thRect.left + filterWidth > viewportWidth) {
-                filterDropdown.style.left = (viewportWidth - filterWidth - 10) + 'px';
-            }
             
             const uniqueValues = getUniqueValuesForColumn(columnId);
             const totalCount = uniqueValues.length;
@@ -2363,8 +3765,6 @@
 
         function getUniqueValuesForColumn(columnId) {
             const values = new Set();
-            const tableData = getCurrentTabData();
-            const customColumns = getCurrentTabCustomColumns();
             
             tableData.forEach(row => {
                 let value;
@@ -2424,28 +3824,28 @@
             document.getElementById('edit-cell-title').textContent = 'Редактирование названия столбца';
             
             document.querySelector('.form-group:nth-child(3)').style.display = 'none';
-            document.getElementById('save-cell-btn').style.display = 'block';
-            document.getElementById('close-file-modal').style.display = 'none';
             
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ДЛЯ ФАЙЛОВ
-        function openFileManagementModal(rowId, columnId) {
+        function openEditCellModal(cell) {
             if (currentUser.role !== 'admin') return;
             
-            currentEditingCell = null;
+            currentEditingCell = cell;
             isEditingHeader = false;
             
-            // Сохраняем информацию о ячейке для загрузки файлов
-            currentFileManagementCell = { rowId, columnId };
+            const textContent = Array.from(cell.childNodes)
+                .filter(node => node.nodeType === Node.TEXT_NODE)
+                .map(node => node.textContent)
+                .join('')
+                .trim();
+                
+            document.getElementById('cell-value').value = textContent;
+            document.getElementById('edit-cell-title').textContent = 'Редактирование ячейки';
             
-            document.getElementById('edit-cell-title').textContent = 'Управление файлами ячейки';
-            document.querySelector('.form-group:nth-child(2)').style.display = 'none';
-            document.getElementById('save-cell-btn').style.display = 'none';
-            document.getElementById('close-file-modal').style.display = 'block';
+            document.querySelector('.form-group:nth-child(3)').style.display = 'block';
             
-            loadAttachedFilesForCell(rowId, columnId);
+            loadAttachedFiles(cell);
             document.getElementById('edit-cell-modal').style.display = 'flex';
         }
 
@@ -2458,32 +3858,6 @@
             const columnId = cell.dataset.columnId;
             const rowId = parseInt(cell.closest('tr').querySelector('td:nth-child(2)').textContent);
             
-            const tableData = getCurrentTabData();
-            const rowData = tableData.find(row => row.id === rowId);
-            if (rowData && rowData.attachments && rowData.attachments[columnId]) {
-                rowData.attachments[columnId].forEach((file, index) => {
-                    const fileElement = document.createElement('div');
-                    fileElement.className = 'attached-file';
-                    
-                    let fileContent = file.name;
-                    if (file.type.startsWith('image/')) {
-                        fileContent = `<img src="${file.data}" style="max-width: 50px; max-height: 50px; margin-right: 10px;"> ${file.name}`;
-                    }
-                    
-                    fileElement.innerHTML = `
-                        <div>${fileContent}</div>
-                        <button class="file-action-btn" onclick="removeAttachment(${rowId}, '${columnId}', ${index})">×</button>
-                    `;
-                    container.appendChild(fileElement);
-                });
-            }
-        }
-
-        function loadAttachedFilesForCell(rowId, columnId) {
-            const container = document.getElementById('attached-files');
-            container.innerHTML = '';
-            
-            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
                 rowData.attachments[columnId].forEach((file, index) => {
@@ -2513,27 +3887,21 @@
                 const columnType = currentEditingCell.dataset.columnType;
                 const columnIndex = parseInt(currentEditingCell.dataset.columnIndex);
                 
-                const currentTab = getCurrentTab();
-                if (!currentTab) return;
-                
                 if (columnType === 'basic') {
-                    currentTab.basicColumns[columnIndex].name = newValue;
+                    basicColumns[columnIndex].name = newValue;
                 } else if (columnType === 'custom') {
-                    currentTab.customColumns[columnIndex].name = newValue;
+                    customColumns[columnIndex].name = newValue;
                 }
                 
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 currentEditingCell.textContent = newValue;
             } else {
                 const columnId = currentEditingCell.dataset.columnId;
                 const rowId = parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent);
                 
-                const tableData = getCurrentTabData();
                 const rowData = tableData.find(row => row.id === rowId);
-                const customColumns = getCurrentTabCustomColumns();
-                
                 if (customColumns.find(col => col.id === columnId)) {
                     if (!rowData.customData) rowData.customData = {};
                     rowData.customData[columnId] = newValue;
@@ -2545,10 +3913,13 @@
                     }
                 }
                 
-                updateCurrentTabData(tableData);
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab) {
+                    currentTab.data = JSON.parse(JSON.stringify(tableData));
+                }
                 
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 const cellContent = currentEditingCell.querySelector('.cell-content');
                 if (cellContent) {
@@ -2564,16 +3935,18 @@
         }
 
         window.removeAttachment = function(rowId, columnId, fileIndex) {
-            const tableData = getCurrentTabData();
             const rowData = tableData.find(row => row.id === rowId);
             if (rowData && rowData.attachments && rowData.attachments[columnId]) {
                 const removedFile = rowData.attachments[columnId][fileIndex];
                 rowData.attachments[columnId].splice(fileIndex, 1);
                 
-                updateCurrentTabData(tableData);
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab) {
+                    currentTab.data = JSON.parse(JSON.stringify(tableData));
+                }
                 
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 
                 if (currentEditingCell) {
                     loadAttachedFiles(currentEditingCell);
@@ -2607,24 +3980,18 @@
             });
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ФАЙЛОВ
         function handleFileUpload(files) {
-            if (!currentFileManagementCell) {
+            if (!currentEditingCell || isEditingHeader) {
                 alert('Сначала выберите ячейку для редактирования!');
                 return;
             }
             
-            const { rowId, columnId } = currentFileManagementCell;
-            
-            if (!columnId || !rowId) {
-                alert('Не удалось определить ячейку для прикрепления файлов');
-                return;
-            }
+            const columnId = currentEditingCell.dataset.columnId;
+            const rowId = parseInt(currentEditingCell.closest('tr').querySelector('td:nth-child(2)').textContent);
             
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const tableData = getCurrentTabData();
                     const rowData = tableData.find(row => row.id === rowId);
                     if (!rowData.attachments) rowData.attachments = {};
                     if (!rowData.attachments[columnId]) rowData.attachments[columnId] = [];
@@ -2635,14 +4002,15 @@
                         data: e.target.result
                     });
                     
-                    updateCurrentTabData(tableData);
+                    const currentTab = tabs.find(tab => tab.id === currentTabId);
+                    if (currentTab) {
+                        currentTab.data = JSON.parse(JSON.stringify(tableData));
+                    }
                     
-                    storageManager.saveToLocalStorage(users, appSettings, tabs);
-                    autoSyncChanges();
+                    saveToLocalStorage();
+                    saveToGitHub(); // Синхронизируем с GitHub
                     
-                    // Обновляем список файлов в модальном окне
-                    loadAttachedFilesForCell(rowId, columnId);
-                    // Перерисовываем таблицу для отображения новых иконок файлов
+                    loadAttachedFiles(currentEditingCell);
                     renderTable();
                     
                     alert(`Файл "${file.name}" успешно добавлен!`);
@@ -2654,9 +4022,6 @@
                 
                 reader.readAsDataURL(file);
             });
-            
-            // Очищаем input файлов после загрузки
-            document.getElementById('file-input').value = '';
         }
 
         function openFilePreview(file, rowId, columnId, fileIndex) {
@@ -2858,8 +4223,8 @@
             }
             
             users.push({ username, password, role });
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
             document.getElementById('add-user-form').reset();
         }
@@ -2897,16 +4262,16 @@
             if (newPassword) user.password = newPassword;
             user.role = newRole;
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderUsersList();
         };
 
         window.deleteUser = function(index) {
             if (confirm('Удалить этого пользователя?')) {
                 users.splice(index, 1);
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
                 renderUsersList();
             }
         };
@@ -2934,8 +4299,8 @@
                     document.getElementById('header-logo').src = e.target.result;
                     document.getElementById('header-logo').style.display = 'block';
                     appSettings.headerLogo = e.target.result;
-                    storageManager.saveToLocalStorage(users, appSettings, tabs);
-                    autoSyncChanges();
+                    saveToLocalStorage();
+                    saveToGitHub(); // Синхронизируем с GitHub
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -2964,8 +4329,8 @@
             const count = parseInt(document.getElementById('fixed-columns-count').value);
             if (count >= 1 && count <= 10) {
                 appSettings.fixedColumnsCount = count;
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
+                saveToLocalStorage();
+                saveToGitHub(); // Синхронизируем с GitHub
             }
         }
 
@@ -2974,37 +4339,29 @@
             const columnName = prompt('Введите название нового столбца:');
             if (!columnName) return;
 
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-
             const columnId = 'col_' + Date.now();
-            currentTab.customColumns.push({
+            customColumns.push({
                 id: columnId,
                 name: columnName
             });
 
-            const tableData = getCurrentTabData();
+            // Добавляем столбец во все строки
             tableData.forEach(row => {
                 if (!row.customData) row.customData = {};
                 row.customData[columnId] = '';
             });
 
-            updateCurrentTabData(tableData);
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
-            
-            if (confirm('Хотите переместить новый столбец в нужную позицию?')) {
-                showMoveColumnModal();
-            }
         }
 
         function showRemoveColumnModal() {
             const select = document.getElementById('column-to-remove');
             select.innerHTML = '';
 
-            const customColumns = getCurrentTabCustomColumns();
+            // Добавляем только кастомные столбцы (базовые нельзя удалять)
             customColumns.forEach(column => {
                 const option = document.createElement('option');
                 option.value = column.id;
@@ -3031,106 +4388,25 @@
 
             if (!columnId) return;
 
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-
-            const column = currentTab.customColumns.find(col => col.id === columnId);
+            const column = customColumns.find(col => col.id === columnId);
             if (!confirm(`Удалить столбец "${column.name}"? Все данные в этом столбце будут потеряны.`)) return;
 
-            const tableData = getCurrentTabData();
+            // Удаляем столбец из всех строк
             tableData.forEach(row => {
                 if (row.customData && row.customData[columnId]) {
                     delete row.customData[columnId];
                 }
             });
 
-            currentTab.customColumns = currentTab.customColumns.filter(col => col.id !== columnId);
-            updateCurrentTabData(tableData);
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            // Удаляем столбец из customColumns
+            customColumns = customColumns.filter(col => col.id !== columnId);
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
 
             renderTable();
             document.getElementById('remove-column-modal').style.display = 'none';
             
             alert(`Столбец "${column.name}" успешно удален!`);
-        }
-
-        function showMoveColumnModal() {
-            const select = document.getElementById('column-to-move');
-            const maxPositionSpan = document.getElementById('max-position');
-            
-            select.innerHTML = '';
-            
-            const basicColumns = getCurrentTabBasicColumns();
-            const customColumns = getCurrentTabCustomColumns();
-            const allColumns = [...basicColumns, ...customColumns];
-            
-            allColumns.forEach((column, index) => {
-                const option = document.createElement('option');
-                option.value = column.id;
-                option.textContent = column.name;
-                option.dataset.index = index + 1;
-                select.appendChild(option);
-            });
-
-            maxPositionSpan.textContent = allColumns.length + 1;
-            
-            document.getElementById('column-position').value = allColumns.length + 1;
-            document.getElementById('column-position').max = allColumns.length + 1;
-            
-            document.getElementById('move-column-modal').style.display = 'flex';
-        }
-
-        function moveSelectedColumn() {
-            const select = document.getElementById('column-to-move');
-            const positionInput = document.getElementById('column-position');
-            
-            const columnId = select.value;
-            const newPosition = parseInt(positionInput.value);
-            
-            if (!columnId || !newPosition) return;
-            
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-            
-            const basicColumns = getCurrentTabBasicColumns();
-            const customColumns = getCurrentTabCustomColumns();
-            const allColumns = [...basicColumns, ...customColumns];
-            
-            const columnIndex = allColumns.findIndex(col => col.id === columnId);
-            
-            if (columnIndex === -1) return;
-            
-            const columnToMove = allColumns[columnIndex];
-            
-            // Удаляем столбец из текущего массива
-            if (columnIndex < basicColumns.length) {
-                currentTab.basicColumns.splice(columnIndex, 1);
-            } else {
-                currentTab.customColumns.splice(columnIndex - basicColumns.length, 1);
-            }
-            
-            const targetPosition = newPosition - 2;
-            
-            // Вставляем столбец в новую позицию
-            if (targetPosition < currentTab.basicColumns.length) {
-                currentTab.basicColumns.splice(targetPosition, 0, columnToMove);
-            } else {
-                currentTab.customColumns.splice(targetPosition - currentTab.basicColumns.length, 0, columnToMove);
-            }
-            
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
-            
-            renderTable();
-            document.getElementById('move-column-modal').style.display = 'none';
-            
-            alert(`Столбец "${columnToMove.name}" успешно перемещен на позицию ${newPosition}!`);
-        }
-
-        function moveColumn(direction) {
-            alert('Используйте модальное окно для точного перемещения столбцов');
-            showMoveColumnModal();
         }
 
         // ФУНКЦИЯ ИМПОРТА ИЗ EXCEL
@@ -3223,11 +4499,6 @@
             const headers = currentImportData[0];
             const rows = currentImportData.slice(1);
             
-            const currentTab = getCurrentTab();
-            if (!currentTab) return;
-            
-            let tableData = getCurrentTabData();
-            
             if (importMode === 'replace') {
                 tableData = [];
             }
@@ -3250,8 +4521,8 @@
                             const columnName = headers[i];
                             const columnId = 'imported_' + columnName.toLowerCase().replace(/\s+/g, '_');
                             
-                            if (!currentTab.customColumns.find(col => col.name === columnName)) {
-                                currentTab.customColumns.push({
+                            if (!customColumns.find(col => col.name === columnName)) {
+                                customColumns.push({
                                     id: columnId,
                                     name: columnName
                                 });
@@ -3265,10 +4536,13 @@
                 }
             });
             
-            updateCurrentTabData(tableData);
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
             document.getElementById('import-excel-modal').style.display = 'none';
@@ -3299,6 +4573,7 @@
                 closeBtn.innerHTML = '×';
                 closeBtn.title = 'Закрыть вкладку';
                 
+                // Скрываем крестик закрытия вкладки для пользователей
                 if (currentUser && currentUser.role !== 'admin') {
                     closeBtn.style.display = 'none';
                 } else if (tabs.length > 1) {
@@ -3327,14 +4602,14 @@
                         const newName = this.textContent.trim();
                         if (newName && newName !== tab.name) {
                             tab.name = newName;
-                            storageManager.saveToLocalStorage(users, appSettings, tabs);
-                            autoSyncChanges();
+                            saveToLocalStorage();
+                            saveToGitHub(); // Синхронизируем с GitHub
                             
                             if (tab.id === currentTabId) {
                                 document.getElementById('header-title').textContent = newName;
                                 appSettings.headerTitle = newName;
-                                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                                autoSyncChanges();
+                                saveToLocalStorage();
+                                saveToGitHub(); // Синхронизируем с GitHub
                             }
                         } else {
                             this.textContent = tab.name;
@@ -3352,7 +4627,15 @@
                 container.appendChild(tabElement);
             });
             
-            const currentTab = getCurrentTab();
+            if (currentTabId && currentTabId !== 'tab1') {
+                const currentTab = tabs.find(tab => tab.id === currentTabId);
+                if (currentTab && currentTab.data) {
+                    tableData = currentTab.data;
+                    renderTable();
+                }
+            }
+
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
             if (currentTab) {
                 document.getElementById('header-title').textContent = currentTab.name;
             }
@@ -3367,42 +4650,55 @@
             const tabId = 'tab_' + Date.now();
             const tabName = `Таблица ${tabs.length + 1}`;
             
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
             const newTab = {
                 id: tabId,
                 name: tabName,
-                tableData: [
+                data: [
                     { id: 1, name: 'Новый проект', date: formatDate(new Date()), status: 'Активен', customData: {}, attachments: {} }
-                ],
-                customButtons: [],
-                customColumns: [],
-                basicColumns: [
-                    { id: 'id', name: '№ п/п', editable: false },
-                    { id: 'name', name: 'Название', editable: true },
-                    { id: 'date', name: 'Дата создания', editable: true },
-                    { id: 'status', name: 'Статус', editable: true }
-                ],
-                dateValidationColumns: {}
+                ]
             };
             
             tabs.push(newTab);
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             currentTabId = tabId;
+            tableData = JSON.parse(JSON.stringify(newTab.data));
             
             renderTabs();
             renderTable();
-            loadCustomButtons();
             resetFiltersAndSearch();
         }
 
         function switchTab(tabId) {
-            currentTabId = tabId;
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
+            currentTabId = tabId;
+            const newTab = tabs.find(tab => tab.id === tabId);
+            
+            if (newTab && newTab.data) {
+                tableData = JSON.parse(JSON.stringify(newTab.data));
+            } else {
+                if (tabId === 'tab1') {
+                    tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                    ];
+                }
+            }
+            
+            saveToLocalStorage();
             renderTabs();
             renderTable();
-            loadCustomButtons();
             resetFiltersAndSearch();
         }
 
@@ -3421,13 +4717,23 @@
             
             if (tabId === currentTabId) {
                 currentTabId = tabs[0].id;
+                const firstTab = tabs[0];
+                
+                if (firstTab.data) {
+                    tableData = JSON.parse(JSON.stringify(firstTab.data));
+                } else if (firstTab.id === 'tab1') {
+                    tableData = JSON.parse(localStorage.getItem('tableData')) || [
+                        { id: 1, name: 'Проект А', date: '01.10.2023', status: 'Активен', customData: {}, attachments: {} },
+                        { id: 2, name: 'Проект Б', date: '05.10.2023', status: 'Завершен', customData: {}, attachments: {} },
+                        { id: 3, name: 'Проект В', date: '10.10.2023', status: 'В процессе', customData: {}, attachments: {} }
+                    ];
+                }
             }
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             renderTabs();
             renderTable();
-            loadCustomButtons();
         }
 
         function resetFiltersAndSearch() {
@@ -3508,9 +4814,6 @@
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЭКСПОРТА В EXCEL
         function exportToExcel() {
-            const tableData = getCurrentTabData();
-            const customColumns = getCurrentTabCustomColumns();
-            
             const exportData = [];
             const headers = ['№ п/п', 'Название', 'Дата создания', 'Статус'];
             
@@ -3553,7 +4856,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             
-            const currentTab = getCurrentTab();
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
             const fileName = currentTab ? currentTab.name : 'таблица';
             
             link.setAttribute('href', url);
@@ -3588,13 +4891,11 @@
             selectAllTh.appendChild(selectAllCheckbox);
             thead.appendChild(selectAllTh);
             
-            const basicColumns = getCurrentTabBasicColumns();
             basicColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'basic');
                 thead.appendChild(th);
             });
             
-            const customColumns = getCurrentTabCustomColumns();
             customColumns.forEach((column, index) => {
                 const th = createHeaderCell(column, index, 'custom');
                 thead.appendChild(th);
@@ -3621,7 +4922,6 @@
             
             tbody.innerHTML = '';
             
-            let tableData = getCurrentTabData();
             let filteredData = applyFilters(tableData);
             filteredData = applySearch(filteredData);
             let sortedData = applySorting(filteredData);
@@ -3670,7 +4970,11 @@
                 tbody.appendChild(row);
             });
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+                saveToLocalStorage();
+            }
         }
 
         function createHeaderCell(column, index, type) {
@@ -3678,9 +4982,6 @@
             th.dataset.columnId = column.id;
             th.dataset.columnType = type;
             th.dataset.columnIndex = index;
-            
-            // ВАЖНОЕ ИСПРАВЛЕНИЕ: Добавляем data-column-name для всех столбцов
-            th.dataset.columnName = column.name;
             
             if (type === 'custom') {
                 th.dataset.columnName = column.name;
@@ -3751,18 +5052,14 @@
             return th;
         }
 
-        // ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ФУНКЦИЯ СОЗДАНИЯ ЯЧЕЙКИ ДАННЫХ
         function createDataCell(rowData, column, type) {
             const td = document.createElement('td');
-            
-            const dateValidationColumns = getCurrentTabDateValidationColumns();
-            const isDateColumn = dateValidationColumns[column.id];
+            if ((type === 'custom' || column.editable) && currentUser && currentUser.role === 'admin') {
+                td.classList.add('editable');
+            }
             
             td.dataset.columnId = column.id;
             td.dataset.rowId = rowData.id;
-            
-            // ВАЖНОЕ ИСПРАВЛЕНИЕ: Добавляем data-column-name для всех ячеек
-            td.dataset.columnName = column.name;
             
             if (type === 'custom') {
                 td.dataset.columnName = column.name;
@@ -3780,6 +5077,41 @@
                 value = rowData.customData && rowData.customData[column.id] 
                     ? rowData.customData[column.id] 
                     : '';
+            }
+            
+            const isDateColumn = dateValidationColumns[column.id];
+            if (isDateColumn) {
+                td.classList.add('date-cell');
+                
+                td.addEventListener('dblclick', (e) => {
+                    if (!e.target.closest('.file-icons') && currentUser && currentUser.role === 'admin') {
+                        openDateInput(td, value);
+                    }
+                });
+                
+                td.addEventListener('click', (e) => {
+                    if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay') && currentUser && currentUser.role === 'admin') {
+                        openDatePicker(td, value);
+                    }
+                });
+                
+                if (value && isValidDate(value)) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const cellDate = parseDate(value);
+                    const timeDiff = cellDate.getTime() - today.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (daysDiff < 0) {
+                        td.classList.add('date-cell-danger');
+                    } else if (daysDiff <= 30) {
+                        td.classList.add('date-cell-warning');
+                    } else {
+                        td.classList.add('date-cell-normal');
+                    }
+                }
+            } else if (currentUser && currentUser.role === 'admin') {
+                td.addEventListener('click', () => openEditCellModal(td));
             }
             
             const cellContent = document.createElement('div');
@@ -3800,167 +5132,7 @@
             cellContent.appendChild(fileIcons);
             td.appendChild(cellContent);
             
-            // Обработчики событий для ячейки
-            if (currentUser && currentUser.role === 'admin') {
-                if (isDateColumn) {
-                    // Для ячеек с датами - специальная обработка
-                    td.classList.add('date-cell');
-                    
-                    td.addEventListener('dblclick', (e) => {
-                        if (!e.target.closest('.file-icons')) {
-                            openDateInput(td, value);
-                        }
-                    });
-                    
-                    td.addEventListener('click', (e) => {
-                        if (!e.target.closest('.file-icons') && !e.target.closest('.date-input-overlay')) {
-                            openDatePicker(td, value);
-                        }
-                    });
-                    
-                    if (value && isValidDate(value)) {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const cellDate = parseDate(value);
-                        const timeDiff = cellDate.getTime() - today.getTime());
-                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                        
-                        if (daysDiff < 0) {
-                            td.classList.add('date-cell-danger');
-                        } else if (daysDiff <= 30) {
-                            td.classList.add('date-cell-warning');
-                        } else {
-                            td.classList.remove('date-cell-warning', 'date-cell-danger');
-                        }
-                    }
-                } else {
-                    // Для обычных текстовых ячеек - новый алгоритм
-                    let clickTimer = null;
-                    let isEditing = false;
-                    
-                    // Одинарный клик - редактирование текста
-                    td.addEventListener('click', (e) => {
-                        if (e.target.closest('.file-icons') || isEditing) return;
-                        
-                        if (clickTimer) {
-                            clearTimeout(clickTimer);
-                            clickTimer = null;
-                            return;
-                        }
-                        
-                        clickTimer = setTimeout(() => {
-                            // Одинарный клик - редактирование текста
-                            startTextEditing(td, rowData, column, type, value);
-                            isEditing = true;
-                            clickTimer = null;
-                        }, 300);
-                    });
-                    
-                    // Двойной клик - открытие модального окна для файлов
-                    td.addEventListener('dblclick', (e) => {
-                        if (e.target.closest('.file-icons') || isEditing) return;
-                        
-                        if (clickTimer) {
-                            clearTimeout(clickTimer);
-                            clickTimer = null;
-                        }
-                        
-                        // Двойной клик - открытие модального окна для файлов
-                        openFileManagementModal(rowData.id, column.id);
-                    });
-                    
-                    // Добавляем визуальный курсор для указания возможности редактирования
-                    td.style.cursor = 'text';
-                }
-            } else {
-                // ДЛЯ РЕЖИМА ПОЛЬЗОВАТЕЛЯ: проверяем и подсвечиваем даты
-                if (isDateColumn && value && isValidDate(value)) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const cellDate = parseDate(value);
-                    const timeDiff = cellDate.getTime() - today.getTime();
-                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                    
-                    if (daysDiff < 0) {
-                        td.classList.add('date-cell-danger');
-                    } else if (daysDiff <= 30) {
-                        td.classList.add('date-cell-warning');
-                    }
-                }
-            }
-            
             return td;
-        }
-
-        // НОВАЯ ФУНКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ ТЕКСТА
-        function startTextEditing(cell, rowData, column, type, currentValue) {
-            const originalContent = cell.innerHTML;
-            
-            // Создаем input для редактирования
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = currentValue || '';
-            input.style.width = '100%';
-            input.style.height = '100%';
-            input.style.border = '2px solid var(--accent-color)';
-            input.style.background = 'var(--bg-primary)';
-            input.style.color = 'var(--text-primary)';
-            input.style.padding = '4px';
-            input.style.borderRadius = '4px';
-            input.style.outline = 'none';
-            input.className = 'cell-input';
-            
-            // Заменяем содержимое ячейки на input
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-            input.select();
-            
-            // Функция сохранения
-            const saveChanges = () => {
-                const newValue = input.value.trim();
-                
-                if (type === 'basic') {
-                    switch(column.id) {
-                        case 'name': rowData.name = newValue; break;
-                        case 'status': rowData.status = newValue; break;
-                        default: 
-                            if (column.editable) {
-                                rowData[column.id] = newValue;
-                            }
-                    }
-                } else {
-                    if (!rowData.customData) rowData.customData = {};
-                    rowData.customData[column.id] = newValue;
-                }
-                
-                const tableData = getCurrentTabData();
-                updateCurrentTabData(tableData);
-                
-                storageManager.saveToLocalStorage(users, appSettings, tabs);
-                autoSyncChanges();
-                
-                // Восстанавливаем ячейку с новым значением
-                renderTable();
-            };
-            
-            // Обработчики для input
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    saveChanges();
-                } else if (e.key === 'Escape') {
-                    // Отмена редактирования - восстанавливаем оригинальное содержимое
-                    cell.innerHTML = originalContent;
-                }
-            });
-            
-            input.addEventListener('blur', function() {
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        saveChanges();
-                    }
-                }, 100);
-            });
         }
 
         function addFileIconsToCell(container, files, rowId, columnId) {
@@ -3986,11 +5158,7 @@
                 
                 fileIcon.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (currentUser && currentUser.role === 'admin') {
-                        openFileManagementModal(rowId, columnId);
-                    } else {
-                        openFilePreview(file, rowId, columnId, index);
-                    }
+                    openFilePreview(file, rowId, columnId, index);
                 });
                 
                 container.appendChild(fileIcon);
@@ -4003,19 +5171,21 @@
                 return;
             }
             
-            const tableData = getCurrentTabData();
-            const updatedData = tableData.filter(row => row.id !== rowId);
+            tableData = tableData.filter(row => row.id !== rowId);
             
-            updatedData.forEach((row, index) => {
+            tableData.forEach((row, index) => {
                 row.displayId = index + 1;
             });
             
-            updateCurrentTabData(updatedData);
-            
             selectedRows.delete(rowId);
             
-            storageManager.saveToLocalStorage(users, appSettings, tabs);
-            autoSyncChanges();
+            const currentTab = tabs.find(tab => tab.id === currentTabId);
+            if (currentTab) {
+                currentTab.data = JSON.parse(JSON.stringify(tableData));
+            }
+            
+            saveToLocalStorage();
+            saveToGitHub(); // Синхронизируем с GitHub
             
             renderTable();
         }
@@ -4030,8 +5200,6 @@
                         return filterValue.includes(row.id);
                     } else {
                         let value;
-                        
-                        const customColumns = getCurrentTabCustomColumns();
                         
                         if (customColumns.find(col => col.id === filterType)) {
                             value = row.customData && row.customData[filterType] ? row.customData[filterType] : '';
@@ -4050,24 +5218,8 @@
                 });
             });
         }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeAppWithFallback();
-            
-            setInterval(updateStatusBar, 30000);
-            
-            window.addEventListener('online', function() {
-                updateSyncStatus('Восстановлено соединение', 'success');
-                if (storageManager.pendingChanges.length > 0) {
-                    storageManager.trySyncChanges(updateSyncStatus);
-                }
-            });
-            
-            window.addEventListener('offline', function() {
-                updateSyncStatus('Отсутствует соединение', 'error');
-            });
-        });
     </script>
 </body>
 </html>
+
+
