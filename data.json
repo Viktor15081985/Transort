@@ -128,6 +128,17 @@
             "2",
             "3"
           ]
+        },
+        {
+          "id": "btn_1764148738529",
+          "name": "ilyygg",
+          "columns": [
+            "jbg",
+            "jjbgji"
+          ],
+          "dateColumns": [
+            "jbg"
+          ]
         }
       ],
       "customColumns": [
@@ -209,7 +220,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-25T07:36:36.474Z",
+  "lastSync": "2025-11-26T09:18:58.537Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
