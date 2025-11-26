@@ -6,7 +6,8 @@
       "date": "01.10.2023",
       "status": "Активен",
       "customData": {},
-      "attachments": {}
+      "attachments": {},
+      "displayId": 1
     },
     {
       "id": 2,
@@ -14,7 +15,8 @@
       "date": "05.10.2023",
       "status": "Завершен",
       "customData": {},
-      "attachments": {}
+      "attachments": {},
+      "displayId": 2
     }
   ],
   "users": [
@@ -36,8 +38,26 @@
     "currentTheme": "theme-orange",
     "currentTabId": "tab1"
   },
-  "customButtons": [],
-  "customColumns": [],
+  "customButtons": [
+    {
+      "id": "btn_1764178431763",
+      "name": "yruyry",
+      "columns": [
+        "5654",
+        "76978"
+      ]
+    }
+  ],
+  "customColumns": [
+    {
+      "id": "col_1764178431766_0",
+      "name": "5654"
+    },
+    {
+      "id": "col_1764178431766_1",
+      "name": "76978"
+    }
+  ],
   "basicColumns": [
     {
       "id": "id",
@@ -220,7 +240,7 @@
       "dateValidationColumns": {}
     }
   ],
-  "lastSync": "2025-11-26T09:18:58.537Z",
+  "lastSync": "2025-11-26T17:33:51.802Z",
   "lastEditor": "admin",
   "mergeOperation": true
 }
